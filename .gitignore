@@ -1,2 +1,4 @@
-tests/__pycache__/example.cpython-311.pyc
+tests/__pycache__
 csv_downloads/*
+.vscode
+__pycache__/
