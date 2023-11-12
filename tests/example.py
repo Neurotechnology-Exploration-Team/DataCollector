@@ -1,9 +1,11 @@
 import random
 import tkinter as tk
-
+import lsl
 def run(display_window, record_timestamp, enable_buttons_callback):
+    lsl.start_collection()
+    #lsl_modified.start_collection()
     # Record a start event
-    record_timestamp("Test Start")
+    record_timestamp("Blink Start")
 
     # Create a label for blinking text
     blink_label = tk.Label(display_window, text="Blinking Text", font=("Helvetica", 16))
@@ -13,7 +15,6 @@ def run(display_window, record_timestamp, enable_buttons_callback):
     def toggle_blink():
         if not stop_test_flag:
             blink_label.config(fg="black" if blink_label.cget("fg") == "white" else "white")
-            record_timestamp("Blink Toggled")
             display_window.after(random.randint(1000, 3000), toggle_blink)  # Schedule the next toggle
 
     # Flag to control stopping of the test
@@ -23,11 +24,14 @@ def run(display_window, record_timestamp, enable_buttons_callback):
         nonlocal stop_test_flag
         stop_test_flag = True
         blink_label.destroy()
-        record_timestamp("Test End")
+        lsl.stop_collection()
+        record_timestamp("Blink End")
         enable_buttons_callback()
+        
 
     # Start the blinking effect
     toggle_blink()
 
     # Schedule to stop the test after 15 seconds
-    display_window.after(15000, stop_test)
+    display_window.after(5000, stop_test)
+    #lsl_modified.stop_and_save_collection()
