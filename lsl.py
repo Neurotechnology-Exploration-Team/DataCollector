@@ -3,7 +3,6 @@ import pandas as pd
 import threading
 from datetime import datetime
 
-
 # Global variables to hold streams, data, and the collection thread
 streams = {'EEG': None, 'Accelerometer': None, 'FFT': None}
 collected_data = []
@@ -13,10 +12,12 @@ collection_thread = None
 lsl_start_time = None
 system_start_time = None
 
+
 def initialize_time_sync():
     global lsl_start_time, system_start_time
     lsl_start_time = pylsl.local_clock()
     system_start_time = datetime.now()
+
 
 def lsl_to_system_time(lsl_timestamp):
     """Convert an LSL timestamp to system time."""
@@ -24,15 +25,21 @@ def lsl_to_system_time(lsl_timestamp):
     offset = system_start_time - datetime.fromtimestamp(lsl_start_time)
     return datetime.fromtimestamp(lsl_timestamp + offset.total_seconds())
 
+
+STREAM_TIMEOUT = 10.0  # Wait this number of seconds to find a stream TODO is 10 seconds fine?
+
+
 # Function to find and initialize a specific LSL stream
 def find_and_initialize_stream(stream_type):
     print(f"Looking for a {stream_type} stream...")
-    streams_info = pylsl.resolve_stream('type', stream_type)
-    if streams_info:
+    streams_info = pylsl.resolve_byprop('type', stream_type, 1, 10.0)
+    if len(streams_info) > 0:
         print(f"{stream_type} stream found.")
         streams[stream_type] = pylsl.StreamInlet(streams_info[0])
     else:
         print(f"No {stream_type} stream found.")
+        exit(1)  # TODO standardize errors + documentation
+
 
 # Function to initialize all required streams
 def initialize_streams():
@@ -41,6 +48,7 @@ def initialize_streams():
     system_start_time = datetime.now()
     for stream_type in streams.keys():
         find_and_initialize_stream(stream_type)
+
 
 def collect_data():
     global collected_data, collecting
@@ -58,6 +66,8 @@ def collect_data():
             # Flatten the data row into a single list
             flattened_data_row = [data_row['Timestamp']] + data_row['EEG'] + data_row['Accelerometer'] + data_row['FFT']
             collected_data.append(flattened_data_row)
+
+
 def save_collected_data():
     global collected_data
     if collected_data:
@@ -67,9 +77,9 @@ def save_collected_data():
         fft_channel_count = streams['FFT'].info().channel_count() if streams['FFT'] else 0
 
         columns = ['Timestamp'] + \
-                  [f'EEG_{i+1}' for i in range(eeg_channel_count)] + \
-                  [f'Accelerometer_{i+1}' for i in range(accelerometer_channel_count)] + \
-                  [f'FFT_{i+1}' for i in range(fft_channel_count)]
+                  [f'EEG_{i + 1}' for i in range(eeg_channel_count)] + \
+                  [f'Accelerometer_{i + 1}' for i in range(accelerometer_channel_count)] + \
+                  [f'FFT_{i + 1}' for i in range(fft_channel_count)]
 
         df = pd.DataFrame(collected_data, columns=columns)
         df['Timestamp'] = pd.to_datetime(df['Timestamp'])
@@ -78,8 +88,6 @@ def save_collected_data():
         print("Collected data saved.")
     else:
         print("No data to save.")
-
-
 
 
 # Function to start data collection
@@ -91,6 +99,7 @@ def start_collection():
     collection_thread = threading.Thread(target=collect_data)
     collection_thread.start()
 
+
 # Function to stop data collection
 def stop_collection():
     global collecting, collection_thread
@@ -98,4 +107,3 @@ def stop_collection():
         collecting = False
         collection_thread.join()
         print("Data collection stopped.")
-
