@@ -13,4 +13,7 @@ $ pip install -r requirements.txt
 ## Usage
 
 ## Contributors
-**Principal Investigator:** [Alex Burbano](mailto:arb)
+**Principal Investigator:** [Alex Burbano](mailto:arb8590@rit.edu)
+
+**Research Team:**
+- [Ian Dunn](mailto:itd3516@rit.edu)
