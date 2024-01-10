@@ -13,9 +13,6 @@ import time
 
 from LSL import LSL
 
-folder = "./csv_downloads/"
-SAVED_DATA_PATH = 'csv_downloads/collected_data.csv'  # Path to save data to
-
 # Boolean constant to determine screen mode
 FULL_SCREEN_MODE = False  # Set to True for full-screen, False for split-screen
 
@@ -23,9 +20,10 @@ FULL_SCREEN_MODE = False  # Set to True for full-screen, False for split-screen
 collected_data = []
 
 # Folder for CSV downloads
-csv_folder = "csv_downloads"
-os.makedirs(csv_folder, exist_ok=True)
-
+CSV_FOLDER = "./csv_downloads"                            # Folder that the CSVs will be saved to
+COLLECTED_DATA_PATH = f'{CSV_FOLDER}/collected_data.csv'  # Path to save LSL data to
+EVENT_DATA_PATH = f'{CSV_FOLDER}/event_data.csv'          # Path to save event data to
+LABELED_DATA_PATH = f'{CSV_FOLDER}/labeled_data.csv'      # Path to save processed, labeled data to
 
 def run_test(test_name, btn, lsl: LSL):
     global current_test_thread, current_test_button
@@ -40,7 +38,7 @@ def run_test(test_name, btn, lsl: LSL):
     # Running the test in a separate thread
     current_test_thread = threading.Thread(
         target=test_module.run,
-        args=(display_window, record_timestamp, enable_buttons, lsl, SAVED_DATA_PATH))
+        args=(display_window, record_timestamp, enable_buttons, lsl, COLLECTED_DATA_PATH))
     current_test_thread.start()
 
 
@@ -55,8 +53,7 @@ def enable_buttons():
         button.config(state="normal")
         save_to_csv()
         time.sleep(1)
-        postProcessing.label_data_based_on_events(f'{folder}collected_data.csv', f'{folder}event_data.csv',
-                                                  f'{folder}labeled_data.csv')
+        postProcessing.label_data_based_on_events(COLLECTED_DATA_PATH, EVENT_DATA_PATH, LABELED_DATA_PATH)
         time.sleep(1)
         show_data_and_confirm()  # Show the popup for data confirmation
     # Prompt for test acceptance
@@ -74,14 +71,14 @@ def enable_buttons():
 def save_to_csv():
     if not collected_data:
         return
-    filename = os.path.join(csv_folder, "event_data.csv")
-    with open(filename, 'w', newline='') as file:
+
+    with open(EVENT_DATA_PATH, 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Event", "Timestamp"])
         for data in collected_data:
             writer.writerow(data)
     collected_data.clear()
-    print(f"Data saved to {filename}")
+    print(f"Event Data saved to {EVENT_DATA_PATH}")
 
 
 def set_window_geometry(window, left_side=True):
@@ -95,9 +92,9 @@ def set_window_geometry(window, left_side=True):
         window.geometry(f"{width}x{screen_height}+{x}+0")
 
 
-def show_data_and_confirm():
+def show_data_and_confirm():  # TODO broken?
     # Load the data
-    data_df = pd.read_csv(f'{csv_folder}/labeled_data.csv')
+    data_df = pd.read_csv(LABELED_DATA_PATH)
 
     # Create a new Tkinter window
     popup = tk.Toplevel()
@@ -143,6 +140,9 @@ def show_data_and_confirm():
 
 
 if __name__ == '__main__':
+    # Make output directory
+    os.makedirs(CSV_FOLDER, exist_ok=True)
+
     # Initialize LSL streams
     lsl = LSL()
 
