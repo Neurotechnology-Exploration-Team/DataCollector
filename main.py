@@ -1,3 +1,9 @@
+"""
+The main driver for the NXT Data Collector project.
+
+TODO more information/usage here
+"""
+
 import tkinter as tk
 import importlib
 import os
@@ -8,10 +14,12 @@ from tkinter import messagebox
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from postProcessing import label_data_based_on_events
+from post_processing import label_data_based_on_events
 import time
 
 from LSL import LSL
+
+# TODO move tkinter functionality to a separate class
 
 # Boolean constant to determine screen mode
 FULL_SCREEN_MODE = False  # Set to True for full-screen, False for split-screen

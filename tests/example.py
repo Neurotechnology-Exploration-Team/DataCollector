@@ -3,6 +3,9 @@ import tkinter as tk
 
 from LSL import LSL
 
+# TODO refactor into a class based system using inheritance
+# TODO move tkinter functionality to a separate class
+
 
 def run(display_window, record_timestamp, enable_buttons_callback, lsl_instance: LSL, saved_data_path: str):
     lsl_instance.start_collection()

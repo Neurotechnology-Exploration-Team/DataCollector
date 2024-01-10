@@ -1,3 +1,7 @@
+"""
+This module contains the LSL class, responsible for handling LSL input, collection, and formatting.
+"""
+
 import pylsl
 import pandas as pd
 import threading
@@ -9,8 +13,6 @@ LSL_RESOLUTION_TIMEOUT = 10.0  # Timeout (in seconds) for an LSL stream
 class LSL:
     """
     A class to interface with a local network Laboratory Streaming Layer to collect EEG, accelerometer, and FFT data.
-
-    Authors: Alex Burbano, Ian Dunn
     """
 
     def __init__(self):
@@ -42,24 +44,26 @@ class LSL:
         self.collection_thread = threading.Thread(target=self.__collect_data)
         self.collection_thread.start()
 
-    def stop_collection(self, saved_data_path: str):
+    def stop_collection(self, path: str):
         """
         Function to stop data collection and save to CSV.
 
-        :param saved_data_path: The path to save the data to.
+        :param path: The path to write the collected data to as a CSV file.
         """
         if self.collecting:
             self.collecting = False
             self.collection_thread.join()
             print("Data collection stopped. Saving collected data.")
-            self.__save_collected_data(saved_data_path)
+            self.__save_collected_data(path)
 
     #
     # HELPER METHODS
     #
-    def __save_collected_data(self, path):
+    def __save_collected_data(self, path: str):
         """
         Function to save data collected after collection has been stopped.
+
+        :param path: The path to write the collected data to as a CSV file.
         """
         if self.collected_data:
             # Define column headers
@@ -81,7 +85,7 @@ class LSL:
         else:
             print("No data to save.")
 
-    def __lsl_to_system_time(self, lsl_timestamp):
+    def __lsl_to_system_time(self, lsl_timestamp):  # TODO idk what type lsl_timestamp is
         """Convert an LSL timestamp to system time."""
         return datetime.fromtimestamp(lsl_timestamp + self.TIMESTAMP_OFFSET.total_seconds())
 
