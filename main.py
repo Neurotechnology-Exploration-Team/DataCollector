@@ -8,7 +8,7 @@ from tkinter import messagebox
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import postProcessing
+from postProcessing import label_data_based_on_events
 import time
 
 from LSL import LSL
@@ -20,10 +20,11 @@ FULL_SCREEN_MODE = False  # Set to True for full-screen, False for split-screen
 collected_data = []
 
 # Folder for CSV downloads
-CSV_FOLDER = "./csv_downloads"                            # Folder that the CSVs will be saved to
+CSV_FOLDER = "./csv_downloads"  # Folder that the CSVs will be saved to
 COLLECTED_DATA_PATH = f'{CSV_FOLDER}/collected_data.csv'  # Path to save LSL data to
-EVENT_DATA_PATH = f'{CSV_FOLDER}/event_data.csv'          # Path to save event data to
-LABELED_DATA_PATH = f'{CSV_FOLDER}/labeled_data.csv'      # Path to save processed, labeled data to
+EVENT_DATA_PATH = f'{CSV_FOLDER}/event_data.csv'  # Path to save event data to
+LABELED_DATA_PATH = f'{CSV_FOLDER}/labeled_data.csv'  # Path to save processed, labeled data to
+
 
 def run_test(test_name, btn, lsl: LSL):
     global current_test_thread, current_test_button
@@ -53,7 +54,10 @@ def enable_buttons():
         button.config(state="normal")
         save_to_csv()
         time.sleep(1)
-        postProcessing.label_data_based_on_events(COLLECTED_DATA_PATH, EVENT_DATA_PATH, LABELED_DATA_PATH)
+
+        # Process data
+        label_data_based_on_events(COLLECTED_DATA_PATH, EVENT_DATA_PATH, LABELED_DATA_PATH)
+
         time.sleep(1)
         show_data_and_confirm()  # Show the popup for data confirmation
     # Prompt for test acceptance

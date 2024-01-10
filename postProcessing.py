@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def label_data_based_on_events(data_csv, events_csv, output_csv):
     # Load the data and the events
     data_df = pd.read_csv(data_csv)
@@ -25,8 +26,3 @@ def label_data_based_on_events(data_csv, events_csv, output_csv):
 
     # Save the labeled data to a new CSV file
     data_df.to_csv(output_csv, index=False)
-
-if __name__ == "__main__":
-    # Example usage
-    folder = "./csv_downloads/"
-    label_data_based_on_events(f'{folder}collected_data.csv', f'{folder}event_data.csv', f'{folder}labeled_data.csv')

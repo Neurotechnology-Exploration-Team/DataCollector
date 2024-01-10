@@ -103,6 +103,9 @@ class LSL:
             exit(1)  # TODO standardize errors + documentation
 
     def __collect_data(self):
+        """
+        Helper function to collect data in the LSL stream on a separate thread to run tests with.
+        """
         while self.collecting:
             data_row = {'Timestamp': None, 'EEG': [], 'Accelerometer': [], 'FFT': []}
             for stream_type, stream in self.streams.items():
