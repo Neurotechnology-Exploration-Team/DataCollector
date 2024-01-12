@@ -4,15 +4,18 @@ This module is responsible for all post-processing functions.
 
 import pandas as pd
 
+import config
 
-def label_data_based_on_events(data_csv: str, events_csv: str, output_csv: str):
+
+def label_data_based_on_events():
     """
     A post-processing function that merges collected data timestamps with their corresponding events.
-
-    :param data_csv: Path to the CSV file containing the LSL data.
-    :param events_csv: Path to the CSV file containing the event data.
-    :param output_csv: The path of the output CSV file containing the merged data that will be written to.
     """
+
+    # Output paths from config
+    data_csv = config.COLLECTED_DATA_PATH
+    events_csv = config.EVENT_DATA_PATH
+    output_csv = config.LABELED_DATA_PATH
 
     # Load the data and the events
     data_df = pd.read_csv(data_csv)

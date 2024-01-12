@@ -1,13 +1,14 @@
 """
 This module contains the LSL class, responsible for handling LSL input, collection, and formatting.
 """
+import csv
 
 import pylsl
 import pandas as pd
 import threading
 from datetime import datetime
 
-LSL_RESOLUTION_TIMEOUT = 10.0  # Timeout (in seconds) for an LSL stream
+import config
 
 
 class LSL:
@@ -44,7 +45,7 @@ class LSL:
         self.collection_thread = threading.Thread(target=self.__collect_data)
         self.collection_thread.start()
 
-    def stop_collection(self, path: str):
+    def stop_collection(self):
         """
         Function to stop data collection and save to CSV.
 
@@ -54,7 +55,7 @@ class LSL:
             self.collecting = False
             self.collection_thread.join()
             print("Data collection stopped. Saving collected data.")
-            self.__save_collected_data(path)
+            self.__save_collected_data(config.COLLECTED_DATA_PATH)
 
     #
     # HELPER METHODS
@@ -97,7 +98,7 @@ class LSL:
         """
         print(f"Looking for a {stream_type} stream...")
 
-        streams_info = pylsl.resolve_byprop('type', stream_type, 1, LSL_RESOLUTION_TIMEOUT)
+        streams_info = pylsl.resolve_byprop('type', stream_type, 1, config.LSL_RESOLUTION_TIMEOUT)
 
         if len(streams_info) > 0:
             print(f"{stream_type} stream found.")
@@ -125,3 +126,50 @@ class LSL:
                 flattened_data_row = [data_row['Timestamp']] + data_row['EEG'] + data_row['Accelerometer'] + data_row[
                     'FFT']
                 self.collected_data.append(flattened_data_row)
+
+
+class EventLogger:
+    """
+    A static class to log test events in a separate CSV
+    """
+    event_data = []
+
+    @staticmethod
+    def record_timestamp(event_name):
+        """
+        Record the time the data was collected along with the event
+
+        :param event_name: Event that was collected
+        """
+        timestamp = datetime.now()
+        EventLogger.event_data.append((event_name, timestamp))
+        print(f"{event_name}: {timestamp}")
+
+    @staticmethod
+    def save_to_csv() -> bool:
+        """
+        Write all data to the csv files
+
+        :return: If the writing was successful
+        """
+        if not EventLogger.event_data:
+            return False
+
+        # Wrap it to catch any file issues
+        try:
+            with open(config.EVENT_DATA_PATH, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["Event", "Timestamp"])
+                for data in EventLogger.event_data:
+                    writer.writerow(data)
+        except Exception:
+            return False
+
+        EventLogger.event_data.clear()
+        print(f"Event Data saved to {config.EVENT_DATA_PATH}")
+
+        return True
+
+    @staticmethod
+    def clear_data():
+        EventLogger.event_data.clear()
