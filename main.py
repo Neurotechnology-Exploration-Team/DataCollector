@@ -14,26 +14,18 @@ class DataCollectorApp:
     """
 
     @staticmethod
-    def run_test(test_name, btn, lsl: LSL, display_window):
+    def run_test(test_name, lsl: LSL, test_gui):
         """
         Connect to lsl and run the test in a thread
 
         :param test_name: Name of test being run
-        :param btn: The test being run (which button was pushed)
         :param lsl: LSL connection to openBCI
-        :param display_window: Window from TKinter
+        :param test_gui: Window from TKinter
         """
-        current_test_button = btn
-
-        for button in DataCollectorApp.test_buttons.values():
-            button.config(state="disabled")
-
         test_class = getattr(importlib.import_module(f"tests.{test_name}"), test_name)
-        test = test_class(display_window, lsl)
+        test = test_class(test_gui, lsl)
 
-        current_test_thread = threading.Thread(target=test.run)
-
-        current_test_thread.start()  # Start test
+        test.start()  # Start test thread
         # TODO does this data overwrite? What happens if multiple tests are ran and a few are rejected?
 
     @staticmethod
@@ -51,15 +43,14 @@ class DataCollectorApp:
                       for filename in os.listdir(test_directory)
                       if filename.endswith('.py') and not filename.startswith('Test')]
 
-        def create_lambda(test_name, btn):
-            return lambda: DataCollectorApp.run_test(test_name, btn, lsl, test_gui.display_window)
+        def create_lambda(test_name):
+            return lambda: DataCollectorApp.run_test(test_name, lsl, test_gui)
 
-        DataCollectorApp.test_buttons = {}
         for test_name in test_names:
             btn = tk.Button(test_gui.control_window, text=test_name)
-            btn.config(command=create_lambda(test_name, btn))
+            btn.config(command=create_lambda(test_name))
             btn.pack()
-            DataCollectorApp.test_buttons[test_name] = btn
+            test_gui.test_buttons[test_name] = btn
 
         test_gui.control_window.mainloop()
 

@@ -53,6 +53,10 @@ class TestGUI:
         for button in self.test_buttons.values():
             button.config(state="normal")
 
+    def disable_buttons(self):
+        for button in self.test_buttons.values():
+            button.config(state="disabled")
+
     @staticmethod
     def show_data_and_confirm():
         """
