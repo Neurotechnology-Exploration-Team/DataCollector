@@ -14,11 +14,10 @@ $ cd DataCollector/
 $ pip install -r requirements.txt
 ```
 
-### OpenBCI GUI
-
-> This is required to interact with LSL stream data.
-
-Install the latest version of the [Standalone OpenBCI GUI](https://openbci.com/downloads) (v5.2.2)
+### Software Requirements
+- Python v3.12.x
+- [Standalone OpenBCI GUI](https://openbci.com/downloads) v5.2.2 (Required to interact with LSL stream data)
+  - MacOS & Linux users will need to install [liblsl](https://github.com/sccn/liblsl); OpenBCI only ships with the library on Windows.
 
 ## Usage
 
@@ -26,16 +25,23 @@ Install the latest version of the [Standalone OpenBCI GUI](https://openbci.com/d
 
 ### LSL Streaming
 
-1. Launch **`OpenBCI_GUI.exe`**
-2. Select data source type from **`System Control Panel > DATA SOURCE`**.
-   1. Algorithmic LSL Data (Testing): Select **`SYNTHETIC (Algorithmic)`** 
-   2. ***TODO*** Real-Time LSL Data: Select **`CYTON (Live)`**
-3. Leave all settings as default, and press **`START SESSION`**
-4. Change the bottom right widget to **`Networking`**
-   1. Change protocol to **`LSL`**
-   2. Configure the Networking Window as follows: ![image](https://github.com/Neurotechnology-Exploration-Team/DataCollector/assets/10554606/4fd7a174-5543-4157-95d3-a7512716b344)
-   4. Press **`Start LSL Stream`** to activate the LSL stream on the local network.
-5. Press **`Start Data Stream`** to begin streaming test data.
+Launch **`OpenBCI_GUI.exe`**
+
+
+Select data source type from **`System Control Panel > DATA SOURCE`**.
+- Algorithmic LSL Data (Testing): Select **`SYNTHETIC (Algorithmic)`**
+- ***TODO*** Real-Time LSL Data: Select **`CYTON (Live)`**
+
+
+Leave all settings as default, and press **`START SESSION`**
+
+Setup LSL Stream
+- Change one of the widgets to **`Networking`**
+- Change protocol to **`LSL`**
+- Configure the Networking Window as follows:
+> ![image](./docs/images/networking_configuration.png)
+
+Press **`Start LSL Stream`** to activate the LSL stream on the local network. Press **`Start Data Stream`** to begin streaming test data.
 
 > The LSL streams are now streaming on your laptop. Press **`Stop LSL Stream`** and **`Stop Data Stream`** when complete.
 
@@ -52,3 +58,5 @@ $ python main.py
 
 **Research Team:**
 - [Ian Dunn](mailto:itd3516@rit.edu)
+- [Mack Leonard](mailto:mml2034@rit.edu)
+- [Matt London](mailto:mrl2534@rit.edu)

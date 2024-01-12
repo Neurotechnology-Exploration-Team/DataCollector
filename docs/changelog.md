@@ -14,9 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed `lsl.py` module to the `LSL.py` class, allowing for one instance of LSL to manipulate.
 - Moved most constants to the top-level of relevant modules.
 
+## [1.0.1-a] - 1/9/2024
+
+### Changed
+- Update `requirements.txt` to be the minimum required packages to install.
+
 ## [1.0.0-a] - 1/9/2024
 
 ### Added
+- `changelog.md` to keep track of changes.
 - All LSL & post-processing functionality.
 - Tests using Tkinter windows.
 
