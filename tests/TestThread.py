@@ -25,7 +25,7 @@ class TestThread(threading.Thread):
         EventLogger.record_timestamp(f"{self.name} End")
         self.lsl.stop_collection()
 
-        self.test_gui.enable_buttons()
+        self.test_gui.confirm_test()
 
         self._stop_event.set()
 

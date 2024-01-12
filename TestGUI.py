@@ -22,51 +22,45 @@ class TestGUI:
         TestGUI.set_window_geometry(self.display_window, left_side=False)
 
         self.test_buttons = {}
-        self.current_test_button = None
+        self.test_status = {}
+        self.current_test = None
 
     def add_button(self, test_name, test_lambda):
         btn = tk.Button(self.control_window, text=test_name)
-        btn.config(command=test_lambda)
+        btn.config(command=test_lambda, bg='red')
         btn.pack()
         self.test_buttons[test_name] = btn
+        self.test_status[test_name] = False
         print("Added test: " + test_name)
 
-    def enable_buttons(self):
+    def confirm_test(self):
         """
         Run the test and prompt the user to confirm or deny the data
         """
-        for button in self.test_buttons.values():
-            button.config(state="normal")
-            EventLogger.save_to_csv()
-            time.sleep(1)
+        EventLogger.save_to_csv()
+        time.sleep(1)
 
-            # Process data
-            label_data_based_on_events()
+        # Process data
+        label_data_based_on_events()
 
-            time.sleep(1)
-            TestGUI.show_data_and_confirm()
+        self.show_data_and_confirm()
 
-        # Prompt for test acceptance
-        if messagebox.askyesno("Test Complete", "Do you want to accept this test?"):
-            self.current_test_button.config(bg="green")
-
-        else:
-            # If the data is rejected then we want to clear everything collected
-            self.current_test_button.config(bg="red")
-            EventLogger.clear_data()
-
+    def enable_buttons(self):
         # Reset the buttons
-        for button in self.test_buttons.values():
-            button.config(state="normal")
+        for test in self.test_buttons.keys():
+            if not self.test_status[test]:  # If test is not complete, re-enable button
+                self.test_buttons[test].config(state="normal")
+
+        self.current_test = None
 
     def disable_buttons(self, test_name):
         for button in self.test_buttons.values():
             button.config(state="disabled")
 
-        self.current_test_button = self.test_buttons[test_name]
+        self.current_test = test_name
+        self.test_buttons[self.current_test].config(bg="yellow")
 
-    @staticmethod
-    def show_data_and_confirm():
+    def show_data_and_confirm(self):
         """
         Popup the data confirmation window and check if it should be accepted or rejected
         """
@@ -101,6 +95,8 @@ class TestGUI:
         if graphs_per_row == 0:
             graphs_per_row = 1
 
+        # TODO do we want to draw the graphs from the timestamp of the past test?
+
         # Loop through each EEG and draw the graphs
         idx = 0
         for idx, col in enumerate(data_df.filter(like='EEG')):
@@ -123,16 +119,30 @@ class TestGUI:
         scrollbar.pack(side="right", fill="y")
 
         # Create buttons to accept and deny the data
-        confirm_button = tk.Button(scrollable_frame, text="Confirm Data", command=popup.destroy)
+        confirm_button = tk.Button(scrollable_frame, text="Confirm Data", command=lambda: self.confirm_data(popup))
         confirm_button.grid(row=(idx + 2) // graphs_per_row, column=0, pady=10)
 
-        deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: TestGUI.deny_data(popup))
+        deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: self.deny_data(popup))
         deny_button.grid(row=(idx + 2) // graphs_per_row, column=1, pady=10)
 
         popup.mainloop()
 
-    @staticmethod
-    def deny_data(popup):
+    def confirm_data(self, popup):
+        """
+        Run if the accept button is pressed
+
+        :param popup: Popup window which must be closed
+        """
+        popup.destroy()
+
+        # Set button color to green and disable to mark that the test has been completed
+        self.test_buttons[self.current_test].config(bg="green")
+        self.test_buttons[self.current_test].config(state="disabled")
+        self.test_status[self.current_test] = True
+
+        self.enable_buttons()
+
+    def deny_data(self, popup):
         """
         Run if the deny button is pressed
 
@@ -141,6 +151,7 @@ class TestGUI:
         # Close window and then clear all the data
         popup.destroy()
         EventLogger.clear_data()
+        self.test_buttons[self.current_test].config(bg="red")
 
     @staticmethod
     def enable_scroll(canvas):

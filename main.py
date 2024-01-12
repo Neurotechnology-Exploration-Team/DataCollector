@@ -21,8 +21,6 @@ class DataCollectorApp:
         Connect to lsl and run the test in a thread
 
         :param test_name: Name of test being run
-        :param lsl: LSL connection to openBCI
-        :param test_gui: Window from TKinter
         """
         test_class = getattr(importlib.import_module(f"tests.{test_name}"), test_name)
         test = test_class(self.test_gui, self.lsl)
@@ -42,7 +40,7 @@ class DataCollectorApp:
                       if filename.endswith('.py') and not filename.startswith('Test')]
 
         for test_name in test_names:
-            test_gui.add_button(test_name, lambda: self.run_test(test_name))
+            test_gui.add_button(test_name, lambda name=test_name: self.run_test(name))
 
         test_gui.control_window.mainloop()
 
