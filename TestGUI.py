@@ -22,8 +22,14 @@ class TestGUI:
         TestGUI.set_window_geometry(self.display_window, left_side=False)
 
         self.test_buttons = {}
-        self.current_test_thread = None
         self.current_test_button = None
+
+    def add_button(self, test_name, test_lambda):
+        btn = tk.Button(self.control_window, text=test_name)
+        btn.config(command=test_lambda)
+        btn.pack()
+        self.test_buttons[test_name] = btn
+        print("Added test: " + test_name)
 
     def enable_buttons(self):
         """
@@ -53,9 +59,11 @@ class TestGUI:
         for button in self.test_buttons.values():
             button.config(state="normal")
 
-    def disable_buttons(self):
+    def disable_buttons(self, test_name):
         for button in self.test_buttons.values():
             button.config(state="disabled")
+
+        self.current_test_button = self.test_buttons[test_name]
 
     @staticmethod
     def show_data_and_confirm():

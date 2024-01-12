@@ -10,6 +10,8 @@ class TestThread(threading.Thread):
     def __init__(self, duration, test_gui, lsl):
         super().__init__()
 
+        self.name = self.__class__.__name__
+
         self.duration = duration
         self.test_gui = test_gui
         self.lsl = lsl
@@ -20,7 +22,7 @@ class TestThread(threading.Thread):
         """
         All logic related to destroying the test/any Tkinter widgets associated
         """
-        EventLogger.record_timestamp(f"{__class__} End")
+        EventLogger.record_timestamp(f"{self.name} End")
         self.lsl.stop_collection()
 
         self.test_gui.enable_buttons()
@@ -34,10 +36,10 @@ class TestThread(threading.Thread):
         """
         All logic related to the lifetime of the test
         """
-        self.test_gui.disable_buttons()
+        self.test_gui.disable_buttons(self.name)
 
         self.lsl.start_collection()  # Start LSL collection
-        EventLogger.record_timestamp(f"{__class__} Start")
+        EventLogger.record_timestamp(f"{self.name} Start")
 
         # Schedule to stop the test after 15 seconds
         self.test_gui.display_window.after(self.duration, self.stop)
