@@ -50,7 +50,7 @@ class TestGUI:
         time.sleep(1)
 
         # Process data
-        label_data_based_on_events()
+        label_data_based_on_events()  # TODO data should be confirmed first, doesn't work for some reason
 
         TestGUI.show_data_and_confirm()
 

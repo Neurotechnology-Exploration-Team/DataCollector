@@ -70,7 +70,7 @@ class LSL:
     @staticmethod
     def __save_collected_data(path: str):
         """
-        Function to save data collected after collection has been stopped.
+        Function to save data collected after collection has been stopped. TODO make sure this doesn't overwrite
 
         :param path: The path to write the collected data to as a CSV file.
         """
@@ -168,7 +168,7 @@ class EventLogger:
 
         # Wrap it to catch any file issues
         try:
-            with open(config.EVENT_DATA_PATH, 'w', newline='') as file:
+            with open(config.EVENT_DATA_PATH, 'w', newline='') as file:  # TODO does this overwrite?
                 writer = csv.writer(file)
                 writer.writerow(["Event", "Timestamp"])
                 for data in EventLogger.event_data:

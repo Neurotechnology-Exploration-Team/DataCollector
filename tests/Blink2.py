@@ -1,7 +1,7 @@
 import random
 import tkinter as tk
 
-from test_gui import TestGUI
+from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
 

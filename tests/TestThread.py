@@ -4,7 +4,7 @@ Uses "duck typing" to mock a template interface for what a test class should loo
 import threading
 
 from lsl import EventLogger, LSL
-from test_gui import TestGUI
+from tests.TestGUI import TestGUI
 
 
 class TestThread(threading.Thread):
