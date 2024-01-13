@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import config
-from data_logging.loggers import EventLogger
-from data_logging.post_processing import label_data_based_on_events
+from lsl import EventLogger
+from post_processing import label_data_based_on_events
 
 
 class TestGUI:
@@ -24,13 +24,13 @@ class TestGUI:
         """
         MUST BE CALLED BEFORE ACCESSING ANY CLASS VARIABLES
         """
-        TestGUI.control_window = tk.Tk()
-        TestGUI.control_window.title("Control Panel")
-        TestGUI.set_window_geometry(TestGUI.control_window, left_side=True)
+        control_window = tk.Tk()
+        control_window.title("Control Panel")
+        TestGUI.set_window_geometry(control_window, left_side=True)
 
-        TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
-        TestGUI.display_window.title("Display")
-        TestGUI.set_window_geometry(TestGUI.display_window, left_side=False)
+        display_window = tk.Toplevel(control_window)
+        display_window.title("Display")
+        TestGUI.set_window_geometry(display_window, left_side=False)
 
     @staticmethod
     def add_button(test_name, test_lambda):

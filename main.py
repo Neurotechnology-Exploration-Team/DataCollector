@@ -1,7 +1,6 @@
 import importlib
 import os
 
-from lsl import LSL
 from test_gui import TestGUI
 import config
 
@@ -45,5 +44,4 @@ class DataCollectorApp:
 
 if __name__ == '__main__':
     TestGUI.init_gui()
-    LSL.init_lsl_stream()
     DataCollectorApp.run()
