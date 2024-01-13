@@ -17,6 +17,7 @@ def label_data_based_on_events():
     events_csv = config.EVENT_DATA_PATH
     output_csv = config.LABELED_DATA_PATH
 
+    # TODO exit program if data paths do not exist
     # Load the data and the events
     data_df = pd.read_csv(data_csv)
     events_df = pd.read_csv(events_csv)

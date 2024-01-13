@@ -3,7 +3,8 @@ Uses "duck typing" to mock a template interface for what a test class should loo
 """
 import threading
 
-from lsl import EventLogger, LSL
+from data_logging.loggers import EventLogger
+from lsl import LSL
 from test_gui import TestGUI
 
 
