@@ -1,14 +1,15 @@
 import random
 import tkinter as tk
 
+from test_gui import TestGUI
 from tests.TestThread import TestThread
 
 
 class Blink(TestThread):
-    def __init__(self, test_gui, lsl):
-        super().__init__(5000, test_gui, lsl)
+    def __init__(self):
+        super().__init__(5000)
 
-        self.blink_label = tk.Label(self.test_gui.display_window, text="Blinking Text", font=("Helvetica", 16))
+        self.blink_label = tk.Label(TestGUI.display_window, text="Blinking Text", font=("Helvetica", 16))
         self.blink_label.pack()
 
         self.blinking = True
@@ -25,7 +26,7 @@ class Blink(TestThread):
         def toggle_blink():
             if self.blinking:
                 self.blink_label.config(fg="black" if self.blink_label.cget("fg") == "white" else "white")
-                self.test_gui.display_window.after(random.randint(1000, 3000), toggle_blink)  # Schedule the next toggle
+                TestGUI.display_window.after(random.randint(1000, 3000), toggle_blink)  # Schedule the next toggle
 
         # Start the blinking effect
         toggle_blink()

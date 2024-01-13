@@ -16,69 +16,77 @@ class LSL:
     A class to interface with a local network Laboratory Streaming Layer to collect EEG, accelerometer, and FFT data.
     """
 
-    def __init__(self):
+    streams = None
+    collected_data = []
+    collecting = False
+    collection_thread = None
+
+    timestamp_offset = None
+
+    @staticmethod
+    def init_lsl_stream():
         """
-        The main constructor to initialize streams, data, timestamp offset, and the collection thread.
+        MUST BE CALLED TO initialize streams, data, timestamp offset, and the collection thread.
         """
         # Variables to hold streams, data, and the collection thread
-        self.streams = {'EEG': None, 'Accelerometer': None, 'FFT': None}
-        self.collected_data = []
-        self.collecting = False
-        self.collection_thread = None
+        LSL.streams = {'EEG': None, 'Accelerometer': None, 'FFT': None}
 
         # Set up timestamp conversion using a constant offset
         lsl_start_time = datetime.fromtimestamp(pylsl.local_clock())
         system_start_time = datetime.now()
-        self.TIMESTAMP_OFFSET = system_start_time - lsl_start_time
+        LSL.timestamp_offset = system_start_time - lsl_start_time
 
         # Initialize all required streams
-        for stream_type in self.streams.keys():
-            self.__find_and_initialize_stream(stream_type)
+        for stream_type in LSL.streams.keys():
+            LSL.__find_and_initialize_stream(stream_type)
 
-    def start_collection(self):
+    @staticmethod
+    def start_collection():
         """
         Function to start data collection.
         """
         print("Started data collection.")
-        self.collecting = True
-        self.collected_data = []
-        self.collection_thread = threading.Thread(target=self.__collect_data)
-        self.collection_thread.start()
+        LSL.collecting = True
+        LSL.collected_data = []
+        LSL.collection_thread = threading.Thread(target=LSL.__collect_data)
+        LSL.collection_thread.start()
 
-    def stop_collection(self):
+    @staticmethod
+    def stop_collection():
         """
         Function to stop data collection and save to CSV.
 
         :param path: The path to write the collected data to as a CSV file.
         """
-        if self.collecting:
-            self.collecting = False
-            self.collection_thread.join()
+        if LSL.collecting:
+            LSL.collecting = False
+            LSL.collection_thread.join()
             print("Data collection stopped. Saving collected data.")
-            self.__save_collected_data(config.COLLECTED_DATA_PATH)
+            LSL.__save_collected_data(config.COLLECTED_DATA_PATH)
 
     #
     # HELPER METHODS
     #
-    def __save_collected_data(self, path: str):
+    @staticmethod
+    def __save_collected_data(path: str):
         """
         Function to save data collected after collection has been stopped.
 
         :param path: The path to write the collected data to as a CSV file.
         """
-        if self.collected_data:
+        if LSL.collected_data:
             # Define column headers
-            eeg_channel_count = self.streams['EEG'].info().channel_count() if self.streams['EEG'] else 0
-            accelerometer_channel_count = self.streams['Accelerometer'].info().channel_count() if self.streams[
-                'Accelerometer'] else 0
-            fft_channel_count = self.streams['FFT'].info().channel_count() if self.streams['FFT'] else 0
+            eeg_channel_count = LSL.streams['EEG'].info().channel_count() if LSL.streams['EEG'] else 0
+            accelerometer_channel_count = LSL.streams['Accelerometer'].info().channel_count() \
+                if LSL.streams['Accelerometer'] else 0
+            fft_channel_count = LSL.streams['FFT'].info().channel_count() if LSL.streams['FFT'] else 0
 
             columns = ['Timestamp'] + \
                       [f'EEG_{i + 1}' for i in range(eeg_channel_count)] + \
                       [f'Accelerometer_{i + 1}' for i in range(accelerometer_channel_count)] + \
                       [f'FFT_{i + 1}' for i in range(fft_channel_count)]
 
-            df = pd.DataFrame(self.collected_data, columns=columns)
+            df = pd.DataFrame(LSL.collected_data, columns=columns)
             df['Timestamp'] = pd.to_datetime(df['Timestamp'])
             df = df.sort_values(by='Timestamp')
             df.to_csv(path, index=False)
@@ -86,11 +94,13 @@ class LSL:
         else:
             print("No data to save.")
 
-    def __lsl_to_system_time(self, lsl_timestamp):  # TODO idk what type lsl_timestamp is
+    @staticmethod
+    def __lsl_to_system_time(lsl_timestamp):  # TODO idk what type lsl_timestamp is
         """Convert an LSL timestamp to system time."""
-        return datetime.fromtimestamp(lsl_timestamp + self.TIMESTAMP_OFFSET.total_seconds())
+        return datetime.fromtimestamp(lsl_timestamp + LSL.timestamp_offset.total_seconds())
 
-    def __find_and_initialize_stream(self, stream_type: str):
+    @staticmethod
+    def __find_and_initialize_stream(stream_type: str):
         """
         Function to find and initialize a specific LSL stream
 
@@ -102,22 +112,23 @@ class LSL:
 
         if len(streams_info) > 0:
             print(f"{stream_type} stream found.")
-            self.streams[stream_type] = pylsl.StreamInlet(streams_info[0])
+            LSL.streams[stream_type] = pylsl.StreamInlet(streams_info[0])
         else:
             print(f"No {stream_type} stream found.")
             exit(1)  # TODO standardize errors + documentation
 
-    def __collect_data(self):
+    @staticmethod
+    def __collect_data():
         """
         Helper function to collect data in the LSL stream on a separate thread to run tests with.
         """
-        while self.collecting:
+        while LSL.collecting:
             data_row = {'Timestamp': None, 'EEG': [], 'Accelerometer': [], 'FFT': []}
-            for stream_type, stream in self.streams.items():
+            for stream_type, stream in LSL.streams.items():
                 if stream:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
                     if sample:
-                        system_timestamp = self.__lsl_to_system_time(timestamp)
+                        system_timestamp = LSL.__lsl_to_system_time(timestamp)
                         if data_row['Timestamp'] is None:
                             data_row['Timestamp'] = system_timestamp  # Set timestamp from the first stream
                         data_row[stream_type] = sample
@@ -125,7 +136,7 @@ class LSL:
                 # Flatten the data row into a single list
                 flattened_data_row = [data_row['Timestamp']] + data_row['EEG'] + data_row['Accelerometer'] + data_row[
                     'FFT']
-                self.collected_data.append(flattened_data_row)
+                LSL.collected_data.append(flattened_data_row)
 
 
 class EventLogger:
