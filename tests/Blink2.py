@@ -9,7 +9,7 @@ class Blink2(TestThread):
     def __init__(self):
         super().__init__(5000)
 
-        self.blink_label = tk.Label(TestGUI.display_window, text="Blinking Text", font=("Helvetica", 16))
+        self.blink_label = tk.Label(TestGUI.display_window, text="Blinking Text 2", font=("Helvetica", 16))
         self.blink_label.pack()
 
         self.blinking = True

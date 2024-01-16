@@ -3,7 +3,7 @@ Uses "duck typing" to mock a template interface for what a test class should loo
 """
 import threading
 
-from lsl import EventLogger, LSL
+from lsl import LSL
 from tests.TestGUI import TestGUI
 
 
@@ -20,7 +20,6 @@ class TestThread(threading.Thread):
         """
         All logic related to destroying the test/any Tkinter widgets associated
         """
-        EventLogger.record_timestamp(f"{self.name} End")
         LSL.stop_collection()
 
         TestGUI.confirm_test()
@@ -36,8 +35,7 @@ class TestThread(threading.Thread):
         """
         TestGUI.disable_buttons(self.name)
 
-        LSL.start_collection()  # Start LSL collection
-        EventLogger.record_timestamp(f"{self.name} Start")
+        LSL.start_collection(self.name)  # Start LSL collection
 
         # Schedule to stop the test after 15 seconds
         TestGUI.display_window.after(self.duration, self.stop)

@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import config
-from lsl import EventLogger
-from post_processing import label_data_based_on_events
 
 
 class TestGUI:
@@ -46,13 +44,9 @@ class TestGUI:
         """
         Run the test and prompt the user to confirm or deny the data
         """
-        EventLogger.save_to_csv()
         time.sleep(1)
 
-        # Process data
-        label_data_based_on_events()  # TODO data should be confirmed first, doesn't work for some reason
-
-        TestGUI.show_data_and_confirm()
+        TestGUI.show_data_and_confirm()  # TODO if denied, move to next test and allow for a rerun
 
     @staticmethod
     def enable_buttons():
@@ -98,7 +92,7 @@ class TestGUI:
         # Make it scrollable so we don't have to click the tiny scrollbar
         TestGUI.enable_scroll(canvas)
 
-        data_df = pd.read_csv(config.LABELED_DATA_PATH)
+        data_df = pd.read_csv(config.COLLECTED_DATA_PATH)
 
         # Figure out how many graphs we can fit on the screen
         screen_width = popup.winfo_screenwidth()
@@ -137,7 +131,7 @@ class TestGUI:
         deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: TestGUI.deny_data(popup))
         deny_button.grid(row=(idx + 2) // graphs_per_row, column=1, pady=10)
 
-        # TODO explicitly destroy the prompts
+        # TODO explicitly destroy the graphs
 
         popup.mainloop()
 
@@ -157,6 +151,8 @@ class TestGUI:
 
         TestGUI.enable_buttons()
 
+        # TODO save test and mark as done
+
     @staticmethod
     def deny_data(popup):
         """
@@ -166,9 +162,10 @@ class TestGUI:
         """
         # Close window and then clear all the data
         popup.destroy()
-        EventLogger.clear_data()
         TestGUI.test_buttons[TestGUI.current_test].config(bg="red")
         TestGUI.enable_buttons()
+
+        # TODO if this is called, move to next test
 
     @staticmethod
     def enable_scroll(canvas):

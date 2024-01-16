@@ -40,6 +40,8 @@ class DataCollectorApp:
         for test_name in test_names:
             TestGUI.add_button(test_name, lambda name=test_name: DataCollectorApp.run_test(name))
 
+        # TODO how do we know if all tests are complete? close window when done.
+
         TestGUI.control_window.mainloop()
 
 
