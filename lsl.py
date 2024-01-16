@@ -126,9 +126,8 @@ class LSL:
                 if stream:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
                     if sample:
-                        system_timestamp = timestamp
                         if data_row['Timestamp'] is None:
-                            data_row['Timestamp'] = system_timestamp  # Set timestamp from the first stream
+                            data_row['Timestamp'] = LSL.__lsl_to_system_time(timestamp)  # Set timestamp from the first stream
                         data_row[stream_type] = sample
                     else:
                         data_row[stream_type] = [0 for i in range(stream.info().channel_count())]
