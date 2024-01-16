@@ -24,13 +24,13 @@ class TestGUI:
         """
         MUST BE CALLED BEFORE ACCESSING ANY CLASS VARIABLES
         """
-        control_window = tk.Tk()
-        control_window.title("Control Panel")
-        TestGUI.set_window_geometry(control_window, left_side=True)
+        TestGUI.control_window = tk.Tk()
+        TestGUI.control_window.title("Control Panel")
+        TestGUI.set_window_geometry(TestGUI.control_window, left_side=True)
 
-        display_window = tk.Toplevel(control_window)
-        display_window.title("Display")
-        TestGUI.set_window_geometry(display_window, left_side=False)
+        TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
+        TestGUI.display_window.title("Display")
+        TestGUI.set_window_geometry(TestGUI.display_window, left_side=False)
 
     @staticmethod
     def add_button(test_name, test_lambda):
@@ -137,6 +137,8 @@ class TestGUI:
         deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: TestGUI.deny_data(popup))
         deny_button.grid(row=(idx + 2) // graphs_per_row, column=1, pady=10)
 
+        # TODO explicitly destroy the prompts
+
         popup.mainloop()
 
     @staticmethod
@@ -166,6 +168,7 @@ class TestGUI:
         popup.destroy()
         EventLogger.clear_data()
         TestGUI.test_buttons[TestGUI.current_test].config(bg="red")
+        TestGUI.enable_buttons()
 
     @staticmethod
     def enable_scroll(canvas):
