@@ -1,17 +1,18 @@
 """
 This module contains the LSL class, responsible for handling LSL input, collection, and formatting.
 """
-import pylsl
-import pandas as pd
 import threading
 from datetime import datetime
+
+import pandas as pd
+import pylsl
 
 import config
 
 
 class LSL:
     """
-    A class to interface with a local network Laboratory Streaming Layer to collect EEG, accelerometer, and FFT data.
+    A class to interface with a local network Laboratory Streaming Layer to collect EEG and Accelerometer data.
     """
 
     streams = None
@@ -28,6 +29,7 @@ class LSL:
         """
         # Variables to hold streams, data, and the collection thread
         LSL.streams = {'EEG': None, 'Accelerometer': None}  # , 'FFT': None
+        # TODO hold stream names in config
 
         # Set up timestamp conversion using a constant offset
         lsl_start_time = datetime.fromtimestamp(pylsl.local_clock())
@@ -42,6 +44,8 @@ class LSL:
     def start_collection(test_name: str):
         """
         Function to start data collection.
+
+        :param test_name: The name of the test to run data collection on. TODO ensure data is tagged only when test is running. Separate method?
         """
         print("Started data collection.")
         LSL.collecting = True
@@ -53,47 +57,23 @@ class LSL:
     def stop_collection():
         """
         Function to stop data collection and save to CSV.
+        TODO add boolean flag for whether to save data or not
         """
         if LSL.collecting:
             LSL.collecting = False
             LSL.collection_thread.join()
             print("Data collection stopped. Saving collected data.")
-            LSL.__save_collected_data(config.COLLECTED_DATA_PATH)
+            LSL.__save_collected_data()
 
     #
     # HELPER METHODS
     #
-    @staticmethod
-    def __save_collected_data(path: str):
-        """
-        Function to save data collected after collection has been stopped. TODO make sure this doesn't overwrite
-
-        :param path: The path to write the collected data to as a CSV file.
-        """
-        if LSL.collected_data:
-            # Define column headers
-            eeg_channel_count = LSL.streams['EEG'].info().channel_count() if LSL.streams['EEG'] else 0
-            accelerometer_channel_count = LSL.streams['Accelerometer'].info().channel_count() \
-                if LSL.streams['Accelerometer'] else 0
-            # fft_channel_count = LSL.streams['FFT'].info().channel_count() if LSL.streams['FFT'] else 0
-
-            columns = ['Timestamp'] + \
-                      [f'EEG_{i + 1}' for i in range(eeg_channel_count)] + \
-                      [f'Accelerometer_{i + 1}' for i in range(accelerometer_channel_count)] + \
-                      ['Label']
-                    # [f'FFT_{i + 1}' for i in range(fft_channel_count)] + \
-
-            df = pd.DataFrame(LSL.collected_data, columns=columns)
-            df['Timestamp'] = pd.to_datetime(df['Timestamp'])
-            df = df.sort_values(by='Timestamp')
-            df.to_csv(path, index=False)
-            print("Collected data saved.")
-        else:
-            print("No data to save.")
 
     @staticmethod
     def __lsl_to_system_time(lsl_timestamp):  # TODO idk what type lsl_timestamp is
-        """Convert an LSL timestamp to system time."""
+        """
+        Converts an LSL timestamp to system time.
+        """
         return datetime.fromtimestamp(lsl_timestamp + LSL.timestamp_offset.total_seconds())
 
     @staticmethod
@@ -120,6 +100,7 @@ class LSL:
         Helper function to collect data in the LSL stream on a separate thread to run tests with.
         TODO THIS DATA COLLECTION NEEDS TO BE FIXED! CURRENTLY THERE IS NO ACCELEROMETER DATA
         """
+
         while LSL.collecting:
             data_row = {'Timestamp': None, 'EEG': [], 'Accelerometer': [], 'Label': test_name}  # , 'FFT': []
             for stream_type, stream in LSL.streams.items():
@@ -127,11 +108,43 @@ class LSL:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
                     if sample:
                         if data_row['Timestamp'] is None:
-                            data_row['Timestamp'] = LSL.__lsl_to_system_time(timestamp)  # Set timestamp from the first stream
+                            data_row['Timestamp'] = LSL.__lsl_to_system_time(
+                                timestamp)  # Set timestamp from the first stream
                         data_row[stream_type] = sample
                     else:
                         data_row[stream_type] = [0 for i in range(stream.info().channel_count())]
+                        # TODO accelerometer stream seems to transmit data at different times than EEG
             if data_row['Timestamp'] is not None:
                 # Flatten the data row into a single list
-                flattened_data_row = [data_row['Timestamp']] + data_row['EEG'] + data_row['Accelerometer'] + [data_row['Label']]  #  + data_row['FFT']
+                flattened_data_row = [data_row['Timestamp']] + data_row['EEG'] + data_row['Accelerometer'] + [
+                    data_row['Label']]  # + data_row['FFT']
                 LSL.collected_data.append(flattened_data_row)
+
+    @staticmethod
+    def __save_collected_data():
+        """
+        Function to save data collected after collection has been stopped. TODO make sure this doesn't overwrite
+        """
+
+        if LSL.collected_data:
+            # Determine channel counts
+            eeg_channel_count = LSL.streams['EEG'].info().channel_count() if LSL.streams['EEG'] else 0
+            accelerometer_channel_count = LSL.streams['Accelerometer'].info().channel_count() \
+                if LSL.streams['Accelerometer'] else 0
+            # fft_channel_count = LSL.streams['FFT'].info().channel_count() if LSL.streams['FFT'] else 0
+
+            # Define column headers
+            columns = ['Timestamp'] + \
+                      [f'EEG_{i + 1}' for i in range(eeg_channel_count)] + \
+                      [f'Accelerometer_{i + 1}' for i in range(accelerometer_channel_count)] + \
+                      ['Label']
+            # [f'FFT_{i + 1}' for i in range(fft_channel_count)] + \
+
+            # Convert collected data to a DataFrame, format with columns above, and write to CSV
+            df = pd.DataFrame(LSL.collected_data, columns=columns)
+            df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+            df = df.sort_values(by='Timestamp')
+            df.to_csv(config.COLLECTED_DATA_PATH, index=False)
+            print("Collected data saved.")
+        else:
+            print("No data to save.")

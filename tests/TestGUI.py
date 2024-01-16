@@ -1,14 +1,17 @@
 import time
 import tkinter as tk
 
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import config
 
 
 class TestGUI:
+    """
+    Holds all logic relating to creating the GUI, adding buttons/windows, and the test confirmation window.
+    """
 
     control_window = None
     display_window = None
@@ -20,18 +23,21 @@ class TestGUI:
     @staticmethod
     def init_gui():
         """
-        MUST BE CALLED BEFORE ACCESSING ANY CLASS VARIABLES
+        MUST BE CALLED BEFORE ACCESSING ANY CLASS VARIABLES. Sets up the display window.
         """
         TestGUI.control_window = tk.Tk()
         TestGUI.control_window.title("Control Panel")
-        TestGUI.set_window_geometry(TestGUI.control_window, left_side=True)
+        TestGUI.__set_window_geometry(TestGUI.control_window, left_side=True)
 
         TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
         TestGUI.display_window.title("Display")
-        TestGUI.set_window_geometry(TestGUI.display_window, left_side=False)
+        TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
 
     @staticmethod
     def add_button(test_name, test_lambda):
+        """
+        Adds a button to the test window with its name and function to run.
+        """
         btn = tk.Button(TestGUI.control_window, text=test_name)
         btn.config(command=test_lambda, bg='red')
         btn.pack()
@@ -44,12 +50,31 @@ class TestGUI:
         """
         Run the test and prompt the user to confirm or deny the data
         """
-        time.sleep(1)
+        # TODO move this to LSL package for accurate labelling
+        time.sleep(1)  # Wait one second until data collection is complete
 
-        TestGUI.show_data_and_confirm()  # TODO if denied, move to next test and allow for a rerun
+        TestGUI.__show_data_and_confirm()  # TODO if denied, move to next test and allow for a rerun
 
     @staticmethod
-    def enable_buttons():
+    def disable_buttons(test_name):
+        """
+        A function to disable buttons while a test is running.
+        """
+        for button in TestGUI.test_buttons.values():
+            button.config(state="disabled")
+
+        TestGUI.current_test = test_name
+        TestGUI.test_buttons[TestGUI.current_test].config(bg="yellow")
+
+    #
+    # HELPER METHODS
+    #
+
+    @staticmethod
+    def __enable_buttons():
+        """
+        A function to enable buttons after a test has been completed.
+        """
         # Reset the buttons
         for test in TestGUI.test_buttons.keys():
             if not TestGUI.test_status[test]:  # If test is not complete, re-enable button
@@ -58,17 +83,10 @@ class TestGUI:
         TestGUI.current_test = None
 
     @staticmethod
-    def disable_buttons(test_name):
-        for button in TestGUI.test_buttons.values():
-            button.config(state="disabled")
-
-        TestGUI.current_test = test_name
-        TestGUI.test_buttons[TestGUI.current_test].config(bg="yellow")
-
-    @staticmethod
-    def show_data_and_confirm():
+    def __show_data_and_confirm():
         """
-        Popup the data confirmation window and check if it should be accepted or rejected
+        Popup the data confirmation window and check if it should be accepted or rejected.
+        TODO return boolean to determine whether to move onto a new test.
         """
         # Setup the window and canvas
         popup = tk.Toplevel()
@@ -90,7 +108,7 @@ class TestGUI:
         canvas.configure(yscrollcommand=scrollbar.set)
 
         # Make it scrollable so we don't have to click the tiny scrollbar
-        TestGUI.enable_scroll(canvas)
+        TestGUI.__enable_scroll(canvas)
 
         data_df = pd.read_csv(config.COLLECTED_DATA_PATH)
 
@@ -125,10 +143,10 @@ class TestGUI:
         scrollbar.pack(side="right", fill="y")
 
         # Create buttons to accept and deny the data
-        confirm_button = tk.Button(scrollable_frame, text="Confirm Data", command=lambda: TestGUI.confirm_data(popup))
+        confirm_button = tk.Button(scrollable_frame, text="Confirm Data", command=lambda: TestGUI.__confirm_data(popup))
         confirm_button.grid(row=(idx + 2) // graphs_per_row, column=0, pady=10)
 
-        deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: TestGUI.deny_data(popup))
+        deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: TestGUI.__deny_data(popup))
         deny_button.grid(row=(idx + 2) // graphs_per_row, column=1, pady=10)
 
         # TODO explicitly destroy the graphs
@@ -136,7 +154,7 @@ class TestGUI:
         popup.mainloop()
 
     @staticmethod
-    def confirm_data(popup):
+    def __confirm_data(popup):
         """
         Run if the accept button is pressed
 
@@ -149,12 +167,12 @@ class TestGUI:
         TestGUI.test_buttons[TestGUI.current_test].config(state="disabled")
         TestGUI.test_status[TestGUI.current_test] = True
 
-        TestGUI.enable_buttons()
+        TestGUI.__enable_buttons()
 
         # TODO save test and mark as done
 
     @staticmethod
-    def deny_data(popup):
+    def __deny_data(popup):
         """
         Run if the deny button is pressed
 
@@ -163,12 +181,12 @@ class TestGUI:
         # Close window and then clear all the data
         popup.destroy()
         TestGUI.test_buttons[TestGUI.current_test].config(bg="red")
-        TestGUI.enable_buttons()
+        TestGUI.__enable_buttons()
 
         # TODO if this is called, move to next test
 
     @staticmethod
-    def enable_scroll(canvas):
+    def __enable_scroll(canvas):
         """
         Function to enable scrolling using the mouse wheel
 
@@ -177,7 +195,7 @@ class TestGUI:
         canvas.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1 * (event.delta / 120)), "units"))
 
     @staticmethod
-    def set_window_geometry(window, left_side=True):
+    def __set_window_geometry(window, left_side=True):
         """
         Figure out size for a window and align it according to left_side
 
