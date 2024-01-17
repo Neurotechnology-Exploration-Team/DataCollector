@@ -32,8 +32,10 @@ Launch **`OpenBCI_GUI.exe`**
 
 Select data source type from **`System Control Panel > DATA SOURCE`**.
 
-- Algorithmic LSL Data (Testing): Select **`SYNTHETIC (Algorithmic)`**
-- ***TODO*** Real-Time LSL Data: Select **`CYTON (Live)`**
+- Real-Time LSL Data: Select **`CYTON (Live)`**
+  - To configure OpenBCI/set up the Cyton board communication, follow steps III and IV from the [OpenBCI Cyton setup instructions](https://docs.openbci.com/GettingStarted/Boards/CytonGS/#iii-prepare-your-openbci-hardware).
+  - To set up EEG hardware, use the [OpenBCI EEG setup guide](https://docs.openbci.com/GettingStarted/Biosensing-Setups/EEGSetup/).
+- Algorithmic LSL Data **(USE FOR TESTING ONLY)**: Select **`SYNTHETIC (Algorithmic)`**
 
 Leave all settings as default, and press **`START SESSION`**
 
