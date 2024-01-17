@@ -70,12 +70,14 @@ class LSL:
         Function to start labelling each data frame until stop_label() is called
         """
         LSL.collection_label = event
+        print(f"Labeling Data: {event}")
 
     @staticmethod
     def stop_label():
         """
         Function to stop labelling each data frame and revert to no label
         """
+        print(f"Stopped Labeling Data: {LSL.collection_label}")
         LSL.collection_label = None
 
     #

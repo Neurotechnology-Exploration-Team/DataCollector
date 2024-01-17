@@ -33,8 +33,8 @@ class DataCollectorApp:
         os.makedirs(config.DATA_PATH, exist_ok=True)
 
         # Initialize streams & GUI
-        LSL.init_lsl_stream()
         TestGUI.init_gui()
+        LSL.init_lsl_stream()
 
         # Locate all tests (filename should be the same as test name)
         test_directory = 'tests'
