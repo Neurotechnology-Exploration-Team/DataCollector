@@ -20,6 +20,8 @@ class TestGUI:
     test_status = {}
     current_test = None
 
+    subject_number = ""
+
     @staticmethod
     def init_gui():
         """
@@ -32,6 +34,8 @@ class TestGUI:
         TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
         TestGUI.display_window.title("Display")
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
+
+        TestGUI.__prompt_subject_number()
 
     @staticmethod
     def add_button(test_name, test_lambda):
@@ -183,6 +187,33 @@ class TestGUI:
         TestGUI.__enable_buttons()
 
         # TODO if this is called, move to next test
+
+    @staticmethod
+    def __prompt_subject_number():
+        """
+        Creates a mandatory popup to prompt the user for the subject number and sets TestGUI.subject_number to the result.
+        """
+
+        popup = tk.Toplevel(TestGUI.control_window)
+        popup.wm_title("Enter Subject Number")
+        TestGUI.control_window.eval(f'tk::PlaceWindow {str(popup)} center')
+
+        # datatype of menu text
+        subject = tk.StringVar()
+        subject.set("01")
+
+        def submit():
+            TestGUI.subject_number = subject.get()
+            print(f"Subject Number: {TestGUI.subject_number}")
+            popup.destroy()
+
+        drop = tk.OptionMenu(popup, subject, *[str(i).zfill(2) for i in range(1, config.NUMBER_OF_SUBJECTS + 1)])
+        drop.pack()
+
+        submit_button = tk.Button(popup, text='Begin', command=submit)
+        submit_button.pack()
+
+        popup.grab_set()
 
     @staticmethod
     def __enable_scroll(canvas):
