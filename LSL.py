@@ -15,12 +15,13 @@ class LSL:
     A class to interface with a local network Laboratory Streaming Layer to collect EEG and Accelerometer data.
     """
 
-    streams = None
-    collected_data = []
-    collecting = False
-    collection_thread = None
+    streams = None  # The LSL streams being tracked
+    collected_data = []  # The collected data to be held and reviewed between start_collection() and stop_collection()
+    collecting = False  # Flag if data is currently being collected
+    collection_thread = None  # The current thread data is being collected on, if any
+    collection_label = None  # The current label to be appended to the data, if any
 
-    timestamp_offset = None
+    timestamp_offset = None  # The offset between LSL and system timestamps. TODO is this still necessary
 
     @staticmethod
     def init_lsl_stream():
@@ -41,16 +42,14 @@ class LSL:
             LSL.__find_and_initialize_stream(stream_type)
 
     @staticmethod
-    def start_collection(test_name: str):
+    def start_collection():
         """
         Function to start data collection.
-
-        :param test_name: The name of the test to run data collection on. TODO ensure data is tagged only when test is running. Separate method?
         """
         print("Started data collection.")
         LSL.collecting = True
         LSL.collected_data = []
-        LSL.collection_thread = threading.Thread(target=LSL.__collect_data, args=[test_name])
+        LSL.collection_thread = threading.Thread(target=LSL.__collect_data)
         LSL.collection_thread.start()
 
     @staticmethod
@@ -64,6 +63,20 @@ class LSL:
             LSL.collection_thread.join()
             print("Data collection stopped. Saving collected data.")
             LSL.__save_collected_data()
+
+    @staticmethod
+    def start_label(event: str):
+        """
+        Function to start labelling each data frame until stop_label() is called
+        """
+        LSL.collection_label = event
+
+    @staticmethod
+    def stop_label():
+        """
+        Function to stop labelling each data frame and revert to no label
+        """
+        LSL.collection_label = None
 
     #
     # HELPER METHODS
@@ -92,17 +105,16 @@ class LSL:
             LSL.streams[stream_type] = pylsl.StreamInlet(streams_info[0])
         else:
             print(f"No {stream_type} stream found.")
-            exit(1)  # TODO standardize errors + documentation
+            exit(1)
 
     @staticmethod
-    def __collect_data(test_name: str):
+    def __collect_data():
         """
         Helper function to collect data in the LSL stream on a separate thread to run tests with.
-        TODO THIS DATA COLLECTION NEEDS TO BE FIXED! CURRENTLY THERE IS NO ACCELEROMETER DATA
         """
 
         while LSL.collecting:
-            data_row = {'Timestamp': None, 'EEG': [], 'Accelerometer': [], 'Label': test_name}  # , 'FFT': []
+            data_row = {'Timestamp': None, 'EEG': [], 'Accelerometer': [], 'Label': "" if not LSL.collection_label else LSL.collection_label}  # , 'FFT': []
             for stream_type, stream in LSL.streams.items():
                 if stream:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull

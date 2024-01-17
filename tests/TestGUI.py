@@ -50,10 +50,9 @@ class TestGUI:
         """
         Run the test and prompt the user to confirm or deny the data
         """
-        # TODO move this to LSL package for accurate labelling
-        time.sleep(1)  # Wait one second until data collection is complete
+        TestGUI.__show_data_and_confirm()
 
-        TestGUI.__show_data_and_confirm()  # TODO if denied, move to next test and allow for a rerun
+        # TODO if denied, move to next test and allow for a rerun
 
     @staticmethod
     def disable_buttons(test_name):

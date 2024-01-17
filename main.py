@@ -2,7 +2,7 @@ import importlib
 import os
 
 import config
-from lsl import LSL
+from LSL import LSL
 from tests.TestGUI import TestGUI
 
 

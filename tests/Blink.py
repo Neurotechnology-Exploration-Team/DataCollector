@@ -17,21 +17,12 @@ class Blink(TestThread):
         """
         Initializes and creates the blink label in the display window.
         """
-        super().__init__(5000)
+        super().__init__()
 
         self.blink_label = tk.Label(TestGUI.display_window, text="Blinking Text", font=("Helvetica", 16))
         self.blink_label.pack()
 
         self.blinking = True
-
-    def stop(self):
-        """
-        Toggles blinking flag and destroys label.
-        """
-        self.blinking = False
-        self.blink_label.destroy()
-
-        super().stop()
 
     def run(self):
         """
@@ -46,3 +37,12 @@ class Blink(TestThread):
 
         # Start the blinking effect
         toggle_blink()
+
+    def stop(self):
+        """
+        Toggles blinking flag and destroys label.
+        """
+        self.blinking = False
+        self.blink_label.destroy()
+
+        super().stop()

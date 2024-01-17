@@ -10,3 +10,7 @@ HEIGHT_PER_GRAPH = 80
 
 # LSL configuration
 LSL_RESOLUTION_TIMEOUT = 10.0  # Timeout (in seconds) for an LSL stream
+
+# Test length
+DATA_PADDING_DURATION = 1.0  # How many seconds to wait before starting and ending a test
+TEST_DURATION = 5 * 1000  # How many milliseconds the test should take. Default to 30 for trials
