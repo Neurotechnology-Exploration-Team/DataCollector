@@ -1,95 +1,98 @@
 """
 This module contains the LSL class, responsible for handling LSL input, collection, and formatting.
 """
-
-import pylsl
-import pandas as pd
 import threading
 from datetime import datetime
 
-LSL_RESOLUTION_TIMEOUT = 10.0  # Timeout (in seconds) for an LSL stream
+import pandas as pd
+import pylsl
+
+import config
 
 
 class LSL:
     """
-    A class to interface with a local network Laboratory Streaming Layer to collect EEG, accelerometer, and FFT data.
+    A class to interface with a local network Laboratory Streaming Layer to collect EEG and Accelerometer data.
     """
 
-    def __init__(self):
+    streams = None  # The LSL streams being tracked
+    collected_data = []  # The collected data to be held and reviewed between start_collection() and stop_collection()
+    collecting = False  # Flag if data is currently being collected
+    collection_thread = None  # The current thread data is being collected on, if any
+    collection_label = None  # The current label to be appended to the data, if any
+
+    timestamp_offset = None  # The offset between LSL and system timestamps. TODO is this still necessary
+
+    @staticmethod
+    def init_lsl_stream():
         """
-        The main constructor to initialize streams, data, timestamp offset, and the collection thread.
+        MUST BE CALLED TO initialize streams, data, timestamp offset, and the collection thread.
         """
         # Variables to hold streams, data, and the collection thread
-        self.streams = {'EEG': None, 'Accelerometer': None, 'FFT': None}
-        self.collected_data = []
-        self.collecting = False
-        self.collection_thread = None
+        LSL.streams = {'EEG': None, 'Accelerometer': None}  # , 'FFT': None
+        # TODO hold stream names in config
 
         # Set up timestamp conversion using a constant offset
         lsl_start_time = datetime.fromtimestamp(pylsl.local_clock())
         system_start_time = datetime.now()
-        self.TIMESTAMP_OFFSET = system_start_time - lsl_start_time
+        LSL.timestamp_offset = system_start_time - lsl_start_time
 
         # Initialize all required streams
-        for stream_type in self.streams.keys():
-            self.__find_and_initialize_stream(stream_type)
+        for stream_type in LSL.streams.keys():
+            LSL.__find_and_initialize_stream(stream_type)
 
-    def start_collection(self):
+    @staticmethod
+    def start_collection():
         """
         Function to start data collection.
         """
         print("Started data collection.")
-        self.collecting = True
-        self.collected_data = []
-        self.collection_thread = threading.Thread(target=self.__collect_data)
-        self.collection_thread.start()
+        LSL.collecting = True
+        LSL.collected_data = []
+        LSL.collection_thread = threading.Thread(target=LSL.__collect_data)
+        LSL.collection_thread.start()
 
-    def stop_collection(self, path: str):
+    @staticmethod
+    def stop_collection():
         """
         Function to stop data collection and save to CSV.
-
-        :param path: The path to write the collected data to as a CSV file.
+        TODO add boolean flag for whether to save data or not
         """
-        if self.collecting:
-            self.collecting = False
-            self.collection_thread.join()
+        if LSL.collecting:
+            LSL.collecting = False
+            LSL.collection_thread.join()
             print("Data collection stopped. Saving collected data.")
-            self.__save_collected_data(path)
+            LSL.__save_collected_data()
+
+    @staticmethod
+    def start_label(event: str):
+        """
+        Function to start labelling each data frame until stop_label() is called
+        """
+        LSL.collection_label = event
+        print(f"Labeling Data: {event}")
+
+    @staticmethod
+    def stop_label():
+        """
+        Function to stop labelling each data frame and revert to no label
+        """
+        print(f"Stopped Labeling Data: {LSL.collection_label}")
+        LSL.collection_label = None
 
     #
     # HELPER METHODS
     #
-    def __save_collected_data(self, path: str):
+
+    @staticmethod
+    def __lsl_to_system_time(lsl_timestamp):  # TODO idk what type lsl_timestamp is
         """
-        Function to save data collected after collection has been stopped.
-
-        :param path: The path to write the collected data to as a CSV file.
+        Converts an LSL timestamp to system time.
         """
-        if self.collected_data:
-            # Define column headers
-            eeg_channel_count = self.streams['EEG'].info().channel_count() if self.streams['EEG'] else 0
-            accelerometer_channel_count = self.streams['Accelerometer'].info().channel_count() if self.streams[
-                'Accelerometer'] else 0
-            fft_channel_count = self.streams['FFT'].info().channel_count() if self.streams['FFT'] else 0
+        return datetime.fromtimestamp(lsl_timestamp + LSL.timestamp_offset.total_seconds())
 
-            columns = ['Timestamp'] + \
-                      [f'EEG_{i + 1}' for i in range(eeg_channel_count)] + \
-                      [f'Accelerometer_{i + 1}' for i in range(accelerometer_channel_count)] + \
-                      [f'FFT_{i + 1}' for i in range(fft_channel_count)]
-
-            df = pd.DataFrame(self.collected_data, columns=columns)
-            df['Timestamp'] = pd.to_datetime(df['Timestamp'])
-            df = df.sort_values(by='Timestamp')
-            df.to_csv(path, index=False)
-            print("Collected data saved.")
-        else:
-            print("No data to save.")
-
-    def __lsl_to_system_time(self, lsl_timestamp):  # TODO idk what type lsl_timestamp is
-        """Convert an LSL timestamp to system time."""
-        return datetime.fromtimestamp(lsl_timestamp + self.TIMESTAMP_OFFSET.total_seconds())
-
-    def __find_and_initialize_stream(self, stream_type: str):
+    @staticmethod
+    def __find_and_initialize_stream(stream_type: str):
         """
         Function to find and initialize a specific LSL stream
 
@@ -97,31 +100,65 @@ class LSL:
         """
         print(f"Looking for a {stream_type} stream...")
 
-        streams_info = pylsl.resolve_byprop('type', stream_type, 1, LSL_RESOLUTION_TIMEOUT)
+        streams_info = pylsl.resolve_byprop('type', stream_type, 1, config.LSL_RESOLUTION_TIMEOUT)
 
         if len(streams_info) > 0:
             print(f"{stream_type} stream found.")
-            self.streams[stream_type] = pylsl.StreamInlet(streams_info[0])
+            LSL.streams[stream_type] = pylsl.StreamInlet(streams_info[0])
         else:
             print(f"No {stream_type} stream found.")
-            exit(1)  # TODO standardize errors + documentation
+            exit(1)
 
-    def __collect_data(self):
+    @staticmethod
+    def __collect_data():
         """
         Helper function to collect data in the LSL stream on a separate thread to run tests with.
         """
-        while self.collecting:
-            data_row = {'Timestamp': None, 'EEG': [], 'Accelerometer': [], 'FFT': []}
-            for stream_type, stream in self.streams.items():
+
+        while LSL.collecting:
+            data_row = {'Timestamp': None, 'EEG': [], 'Accelerometer': [], 'Label': "" if not LSL.collection_label else LSL.collection_label}  # , 'FFT': []
+            for stream_type, stream in LSL.streams.items():
                 if stream:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
                     if sample:
-                        system_timestamp = self.__lsl_to_system_time(timestamp)
                         if data_row['Timestamp'] is None:
-                            data_row['Timestamp'] = system_timestamp  # Set timestamp from the first stream
+                            data_row['Timestamp'] = LSL.__lsl_to_system_time(
+                                timestamp)  # Set timestamp from the first stream
                         data_row[stream_type] = sample
+                    else:
+                        data_row[stream_type] = [0 for i in range(stream.info().channel_count())]
+                        # TODO accelerometer stream seems to transmit data at different times than EEG
             if data_row['Timestamp'] is not None:
                 # Flatten the data row into a single list
-                flattened_data_row = [data_row['Timestamp']] + data_row['EEG'] + data_row['Accelerometer'] + data_row[
-                    'FFT']
-                self.collected_data.append(flattened_data_row)
+                flattened_data_row = [data_row['Timestamp']] + data_row['EEG'] + data_row['Accelerometer'] + [
+                    data_row['Label']]  # + data_row['FFT']
+                LSL.collected_data.append(flattened_data_row)
+
+    @staticmethod
+    def __save_collected_data():
+        """
+        Function to save data collected after collection has been stopped. TODO make sure this doesn't overwrite
+        """
+
+        if LSL.collected_data:
+            # Determine channel counts
+            eeg_channel_count = LSL.streams['EEG'].info().channel_count() if LSL.streams['EEG'] else 0
+            accelerometer_channel_count = LSL.streams['Accelerometer'].info().channel_count() \
+                if LSL.streams['Accelerometer'] else 0
+            # fft_channel_count = LSL.streams['FFT'].info().channel_count() if LSL.streams['FFT'] else 0
+
+            # Define column headers
+            columns = ['Timestamp'] + \
+                      [f'EEG_{i + 1}' for i in range(eeg_channel_count)] + \
+                      [f'Accelerometer_{i + 1}' for i in range(accelerometer_channel_count)] + \
+                      ['Label']
+            # [f'FFT_{i + 1}' for i in range(fft_channel_count)] + \
+
+            # Convert collected data to a DataFrame, format with columns above, and write to CSV
+            df = pd.DataFrame(LSL.collected_data, columns=columns)
+            df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+            df = df.sort_values(by='Timestamp')
+            df.to_csv(config.COLLECTED_DATA_PATH, index=False)
+            print("Collected data saved.")
+        else:
+            print("No data to save.")
