@@ -1,4 +1,3 @@
-import time
 import tkinter as tk
 
 import matplotlib.pyplot as plt
@@ -213,7 +212,9 @@ class TestGUI:
         submit_button = tk.Button(popup, text='Begin', command=submit)
         submit_button.pack()
 
+        # Force popup to be on top & halt program execution
         popup.grab_set()
+        TestGUI.control_window.wait_window(popup)
 
     @staticmethod
     def __enable_scroll(canvas):

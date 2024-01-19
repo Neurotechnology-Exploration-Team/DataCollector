@@ -29,18 +29,20 @@ class DataCollectorApp:
         """
         Main function for adding buttons that run tests to the GUI and initializing the LSL streams & GUI.
         """
-        # Create tests directory TODO make for each subject
-        os.makedirs(config.DATA_PATH, exist_ok=True)
-
         # Initialize streams & GUI
-        TestGUI.init_gui()
         LSL.init_lsl_stream()
+        TestGUI.init_gui()
 
         # Locate all tests (filename should be the same as test name)
         test_directory = 'tests'
         test_names = [filename.split('.')[0]
                       for filename in os.listdir(test_directory)
                       if filename.endswith('.py') and not filename.startswith('Test')]
+
+        # Create directory for each test along with data & subject directory
+        root_dir = os.path.join(config.DATA_PATH, TestGUI.subject_number)
+        for test_name in test_names:
+            os.makedirs(os.path.join(str(root_dir), test_name), exist_ok=True)
 
         # Add each test button to the GUI that calls the run_test method above w/ the test name
         for test_name in test_names:
