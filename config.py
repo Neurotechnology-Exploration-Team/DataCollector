@@ -14,6 +14,6 @@ TEST_DURATION = 5 * 1000  # How many milliseconds the test should take. Default 
 # Subject information
 NUMBER_OF_SUBJECTS = 10
 
-# Save path configuration
+# Save path configuration (DATA_PATH/<id>/<test>/trial_<trial_number>/FILENAME)
 DATA_PATH = "./csv_downloads"
 FILENAME = "collected_data.csv"

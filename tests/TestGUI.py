@@ -1,3 +1,4 @@
+import os.path
 import tkinter as tk
 
 import matplotlib.pyplot as plt
@@ -49,13 +50,15 @@ class TestGUI:
         print("Added test: " + test_name)
 
     @staticmethod
-    def confirm_test():
+    def confirm_current_test(test_data_path: str) -> bool:
         """
-        Run the test and prompt the user to confirm or deny the data
-        """
-        TestGUI.__show_data_and_confirm()
+        Run the test and prompt the user to confirm or deny the data.
 
-        # TODO if denied, move to next test and allow for a rerun
+        :param test_data_path: The path to the current test data FOLDER.
+        """
+        TestGUI.__show_data_and_confirm(os.path.join(test_data_path, config.FILENAME))
+
+        return TestGUI.test_status[TestGUI.current_test]
 
     @staticmethod
     def disable_buttons(test_name):
@@ -82,13 +85,12 @@ class TestGUI:
             if not TestGUI.test_status[test]:  # If test is not complete, re-enable button
                 TestGUI.test_buttons[test].config(state="normal")
 
-        TestGUI.current_test = None
-
     @staticmethod
-    def __show_data_and_confirm():
+    def __show_data_and_confirm(test_data_path: str):
         """
         Popup the data confirmation window and check if it should be accepted or rejected.
-        TODO return boolean to determine whether to move onto a new test.
+
+        :param test_data_path: The path to the test data CSV.
         """
         # Setup the window and canvas
         popup = tk.Toplevel()
@@ -112,7 +114,7 @@ class TestGUI:
         # Make it scrollable so we don't have to click the tiny scrollbar
         TestGUI.__enable_scroll(canvas)
 
-        data_df = pd.read_csv(config.COLLECTED_DATA_PATH)
+        data_df = pd.read_csv(test_data_path)
 
         # Figure out how many graphs we can fit on the screen
         screen_width = popup.winfo_screenwidth()
@@ -120,8 +122,6 @@ class TestGUI:
 
         if graphs_per_row == 0:
             graphs_per_row = 1
-
-        # TODO do we want to draw the graphs from the timestamp of the past test?
 
         # Loop through each EEG and draw the graphs
         idx = 0
@@ -153,7 +153,10 @@ class TestGUI:
 
         # TODO explicitly destroy the graphs
 
-        popup.mainloop()
+        # popup.mainloop()
+        # Force popup to be on top & halt program execution
+        popup.grab_set()
+        TestGUI.control_window.wait_window(popup)
 
     @staticmethod
     def __confirm_data(popup):
@@ -171,8 +174,6 @@ class TestGUI:
 
         TestGUI.__enable_buttons()
 
-        # TODO save test and mark as done
-
     @staticmethod
     def __deny_data(popup):
         """
@@ -184,8 +185,6 @@ class TestGUI:
         popup.destroy()
         TestGUI.test_buttons[TestGUI.current_test].config(bg="red")
         TestGUI.__enable_buttons()
-
-        # TODO if this is called, move to next test
 
     @staticmethod
     def __prompt_subject_number():

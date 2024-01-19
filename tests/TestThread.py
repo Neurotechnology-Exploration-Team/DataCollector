@@ -1,3 +1,4 @@
+import os.path
 import threading
 from time import sleep
 
@@ -19,6 +20,8 @@ class TestThread(threading.Thread):
         super().__init__()
 
         self.name = self.__class__.__name__  # Test name is class name
+        self.test_path = os.path.join(config.DATA_PATH, TestGUI.subject_number, self.name)
+        self.trial = 0
 
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
 
@@ -45,11 +48,17 @@ class TestThread(threading.Thread):
         """
         LSL.stop_label()  # Stop labelling
         sleep(config.DATA_PADDING_DURATION)  # Wait to collect junk data
-        LSL.stop_collection()  # Stop collecting
 
-        TestGUI.confirm_test()
+        current_path = os.path.join(str(self.test_path), f"trial_{str(self.trial).zfill(2)}")
+        os.makedirs(current_path, exist_ok=True)
 
-        self._stop_event.set()  # Set the stop event so Python auto-kills the thread
+        LSL.stop_collection(current_path)  # Stop collecting
+
+        if not TestGUI.confirm_current_test(current_path):
+            self.trial += 1
+            self.run()
+        else:
+            self._stop_event.set()  # Set the stop event so Python auto-kills the thread
 
     def stopped(self):
         """
