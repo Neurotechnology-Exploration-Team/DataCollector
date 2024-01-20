@@ -94,7 +94,7 @@ class TestGUI:
         # Setup the window and canvas
         popup = tk.Toplevel()
         popup.wm_title("Data Confirmation")
-        popup.wm_state('zoomed')
+        popup.attributes('-zoomed', True)
 
         canvas = tk.Canvas(popup)
         scrollbar = tk.Scrollbar(popup, orient="vertical", command=canvas.yview)

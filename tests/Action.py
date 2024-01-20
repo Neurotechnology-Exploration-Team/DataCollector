@@ -8,21 +8,23 @@ from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
 
-class Blink(TestThread):
+class Action(TestThread):
     """
     The Blink test that extends the TestThread class. Each method should call its super() equivalent to ensure data collection and thread management.
     """
 
-    def __init__(self):
+    def __init__(self, actionName):
         """
         Initializes and creates the blink label in the display window.
         """
+        self.label = actionName
         super().__init__()
 
-        self.blink_label = tk.Label(TestGUI.display_window, text="Blinking Text", font=("Helvetica", 16))
-        self.blink_label.pack()
+        self.action_label = tk.Label(TestGUI.display_window, text=self.label, font=("Helvetica", 16))
+        self.action_label.pack()
 
-        self.blinking = True
+        self.action = True
+        self.name = actionName
 
     def run(self):
         """
@@ -30,19 +32,19 @@ class Blink(TestThread):
         """
         super().run()
 
-        def toggle_blink():
-            if self.blinking:
-                self.blink_label.config(fg="black" if self.blink_label.cget("fg") == "white" else "white")
-                TestGUI.display_window.after(random.randint(1000, 3000), toggle_blink)  # Schedule the next toggle
+        def toggle_action():
+            if self.action:
+                self.action_label.config(fg="black" if self.action_label.cget("fg") == "white" else "white")
+                TestGUI.display_window.after(random.randint(1000, 3000), toggle_action)  # Schedule the next toggle
 
         # Start the blinking effect
-        toggle_blink()
+        toggle_action()
 
     def stop(self):
         """
         Toggles blinking flag and destroys label.
         """
-        self.blinking = False
-        self.blink_label.destroy()
+        self.action = False
+        self.action_label.destroy()
 
         super().stop()

@@ -20,6 +20,8 @@ class TestThread(threading.Thread):
 
         self.name = self.__class__.__name__  # Test name is class name
 
+        # self.name = self.actionName
+
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
 
     def run(self):
