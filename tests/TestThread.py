@@ -60,6 +60,7 @@ class TestThread(threading.Thread):
         complete = TestGUI.confirm_current_test(self.current_path)
         self.callback(complete)
 
+        print("Test completed: " + self.name)
         self._stop_event.set()  # Set the stop event so Python auto-kills the thread
 
     def stopped(self):

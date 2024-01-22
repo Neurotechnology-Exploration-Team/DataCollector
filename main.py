@@ -23,6 +23,10 @@ class DataCollectorApp:
         test = test_class(DataCollectorApp.trials[test_name]["trial_number"])
 
         def callback(test_complete):
+            if DataCollectorApp.all_tests_complete():
+                TestGUI.control_window.quit()
+                print("All tests complete.")
+
             if not test_complete:
                 DataCollectorApp.trials[test_name]["trial_number"] += 1
             else:
@@ -55,6 +59,13 @@ class DataCollectorApp:
             DataCollectorApp.trials[test_name] = {'trial_number': 0, 'complete': False}
 
         TestGUI.control_window.mainloop()
+
+    @staticmethod
+    def all_tests_complete() -> bool:
+        for test_dict in DataCollectorApp.trials.values():
+            if not test_dict['complete']:
+                return False
+        return True
 
 
 if __name__ == '__main__':
