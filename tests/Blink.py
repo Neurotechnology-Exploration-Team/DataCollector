@@ -13,11 +13,11 @@ class Blink(TestThread):
     The Blink test that extends the TestThread class. Each method should call its super() equivalent to ensure data collection and thread management.
     """
 
-    def __init__(self):
+    def __init__(self, trial_number):
         """
         Initializes and creates the blink label in the display window.
         """
-        super().__init__()
+        super().__init__(trial_number)
 
         self.blink_label = tk.Label(TestGUI.display_window, text="Blinking Text", font=("Helvetica", 16))
         self.blink_label.pack()

@@ -9,6 +9,7 @@ class DataCollectorApp:
     """
     A collection of functions to setup the Tkinter GUI
     """
+    trials = {}
 
     @staticmethod
     def run_test(test_name):
@@ -19,7 +20,15 @@ class DataCollectorApp:
         """
         # Dynamically import the test from tests package & construct it w/ no parameters
         test_class = getattr(importlib.import_module(f"tests.{test_name}"), test_name)
-        test = test_class()
+        test = test_class(DataCollectorApp.trials[test_name]["trial_number"])
+
+        def callback(test_complete):
+            if not test_complete:
+                DataCollectorApp.trials[test_name]["trial_number"] += 1
+            else:
+                DataCollectorApp.trials[test_name]["complete"] = True
+
+        test.set_callback(callback)
 
         test.start()  # Start test thread
 
@@ -42,7 +51,8 @@ class DataCollectorApp:
             # Add button to test
             TestGUI.add_button(test_name, lambda name=test_name: DataCollectorApp.run_test(name))
 
-        # TODO how do we know if all tests are complete? Close window when done.
+            # Initialize trial number
+            DataCollectorApp.trials[test_name] = {'trial_number': 0, 'complete': False}
 
         TestGUI.control_window.mainloop()
 
