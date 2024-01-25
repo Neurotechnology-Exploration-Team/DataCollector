@@ -16,6 +16,9 @@ class TestThread(threading.Thread):
     def __init__(self, action_name, trial_number):
         """
         The constructor that sets up the test name and stop condition.
+
+        :param action_name: The name of the action.
+        :param trial_number: The trial number of the action.
         """
         super().__init__()
 
@@ -57,7 +60,9 @@ class TestThread(threading.Thread):
         LSL.stop_collection(self.current_path)  # Stop collecting
 
         complete = TestGUI.confirm_current_test(self.current_path)
-        self.callback(complete)
+
+        if self.callback is not None:
+            self.callback(complete)
 
         print("Test completed: " + self.name)
         self._stop_event.set()  # Set the stop event so Python auto-kills the thread
@@ -69,4 +74,7 @@ class TestThread(threading.Thread):
         return self._stop_event.is_set()
 
     def set_callback(self, callback):
+        """
+        A function to set the callback for the test that takes in a boolean parameter completed.
+        """
         self.callback = callback

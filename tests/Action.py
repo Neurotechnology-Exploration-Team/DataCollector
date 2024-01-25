@@ -16,6 +16,9 @@ class Action(TestThread):
     def __init__(self, action_name, trial_number):
         """
         Initializes and creates the blink label in the display window.
+
+        :param action_name: The name of the action.
+        :param trial_number: The trial number of the action.
         """
         self.label = action_name
         super().__init__(action_name, trial_number)

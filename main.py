@@ -5,7 +5,7 @@ from tests.Action import Action
 
 class DataCollectorApp:
     """
-    A collection of functions to setup the Tkinter GUI
+    A collection of functions to initialize the GUI, tests, and setup test logic.
     """
 
     @staticmethod
@@ -19,7 +19,7 @@ class DataCollectorApp:
         test.start()
 
         def callback(test_complete):
-            if DataCollectorApp.all_tests_complete():
+            if DataCollectorApp.__all_tests_complete():
                 TestGUI.control_window.quit()
                 print("All tests complete.")
 
@@ -47,7 +47,12 @@ class DataCollectorApp:
         TestGUI.control_window.mainloop()
 
     @staticmethod
-    def all_tests_complete() -> bool:
+    def __all_tests_complete() -> bool:
+        """
+        Helper function to check the current state of all tests in the GUI.
+
+        :return: True if all tests are complete, false otherwise.
+        """
         for test in TestGUI.tests.keys():
             if not TestGUI.tests[test]['completed']:
                 return False

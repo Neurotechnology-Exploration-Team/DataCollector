@@ -16,6 +16,8 @@ class TestGUI:
     control_window = None
     display_window = None
 
+    # Setup test states: A dictionary with test name keys corresponding to sub-dictionaries with lambda, button,
+    # trial_number, and completed parameters
     tests = {}
     current_test = None
 
@@ -40,10 +42,16 @@ class TestGUI:
     def add_button(test_name, test_lambda):
         """
         Adds a button to the test window with its name and function to run.
+
+        :param test_name: The name of the test that the button will be assigned to.
+        :param test_lambda: The function that the test will be ran with.
         """
+        # COnfigure button
         btn = tk.Button(TestGUI.control_window, text=test_name)
         btn.config(command=test_lambda, bg='red')
         btn.pack()
+
+        # Configure test state
         TestGUI.tests[test_name] = { 'lambda': test_lambda, 'button': btn, 'trial': 0, 'completed': False}
         print("Added test: " + test_name)
 
@@ -54,7 +62,11 @@ class TestGUI:
 
         :param test_data_path: The path to the current test data FOLDER.
         """
+        # Confirm data
         TestGUI.__show_data_and_confirm(os.path.join(test_data_path, config.FILENAME))
+
+        # Log finalized test status
+        print(f"{TestGUI.current_test} - Trial {TestGUI.tests[TestGUI.current_test]['trial_number']}: {'Complete' if TestGUI.tests[TestGUI.current_test]['completed'] else 'Discarded'}")
 
         return TestGUI.tests[TestGUI.current_test]['completed']
 
@@ -62,6 +74,8 @@ class TestGUI:
     def disable_buttons(test_name):
         """
         A function to disable buttons while a test is running.
+
+        :param test_name: The name of the current test running
         """
         for test in TestGUI.tests.keys():
             TestGUI.tests[test]['button'].config(state="disabled")
