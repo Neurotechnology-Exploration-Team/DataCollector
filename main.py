@@ -15,7 +15,7 @@ class DataCollectorApp:
 
         :param test_name: Name of the test being run
         """
-        test = Action(test_name, 0)
+        test = Action(test_name, TestGUI.tests[test_name]["trial"])
         test.start()
 
         def callback(test_complete):
@@ -24,7 +24,7 @@ class DataCollectorApp:
                 print("All tests complete.")
 
             if not test_complete:  # If test is not complete
-                TestGUI.tests[test_name]["trial_number"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
+                TestGUI.tests[test_name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
 
         test.set_callback(callback)
 

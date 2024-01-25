@@ -65,9 +65,6 @@ class TestGUI:
         # Confirm data
         TestGUI.__show_data_and_confirm(os.path.join(test_data_path, config.FILENAME))
 
-        # Log finalized test status
-        print(f"{TestGUI.current_test} - Trial {TestGUI.tests[TestGUI.current_test]['trial_number']}: {'Complete' if TestGUI.tests[TestGUI.current_test]['completed'] else 'Discarded'}")
-
         return TestGUI.tests[TestGUI.current_test]['completed']
 
     @staticmethod
