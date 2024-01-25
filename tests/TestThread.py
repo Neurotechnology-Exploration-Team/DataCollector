@@ -39,6 +39,8 @@ class TestThread(threading.Thread):
         """
         TestGUI.disable_buttons(self.name)
 
+        print(f"Starting test {self.name}: Trial {self.trial_number}")
+
         LSL.start_collection()  # Start LSL collection
 
         sleep(config.DATA_PADDING_DURATION)  # TODO verify that this works since things are on separate threads
@@ -60,11 +62,12 @@ class TestThread(threading.Thread):
         LSL.stop_collection(self.current_path)  # Stop collecting
 
         complete = TestGUI.confirm_current_test(self.current_path)
+        # Log finalized test status
+        print(f"{TestGUI.current_test} - Trial {TestGUI.tests[TestGUI.current_test]['trial']}: {'Complete' if complete else 'Discarded'}")
 
         if self.callback is not None:
             self.callback(complete)
 
-        print("Test completed: " + self.name)
         self._stop_event.set()  # Set the stop event so Python auto-kills the thread
 
     def stopped(self):
