@@ -2,7 +2,10 @@ import importlib
 import os
 
 from LSL import LSL
+#import sys
+#sys.path.append('/Documents/DataCollector')
 from tests.TestGUI import TestGUI
+from tests.Action import Action
 
 
 class DataCollectorApp:
@@ -18,9 +21,17 @@ class DataCollectorApp:
 
         :param test_name: Name of the test being run
         """
+
+        test_arry = ['Blink', 'Float left']
+
+        """ Trying another way so we dont have 20 test files """
+        test = Action(test_name)
+        test.start()
+
+
         # Dynamically import the test from tests package & construct it w/ no parameters
-        test_class = getattr(importlib.import_module(f"tests.{test_name}"), test_name)
-        test = test_class(DataCollectorApp.trials[test_name]["trial_number"])
+        # test_class = getattr(importlib.import_module(f"tests.{test_name}"), test_name)
+        # test = test_class()
 
         def callback(test_complete):
             if DataCollectorApp.all_tests_complete():
@@ -34,22 +45,30 @@ class DataCollectorApp:
 
         test.set_callback(callback)
 
-        test.start()  # Start test thread
+        # test.start()  # Start test thread
 
     @staticmethod
     def run():
         """
         Main function for adding buttons that run tests to the GUI and initializing the LSL streams & GUI.
         """
+        # Create tests directory TODO make for each subject
+        os.makedirs(config.DATA_PATH, exist_ok=True)
+
         # Initialize streams & GUI
         LSL.init_lsl_stream()
         TestGUI.init_gui()
 
         # Locate all tests (filename should be the same as test name)
+        '''
         test_directory = 'tests'
         test_names = [filename.split('.')[0]
                       for filename in os.listdir(test_directory)
-                      if filename.endswith('.py') and not filename.startswith('Test')]
+                      if filename.endswith('.py') and not filename.startswith('Test') and not filename.startswith('__init__')]
+        '''
+
+
+        test_names = ['Blink', 'Brow Furrow', 'Brow Unfurrow', 'Stationary Floating', 'Float Left', 'Float Right', 'Float Up', 'Float Down', 'Select', 'Eyes Open', 'Eyes Closed']
 
         for test_name in test_names:
             # Add button to test

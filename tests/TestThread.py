@@ -29,6 +29,8 @@ class TestThread(threading.Thread):
 
         self.callback = None
 
+        # self.name = self.actionName
+
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
 
     def run(self):
