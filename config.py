@@ -1,9 +1,5 @@
 FULL_SCREEN_MODE = False  # Whether to run the test in one or two windows (?)
 
-# Save path configuration
-DATA_PATH = "./csv_downloads"
-COLLECTED_DATA_PATH = f'{DATA_PATH}/collected_data.csv'
-
 # Graph confirmation configuration
 WIDTH_PER_GRAPH = 400
 HEIGHT_PER_GRAPH = 80
@@ -17,3 +13,7 @@ TEST_DURATION = 5 * 1000  # How many milliseconds the test should take. Default 
 
 # Subject information
 NUMBER_OF_SUBJECTS = 10
+
+# Save path configuration (DATA_PATH/<id>/<test>/trial_<trial_number>/FILENAME)
+DATA_PATH = "./csv_downloads"
+FILENAME = "collected_data.csv"

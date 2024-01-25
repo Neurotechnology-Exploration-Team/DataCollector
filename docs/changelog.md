@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0-a] - 1/25/2024
+
+### Added
+- Test state tracking in `TestGUI` to implement trial numbers and test completed status.
+- Exit application when all tests are complete
+- Data now saves to `DATA_PATH/<id>/<test>/trial_<trial_number>/FILENAME` (see [config.py](../config.py) for additional configuration)
+
+### Changed
+- Refactored `Blink` (example test) into `Action` with more customizable parameters for blinking text.
+  - This will probably need to be updated in the future for more test variety
+
+### Added
+- Image assets for GUI tests
+
+## [3.2.0-a] - 1/25/2024
+
+### Added
+- Image assets for GUI tests
+
 ## [3.1.0-a] - 1/17/2024
 
 ### Added

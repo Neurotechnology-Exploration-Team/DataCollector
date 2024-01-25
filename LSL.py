@@ -1,9 +1,9 @@
 """
 This module contains the LSL class, responsible for handling LSL input, collection, and formatting.
 """
+import os.path
 import threading
 from datetime import datetime
-
 import pandas as pd
 import pylsl
 
@@ -53,16 +53,17 @@ class LSL:
         LSL.collection_thread.start()
 
     @staticmethod
-    def stop_collection():
+    def stop_collection(path: str):
         """
         Function to stop data collection and save to CSV.
-        TODO add boolean flag for whether to save data or not
+
+        :param path: Path to the FOLDER that the data should be saved to.
         """
         if LSL.collecting:
             LSL.collecting = False
             LSL.collection_thread.join()
             print("Data collection stopped. Saving collected data.")
-            LSL.__save_collected_data()
+            LSL.__save_collected_data(path)
 
     @staticmethod
     def start_label(event: str):
@@ -135,9 +136,11 @@ class LSL:
                 LSL.collected_data.append(flattened_data_row)
 
     @staticmethod
-    def __save_collected_data():
+    def __save_collected_data(path: str):
         """
-        Function to save data collected after collection has been stopped. TODO make sure this doesn't overwrite
+        Function to save data collected after collection has been stopped.
+
+        :param path: Path to the FOLDER that the data should be saved to
         """
 
         if LSL.collected_data:
@@ -158,7 +161,7 @@ class LSL:
             df = pd.DataFrame(LSL.collected_data, columns=columns)
             df['Timestamp'] = pd.to_datetime(df['Timestamp'])
             df = df.sort_values(by='Timestamp')
-            df.to_csv(config.COLLECTED_DATA_PATH, index=False)
+            df.to_csv(os.path.join(path, config.FILENAME), index=False)
             print("Collected data saved.")
         else:
             print("No data to save.")

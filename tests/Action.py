@@ -1,6 +1,3 @@
-"""
-THIS IS AN EXAMPLE OF WHAT A TEST CLASS SHOULD LOOK LIKE. DUPLICATE THIS CLASS AND UPDATE LABELS, ETC TO CREATE A NEW TEST.
-"""
 import random
 import tkinter as tk
 
@@ -13,18 +10,21 @@ class Action(TestThread):
     The Blink test that extends the TestThread class. Each method should call its super() equivalent to ensure data collection and thread management.
     """
 
-    def __init__(self, actionName):
+    def __init__(self, action_name, trial_number):
         """
         Initializes and creates the blink label in the display window.
+
+        :param action_name: The name of the action.
+        :param trial_number: The trial number of the action.
         """
-        self.label = actionName
-        super().__init__()
+        self.label = action_name
+        super().__init__(action_name, trial_number)
 
         self.action_label = tk.Label(TestGUI.display_window, text=self.label, font=("Helvetica", 16))
         self.action_label.pack()
 
         self.action = True
-        self.name = actionName
+        self.name = action_name
 
     def run(self):
         """
