@@ -13,23 +13,20 @@ class TestThread(threading.Thread):
     A class that all tests should extend that holds all threading logic, initialization, and data logging.
     """
 
-    def __init__(self, trial_number):
+    def __init__(self, action_name, trial_number):
         """
         The constructor that sets up the test name and stop condition.
         """
         super().__init__()
 
-        self.name = self.__class__.__name__  # Test name is class name
-        test_path = os.path.join(config.DATA_PATH, TestGUI.subject_number, self.name)
-
+        self.name = action_name
         self.trial_number = trial_number
-        self.current_path = os.path.join(str(test_path), f"trial_{str(self.trial_number).zfill(2)}")
 
+        test_path = os.path.join(config.DATA_PATH, TestGUI.subject_number, self.name)
+        self.current_path = os.path.join(str(test_path), f"trial_{str(self.trial_number).zfill(2)}")
         os.makedirs(self.current_path, exist_ok=True)
 
-        self.callback = None
-
-        # self.name = self.actionName
+        self.callback = None  # Callback for when a test is complete
 
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
 

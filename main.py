@@ -1,9 +1,4 @@
-import importlib
-import os
-
 from LSL import LSL
-#import sys
-#sys.path.append('/Documents/DataCollector')
 from tests.TestGUI import TestGUI
 from tests.Action import Action
 
@@ -12,7 +7,6 @@ class DataCollectorApp:
     """
     A collection of functions to setup the Tkinter GUI
     """
-    trials = {}
 
     @staticmethod
     def run_test(test_name):
@@ -21,68 +15,41 @@ class DataCollectorApp:
 
         :param test_name: Name of the test being run
         """
-
-        test_arry = ['Blink', 'Float left']
-
-        """ Trying another way so we dont have 20 test files """
-        test = Action(test_name)
+        test = Action(test_name, 0)
         test.start()
-
-
-        # Dynamically import the test from tests package & construct it w/ no parameters
-        # test_class = getattr(importlib.import_module(f"tests.{test_name}"), test_name)
-        # test = test_class()
 
         def callback(test_complete):
             if DataCollectorApp.all_tests_complete():
                 TestGUI.control_window.quit()
                 print("All tests complete.")
 
-            if not test_complete:
-                DataCollectorApp.trials[test_name]["trial_number"] += 1
-            else:
-                DataCollectorApp.trials[test_name]["complete"] = True
+            if not test_complete:  # If test is not complete
+                TestGUI.tests[test_name]["trial_number"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
 
         test.set_callback(callback)
-
-        # test.start()  # Start test thread
 
     @staticmethod
     def run():
         """
         Main function for adding buttons that run tests to the GUI and initializing the LSL streams & GUI.
         """
-        # Create tests directory TODO make for each subject
-        os.makedirs(config.DATA_PATH, exist_ok=True)
-
         # Initialize streams & GUI
         LSL.init_lsl_stream()
         TestGUI.init_gui()
 
-        # Locate all tests (filename should be the same as test name)
-        '''
-        test_directory = 'tests'
-        test_names = [filename.split('.')[0]
-                      for filename in os.listdir(test_directory)
-                      if filename.endswith('.py') and not filename.startswith('Test') and not filename.startswith('__init__')]
-        '''
-
-
-        test_names = ['Blink', 'Brow Furrow', 'Brow Unfurrow', 'Stationary Floating', 'Float Left', 'Float Right', 'Float Up', 'Float Down', 'Select', 'Eyes Open', 'Eyes Closed']
+        test_names = ['Blink', 'Brow Furrow', 'Brow Unfurrow', 'Stationary Floating', 'Float Left', 'Float Right',
+                      'Float Up', 'Float Down', 'Select', 'Eyes Open', 'Eyes Closed']
 
         for test_name in test_names:
             # Add button to test
             TestGUI.add_button(test_name, lambda name=test_name: DataCollectorApp.run_test(name))
 
-            # Initialize trial number
-            DataCollectorApp.trials[test_name] = {'trial_number': 0, 'complete': False}
-
         TestGUI.control_window.mainloop()
 
     @staticmethod
     def all_tests_complete() -> bool:
-        for test_dict in DataCollectorApp.trials.values():
-            if not test_dict['complete']:
+        for test in TestGUI.tests.keys():
+            if not TestGUI.tests[test]['completed']:
                 return False
         return True
 
