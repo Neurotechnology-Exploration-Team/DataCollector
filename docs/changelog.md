@@ -16,8 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored `Blink` (example test) into `Action` with more customizable parameters for blinking text.
   - This will probably need to be updated in the future for more test variety
 
-### Removed
-
 ### Added
 - Image assets for GUI tests
 
