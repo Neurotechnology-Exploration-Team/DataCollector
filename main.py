@@ -19,6 +19,10 @@ class DataCollectorApp:
         """
         Runs the specified test in a separate thread and collects data.
 
+        picture_directory = 'assets'
+
+        super().run()
+
         :param test_name: Name of the test being run
         """
 

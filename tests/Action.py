@@ -3,6 +3,7 @@ THIS IS AN EXAMPLE OF WHAT A TEST CLASS SHOULD LOOK LIKE. DUPLICATE THIS CLASS A
 """
 import random
 import tkinter as tk
+import os
 
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
@@ -30,6 +31,25 @@ class Action(TestThread):
         """
         Holds the logic to toggle blinking. TestThread will automatically call stop after the duration has ended.
         """
+
+        '''
+        test_directory = 'tests'
+        test_names = [filename.split('.')[0]
+                      for filename in os.listdir(test_directory)
+                      if filename.endswith('.py') and not filename.startswith('Test') and not filename.startswith('__init__')]
+        '''
+
+        picture_directory = 'assets'
+        picture_names = [filename.split('.')[0]
+                         for filename in os.listdir(picture_directory)]
+
+        print (picture_names)
+
+        if (self.name.split(' ')[-1] in picture_names):
+            print ("We will be displaying picture")
+            print (self.name.split)
+
+
         super().run()
 
         def toggle_action():
