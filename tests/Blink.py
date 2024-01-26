@@ -22,6 +22,9 @@ class Blink(TestThread):
         self.blink_label = tk.Label(TestGUI.display_window, text="Blinking Text", font=("Helvetica", 16))
         self.blink_label.pack()
 
+        # random thing to add to make sure this is working
+
+
         self.blinking = True
 
     def run(self):
