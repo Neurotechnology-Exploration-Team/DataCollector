@@ -63,7 +63,7 @@ class TestGUI:
         :param test_data_path: The path to the current test data FOLDER.
         """
         # Confirm data
-        TestGUI.__show_data_and_confirm(os.path.join(test_data_path, config.FILENAME))
+        TestGUI.__show_data_and_confirm(os.path.join(test_data_path, "collected_data.csv"))
 
         return TestGUI.tests[TestGUI.current_test]['completed']
 

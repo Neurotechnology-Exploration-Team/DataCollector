@@ -10,7 +10,7 @@ class Action(TestThread):
     The Blink test that extends the TestThread class. Each method should call its super() equivalent to ensure data collection and thread management.
     """
 
-    def __init__(self, action_name, trial_number):
+    def __init__(self, action_name):
         """
         Initializes and creates the blink label in the display window.
 
@@ -18,7 +18,7 @@ class Action(TestThread):
         :param trial_number: The trial number of the action.
         """
         self.label = action_name
-        super().__init__(action_name, trial_number)
+        super().__init__(action_name)
 
         self.action_label = tk.Label(TestGUI.display_window, text=self.label, font=("Helvetica", 16))
         self.action_label.pack()

@@ -6,6 +6,8 @@ HEIGHT_PER_GRAPH = 80
 
 # LSL configuration
 LSL_RESOLUTION_TIMEOUT = 10.0  # Timeout (in seconds) for an LSL stream
+DISCARD_ZERO_VALUES = False
+STREAM_TYPES = ['EEG', 'Accelerometer']  # Accelerometer, FFT
 
 # Test length
 DATA_PADDING_DURATION = 1.0  # How many seconds to wait before starting and ending a test
@@ -16,5 +18,3 @@ NUMBER_OF_SUBJECTS = 10
 
 # Save path configuration (DATA_PATH/<id>/<test>/trial_<trial_number>/FILENAME)
 DATA_PATH = "./csv_downloads"
-
-DISCARD_ZERO_VALUES = False
