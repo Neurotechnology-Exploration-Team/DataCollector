@@ -63,7 +63,7 @@ class TestGUI:
         :param test_data_path: The path to the current test data FOLDER.
         """
         # Confirm data
-        TestGUI.__show_data_and_confirm(os.path.join(test_data_path, "collected_data.csv"))
+        TestGUI.__show_data_and_confirm(test_data_path)
 
         return TestGUI.tests[TestGUI.current_test]['completed']
 
@@ -123,7 +123,11 @@ class TestGUI:
         # Make it scrollable so we don't have to click the tiny scrollbar
         TestGUI.__enable_scroll(canvas)
 
-        data_df = pd.read_csv(test_data_path)
+        # Read in and merge all data from the trial into a single dataframe
+        frames = []
+        for stream_type in config.STREAM_TYPES:
+            frames.append(pd.read_csv(os.path.join(test_data_path, f"{stream_type}_data.csv")))
+        data_df = pd.concat(frames, axis=1)
 
         # Figure out how many graphs we can fit on the screen
         screen_width = popup.winfo_screenwidth()

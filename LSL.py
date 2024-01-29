@@ -118,9 +118,9 @@ class LSL:
         """
 
         while LSL.collecting:
-            data_row = {'Timestamp': None, 'Label': "" if not LSL.collection_label else LSL.collection_label}
-
             for stream_type, stream in LSL.streams.items():
+                data_row = {'Timestamp': None, 'Label': "" if not LSL.collection_label else LSL.collection_label}
+
                 if stream:
                     # TODO adjust sample rate
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
@@ -128,9 +128,9 @@ class LSL:
                         if data_row['Timestamp'] is None:
                             data_row['Timestamp'] = LSL.__lsl_to_system_time(timestamp)  # Set timestamp from the first stream
 
-                        # Flatten the data row into a single list
-                        flattened_data_row = [data_row['Timestamp']] + [data_row['Label']] + sample
-                        LSL.collected_data[stream_type] += flattened_data_row
+                    # Flatten the data row into a single list
+                    flattened_data_row = [data_row['Timestamp']] + [data_row['Label']] + sample
+                    LSL.collected_data[stream_type] += flattened_data_row
 
     @staticmethod
     def __save_collected_data(path: str):

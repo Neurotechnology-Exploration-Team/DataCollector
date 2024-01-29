@@ -24,8 +24,7 @@ class TestThread(threading.Thread):
         self.name = action_name
         self.trial_number = TestGUI.tests[self.name]["trial"]
 
-        test_path = os.path.join(config.DATA_PATH, TestGUI.subject_number, self.name)
-        self.current_path = os.path.join(str(test_path), f"trial_{str(self.trial_number).zfill(2)}")
+        self.current_path = os.path.join('.', config.DATA_PATH, TestGUI.subject_number, self.name, f"trial_{str(self.trial_number).zfill(2)}")
         os.makedirs(self.current_path, exist_ok=True)
 
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
