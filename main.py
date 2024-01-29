@@ -15,7 +15,7 @@ class DataCollectorApp:
 
         :param test_name: Name of the test being run
         """
-        test = Action(test_name, TestGUI.tests[test_name]["trial"])
+        test = Action(test_name)
         test.start()
 
     @staticmethod
