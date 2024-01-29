@@ -16,7 +16,7 @@ class LSL:
     """
 
     streams = None  # The LSL streams being tracked
-    collected_data = []  # The collected data to be held and reviewed between start_collection() and stop_collection()
+    collected_data = {}  # The collected data to be held and reviewed between start_collection() and stop_collection()
     collecting = False  # Flag if data is currently being collected
     collection_thread = None  # The current thread data is being collected on, if any
     collection_label = None  # The current label to be appended to the data, if any
@@ -49,7 +49,7 @@ class LSL:
         """
         print("Started data collection.")
         LSL.collecting = True
-        LSL.collected_data = []
+        LSL.collected_data = {}
         LSL.collection_thread = threading.Thread(target=LSL.__collect_data)
         LSL.collection_thread.start()
 
@@ -119,22 +119,18 @@ class LSL:
 
         while LSL.collecting:
             data_row = {'Timestamp': None, 'Label': "" if not LSL.collection_label else LSL.collection_label}
+
             for stream_type, stream in LSL.streams.items():
                 if stream:
+                    # TODO adjust sample rate
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
                     if sample:
                         if data_row['Timestamp'] is None:
                             data_row['Timestamp'] = LSL.__lsl_to_system_time(timestamp)  # Set timestamp from the first stream
-                        data_row[stream_type] = sample
-                    else:
-                        data_row[stream_type] = [0 for i in range(stream.info().channel_count())]
-                        # TODO accelerometer stream seems to transmit data at different times than EEG
-            if data_row['Timestamp'] is not None:
-                # Flatten the data row into a single list
-                flattened_data_row = [data_row['Timestamp']] + [data_row['Label']]
-                for stream_type in LSL.streams.keys():
-                    flattened_data_row += data_row[stream_type]
-                LSL.collected_data.append(flattened_data_row)
+
+                        # Flatten the data row into a single list
+                        flattened_data_row = [data_row['Timestamp']] + [data_row['Label']] + sample
+                        LSL.collected_data[stream_type] += flattened_data_row
 
     @staticmethod
     def __save_collected_data(path: str):
@@ -145,21 +141,17 @@ class LSL:
         """
 
         if LSL.collected_data:
-            # Determine channel counts
-            channel_counts = {}
             for stream_type in LSL.streams.keys():
-                channel_counts[stream_type] = LSL.streams[stream_type].info().channel_count() if LSL.streams[stream_type] else 0
+                channel_count = LSL.streams[stream_type].info().channel_count() if LSL.streams[stream_type] else 0
 
-            # Define column headers
-            columns = ['Timestamp'] + ['Label']
-            for stream_type in LSL.streams.keys():
-                columns += [f'{stream_type}_{i + 1}' for i in range(channel_counts[stream_type])]
+                # Define column headers
+                columns = ['Timestamp'] + ['Label'] + [f'{stream_type}_{i + 1}' for i in range(channel_count)]
 
-            # Convert collected data to a DataFrame, format with columns above, and write to CSV
-            df = pd.DataFrame(LSL.collected_data, columns=columns)
-            df['Timestamp'] = pd.to_datetime(df['Timestamp'])
-            df = df.sort_values(by='Timestamp')
-            df.to_csv(os.path.join(path, "collected_data.csv"), index=False)
-            print("Collected data saved.")
+                # Convert collected data to a DataFrame, format with columns above, and write to CSV
+                df = pd.DataFrame(LSL.collected_data[stream_type], columns=columns)
+                df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+                df = df.sort_values(by='Timestamp')
+                df.to_csv(os.path.join(path, f"{stream_type}_data.csv"), index=False)
+                print(f"Collected {stream_type} data saved.")
         else:
             print("No data to save.")
