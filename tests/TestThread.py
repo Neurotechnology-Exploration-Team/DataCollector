@@ -29,8 +29,6 @@ class TestThread(threading.Thread):
         self.current_path = os.path.join(str(test_path), f"trial_{str(self.trial_number).zfill(2)}")
         os.makedirs(self.current_path, exist_ok=True)
 
-        self.callback = None  # Callback for when a test is complete
-
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
 
     def run(self):
@@ -65,8 +63,13 @@ class TestThread(threading.Thread):
         # Log finalized test status
         print(f"{TestGUI.current_test} - Trial {TestGUI.tests[TestGUI.current_test]['trial']}: {'Complete' if complete else 'Discarded'}")
 
-        if self.callback is not None:
-            self.callback(complete)
+        # EXIT LOGIC TODO Add button
+        if TestThread.__all_tests_complete():
+            TestGUI.control_window.quit()
+            print("All tests complete.")
+
+        if not complete:  # If test is not complete
+            TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
 
         self._stop_event.set()  # Set the stop event so Python auto-kills the thread
 
@@ -76,8 +79,14 @@ class TestThread(threading.Thread):
         """
         return self._stop_event.is_set()
 
-    def set_callback(self, callback):
+    @staticmethod
+    def __all_tests_complete() -> bool:
         """
-        A function to set the callback for the test that takes in a boolean parameter completed.
+        Helper function to check the current state of all tests in the GUI.
+
+        :return: True if all tests are complete, false otherwise.
         """
-        self.callback = callback
+        for test in TestGUI.tests.keys():
+            if not TestGUI.tests[test]['completed']:
+                return False
+        return True

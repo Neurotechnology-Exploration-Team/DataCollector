@@ -16,4 +16,5 @@ NUMBER_OF_SUBJECTS = 10
 
 # Save path configuration (DATA_PATH/<id>/<test>/trial_<trial_number>/FILENAME)
 DATA_PATH = "./csv_downloads"
-FILENAME = "collected_data.csv"
+
+DISCARD_ZERO_VALUES = False
