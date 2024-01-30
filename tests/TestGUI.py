@@ -21,8 +21,8 @@ class TestGUI:
     tests = {}
     current_test = None
 
-    subject_number = ""
-
+    participant_ID = ""
+    session_ID = ""
     @staticmethod
     def init_gui():
         """
@@ -36,7 +36,7 @@ class TestGUI:
         TestGUI.display_window.title("Display")
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
 
-        TestGUI.__prompt_subject_number()
+        TestGUI.__prompt_participant_info()
 
     @staticmethod
     def add_button(test_name, test_lambda):
@@ -196,33 +196,38 @@ class TestGUI:
         TestGUI.__enable_buttons()
 
     @staticmethod
-    def __prompt_subject_number():
+    def __prompt_participant_info():
         """
-        Creates a mandatory popup to prompt the user for the subject number and sets TestGUI.subject_number to the result.
+        Creates a mandatory popup to prompt the user for the participant number and session,
+        and sets TestGUI.participant_number and TestGUI.session to the result.
+        Info that has to be collected: Participant:P001 Session:S001
         """
 
         popup = tk.Toplevel(TestGUI.control_window)
-        popup.wm_title("Enter Subject Number")
+        popup.wm_title("Enter Participant Information")
         TestGUI.control_window.eval(f'tk::PlaceWindow {str(popup)} center')
 
-        # datatype of menu text
-        subject = tk.StringVar()
-        subject.set("01")
+        participant = tk.StringVar(value="P001")
+        session = tk.StringVar(value="S001")
 
         def submit():
-            TestGUI.subject_number = subject.get()
-            print(f"Subject Number: {TestGUI.subject_number}")
+            TestGUI.participant_ID = participant.get()
+            TestGUI.session_ID = session.get()
+            print(f"Participant: {TestGUI.participant_ID}, Session: {TestGUI.session_ID}")
+
             popup.destroy()
 
-        drop = tk.OptionMenu(popup, subject, *[str(i).zfill(2) for i in range(1, config.NUMBER_OF_SUBJECTS + 1)])
-        drop.pack()
+        tk.Entry(popup, textvariable=participant).pack()
+        tk.Entry(popup, textvariable=session).pack()
 
         submit_button = tk.Button(popup, text='Begin', command=submit)
         submit_button.pack()
 
-        # Force popup to be on top & halt program execution
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
+
+
+
 
     @staticmethod
     def __enable_scroll(canvas):
