@@ -3,7 +3,7 @@
 > This project houses the code to prompt the user in a Tkinter window, store, and process brain wave EEG data from an
 > LSL stream.
 
-### Current Version: [[4.3.0-a] - 1/31/2024](docs/changelog.md)
+### Current Version: [[4.3.1-a] - 1/31/2024](docs/changelog.md)
 
 ## Download & Install
 
