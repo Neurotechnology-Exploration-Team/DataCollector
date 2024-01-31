@@ -75,6 +75,6 @@ $ python main.py
 
 **Research Team:**
 
-- [Ian Dunn](mailto:itd3516@rit.edu)
 - [Akhil Devarapalli](mailto:ad7171@rit.edu)
+- [Ian Dunn](mailto:itd3516@rit.edu)
 - [Matt London](mailto:mrl2534@rit.edu)
