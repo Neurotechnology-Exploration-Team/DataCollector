@@ -1,7 +1,6 @@
 # NXT Data Collector
 
-> This project houses the code to prompt the user in a Tkinter window, store, and process brain wave EEG data from an
-> LSL stream.
+> The Data Collector is a graphical user interface to record participant EEG data. A researcher will run tests that prompt the participant to imagine motor impulses using audiovisual cues. The data from the OpenBCI LSL stream will be recorded, labeled, and saved to a folder hierarchy of all participants, sessions, and trials after a manual visual confirmation by the researcher.
 
 ### Current Version: [[4.0.1-a] - 1/25/2024](docs/changelog.md)
 
