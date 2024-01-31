@@ -16,7 +16,7 @@ class LSL:
     """
 
     streams = None  # The LSL streams being tracked
-    collected_data = {}  # The collected data to be held and reviewed between start_collection() and stop_collection()
+    collected_data = None  # The collected data to be held and reviewed between start_collection() and stop_collection()
     collecting = False  # Flag if data is currently being collected
     collection_thread = None  # The current thread data is being collected on, if any
     collection_label = None  # The current label to be appended to the data, if any
@@ -30,8 +30,10 @@ class LSL:
         """
         # Variables to hold streams, data, and the collection thread
         LSL.streams = {}
+        LSL.collected_data = {}
         for stream_type in config.STREAM_TYPES:
             LSL.streams[stream_type] = None
+            LSL.collected_data[stream_type] = []
 
         # Set up timestamp conversion using a constant offset
         lsl_start_time = datetime.fromtimestamp(pylsl.local_clock())
@@ -49,7 +51,8 @@ class LSL:
         """
         print("Started data collection.")
         LSL.collecting = True
-        LSL.collected_data = {}
+        for stream_type in LSL.collected_data.keys():
+            LSL.collected_data[stream_type] = []
         LSL.collection_thread = threading.Thread(target=LSL.__collect_data)
         LSL.collection_thread.start()
 
@@ -126,11 +129,12 @@ class LSL:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
                     if sample:
                         if data_row['Timestamp'] is None:
-                            data_row['Timestamp'] = LSL.__lsl_to_system_time(timestamp)  # Set timestamp from the first stream
+                            # Set timestamp from the first stream
+                            data_row['Timestamp'] = LSL.__lsl_to_system_time(timestamp)
 
-                    # Flatten the data row into a single list
-                    flattened_data_row = [data_row['Timestamp']] + [data_row['Label']] + sample
-                    LSL.collected_data[stream_type] += flattened_data_row
+                        # Flatten the data row into a single list
+                        flattened_data_row = [data_row['Timestamp']] + [data_row['Label']] + sample
+                        LSL.collected_data[stream_type] += flattened_data_row
 
     @staticmethod
     def __save_collected_data(path: str):
