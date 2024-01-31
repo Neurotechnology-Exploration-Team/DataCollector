@@ -3,7 +3,7 @@
 > This project houses the code to prompt the user in a Tkinter window, store, and process brain wave EEG data from an
 > LSL stream.
 
-### Current Version: [[4.0.1-a] - 1/25/2024](docs/changelog.md)
+### Current Version: [[4.3.0-a] - 1/31/2024](docs/changelog.md)
 
 ## Download & Install
 
@@ -65,7 +65,8 @@ $ python main.py
 
 - Clicking on the button to start each test will display the test in the display window.
 - After each test, a confirmation window will appear with the recorded data.
-- Each trial will be saved to `DATA_PATH/<id>/<test>/trial_<trial_number>/FILENAME` (see [config.py](./config.py) for additional configuration)
+- Each trial will be saved to `<DATA_PATH>/PXXX/SXXX/trial_XX/<STREAM_TYPE>_date.csv` (see [config.py](./config.py) for additional configuration)
+  - Each LSL stream will be saved to a separate CSV file. There should be no blank values.
 - Once all tests have been completed, the window will automatically close.
 
 ## Contributors
@@ -74,6 +75,6 @@ $ python main.py
 
 **Research Team:**
 
+- [Akhil Devarapalli](mailto:ad7171@rit.edu)
 - [Ian Dunn](mailto:itd3516@rit.edu)
-- [Mack Leonard](mailto:mml2034@rit.edu)
 - [Matt London](mailto:mrl2534@rit.edu)

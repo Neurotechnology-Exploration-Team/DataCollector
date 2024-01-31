@@ -23,6 +23,7 @@ class TestGUI:
 
     participant_ID = ""
     session_ID = ""
+
     @staticmethod
     def init_gui():
         """
@@ -39,20 +40,20 @@ class TestGUI:
         TestGUI.__prompt_participant_info()
 
     @staticmethod
-    def add_button(test_name, test_lambda):
+    def add_button(test_name: str, test_lambda):
         """
         Adds a button to the test window with its name and function to run.
 
         :param test_name: The name of the test that the button will be assigned to.
-        :param test_lambda: The function that the test will be ran with.
+        :param test_lambda: The function that the test will be ran with (no arguments).
         """
-        # COnfigure button
+        # Configure button
         btn = tk.Button(TestGUI.control_window, text=test_name)
         btn.config(command=test_lambda, bg='red')
         btn.pack()
 
         # Configure test state
-        TestGUI.tests[test_name] = { 'lambda': test_lambda, 'button': btn, 'trial': 0, 'completed': False}
+        TestGUI.tests[test_name] = {'lambda': test_lambda, 'button': btn, 'trial': 0, 'completed': False}
         print("Added test: " + test_name)
 
     @staticmethod
@@ -63,8 +64,9 @@ class TestGUI:
         :param test_data_path: The path to the current test data FOLDER.
         """
         # Confirm data
-        TestGUI.__show_data_and_confirm(os.path.join(test_data_path, config.FILENAME))
+        TestGUI.__show_data_and_confirm(test_data_path)
 
+        # Return if test is
         return TestGUI.tests[TestGUI.current_test]['completed']
 
     @staticmethod
@@ -72,7 +74,7 @@ class TestGUI:
         """
         A function to disable buttons while a test is running.
 
-        :param test_name: The name of the current test running
+        :param test_name: The name of the current test running (to enable the indicator).
         """
         for test in TestGUI.tests.keys():
             TestGUI.tests[test]['button'].config(state="disabled")
@@ -98,6 +100,7 @@ class TestGUI:
     def __show_data_and_confirm(test_data_path: str):
         """
         Popup the data confirmation window and check if it should be accepted or rejected.
+        If enabled for collection, EEG and accelerometer graphs will be displayed.
 
         :param test_data_path: The path to the test data CSV.
         """
@@ -123,7 +126,13 @@ class TestGUI:
         # Make it scrollable so we don't have to click the tiny scrollbar
         TestGUI.__enable_scroll(canvas)
 
-        data_df = pd.read_csv(test_data_path)
+        # Read in and merge all data from the trial into a single dataframe
+        # This should ignore NaN values, so graphs will not go to zero unless value is actually zero
+        frames = []
+        for stream_type, enabled in config.SUPPORTED_STREAMS.items():
+            if enabled and stream_type != 'FFT':
+                frames.append(pd.read_csv(os.path.join(test_data_path, f"{stream_type}_data.csv")))
+        data_df = pd.concat(frames, axis=1)
 
         # Figure out how many graphs we can fit on the screen
         screen_width = popup.winfo_screenwidth()
@@ -133,23 +142,25 @@ class TestGUI:
             graphs_per_row = 1
 
         # Loop through each EEG and draw the graphs
-        idx = 0
-        for idx, col in enumerate(data_df.filter(like='EEG')):
-            fig, ax = plt.subplots(figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
-            filtered_data = butter_bandpass_filter(data_df[col],order=6)
-            ax.plot(filtered_data)
-            ax.set_title(f'{col} Data')
-            FigureCanvasTkAgg(fig, master=scrollable_frame).get_tk_widget().grid(row=idx // graphs_per_row,
-                                                                                 column=idx % graphs_per_row)
+        if config.SUPPORTED_STREAMS['EEG']:
+            idx = 0
+            for idx, col in enumerate(data_df.filter(like='EEG')):
+                fig, ax = plt.subplots(figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
+                filtered_data = butter_bandpass_filter(data_df[col], order=6)
+                ax.plot(filtered_data)
+                ax.set_title(f'{col} Data')
+                FigureCanvasTkAgg(fig, master=scrollable_frame).get_tk_widget().grid(row=idx // graphs_per_row,
+                                                                                     column=idx % graphs_per_row)
 
         # Now draw the accelerometer graph at the end
-        accel_data = data_df.filter(like='Accelerometer').mean(axis=1)
-        fig2, ax2 = plt.subplots(
-            figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
-        ax2.plot(accel_data)
-        ax2.set_title('Accelerometer Data')
-        FigureCanvasTkAgg(fig2, master=scrollable_frame).get_tk_widget().grid(row=(idx + 1) // graphs_per_row,
-                                                                              column=(idx + 1) % graphs_per_row)
+        if config.SUPPORTED_STREAMS['Accelerometer']:
+            accel_data = data_df.filter(like='Accelerometer').mean(axis=1)
+            fig2, ax2 = plt.subplots(
+                figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
+            ax2.plot(accel_data)
+            ax2.set_title('Accelerometer Data')
+            FigureCanvasTkAgg(fig2, master=scrollable_frame).get_tk_widget().grid(row=(idx + 1) // graphs_per_row,
+                                                                                  column=(idx + 1) % graphs_per_row)
 
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
@@ -226,9 +237,6 @@ class TestGUI:
 
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
-
-
-
 
     @staticmethod
     def __enable_scroll(canvas):

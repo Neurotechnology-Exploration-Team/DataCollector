@@ -9,24 +9,14 @@ class DataCollectorApp:
     """
 
     @staticmethod
-    def run_test(test_name):
+    def run_test(test_name: str):
         """
         Runs the specified test in a separate thread and collects data.
 
         :param test_name: Name of the test being run
         """
-        test = Action(test_name, TestGUI.tests[test_name]["trial"])
+        test = Action(test_name)
         test.start()
-
-        def callback(test_complete):
-            if DataCollectorApp.__all_tests_complete():
-                TestGUI.control_window.quit()
-                print("All tests complete.")
-
-            if not test_complete:  # If test is not complete
-                TestGUI.tests[test_name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
-
-        test.set_callback(callback)
 
     @staticmethod
     def run():
@@ -45,18 +35,6 @@ class DataCollectorApp:
             TestGUI.add_button(test_name, lambda name=test_name: DataCollectorApp.run_test(name))
 
         TestGUI.control_window.mainloop()
-
-    @staticmethod
-    def __all_tests_complete() -> bool:
-        """
-        Helper function to check the current state of all tests in the GUI.
-
-        :return: True if all tests are complete, false otherwise.
-        """
-        for test in TestGUI.tests.keys():
-            if not TestGUI.tests[test]['completed']:
-                return False
-        return True
 
 
 if __name__ == '__main__':

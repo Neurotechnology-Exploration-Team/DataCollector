@@ -16,7 +16,7 @@ class LSL:
     """
 
     streams = None  # The LSL streams being tracked
-    collected_data = []  # The collected data to be held and reviewed between start_collection() and stop_collection()
+    collected_data = None  # The collected data to be held and reviewed between start_collection() and stop_collection()
     collecting = False  # Flag if data is currently being collected
     collection_thread = None  # The current thread data is being collected on, if any
     collection_label = None  # The current label to be appended to the data, if any
@@ -29,8 +29,12 @@ class LSL:
         MUST BE CALLED TO initialize streams, data, timestamp offset, and the collection thread.
         """
         # Variables to hold streams, data, and the collection thread
-        LSL.streams = {'EEG': None, 'Accelerometer': None}  # , 'FFT': None
-        # TODO hold stream names in config
+        LSL.streams = {}
+        LSL.collected_data = {}
+        for stream_type, enabled in config.SUPPORTED_STREAMS.items():
+            if enabled:
+                LSL.streams[stream_type] = None
+                LSL.collected_data[stream_type] = []
 
         # Set up timestamp conversion using a constant offset
         lsl_start_time = datetime.fromtimestamp(pylsl.local_clock())
@@ -48,7 +52,8 @@ class LSL:
         """
         print("Started data collection.")
         LSL.collecting = True
-        LSL.collected_data = []
+        for stream_type in LSL.collected_data.keys():
+            LSL.collected_data[stream_type] = []
         LSL.collection_thread = threading.Thread(target=LSL.__collect_data)
         LSL.collection_thread.start()
 
@@ -86,7 +91,7 @@ class LSL:
     #
 
     @staticmethod
-    def __lsl_to_system_time(lsl_timestamp):  # TODO idk what type lsl_timestamp is
+    def __lsl_to_system_time(lsl_timestamp):
         """
         Converts an LSL timestamp to system time.
         """
@@ -117,23 +122,20 @@ class LSL:
         """
 
         while LSL.collecting:
-            data_row = {'Timestamp': None, 'EEG': [], 'Accelerometer': [], 'Label': "" if not LSL.collection_label else LSL.collection_label}  # , 'FFT': []
             for stream_type, stream in LSL.streams.items():
+                data_row = {'Timestamp': None, 'Label': "" if not LSL.collection_label else LSL.collection_label}
+
                 if stream:
+                    # TODO adjust sample rate
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
                     if sample:
                         if data_row['Timestamp'] is None:
-                            data_row['Timestamp'] = LSL.__lsl_to_system_time(
-                                timestamp)  # Set timestamp from the first stream
-                        data_row[stream_type] = sample
-                    else:
-                        data_row[stream_type] = [0 for i in range(stream.info().channel_count())]
-                        # TODO accelerometer stream seems to transmit data at different times than EEG
-            if data_row['Timestamp'] is not None:
-                # Flatten the data row into a single list
-                flattened_data_row = [data_row['Timestamp']] + data_row['EEG'] + data_row['Accelerometer'] + [
-                    data_row['Label']]  # + data_row['FFT']
-                LSL.collected_data.append(flattened_data_row)
+                            # Set timestamp from the first stream
+                            data_row['Timestamp'] = LSL.__lsl_to_system_time(timestamp)
+
+                        # Flatten the data row into a single list
+                        flattened_data_row = [data_row['Timestamp']] + [data_row['Label']] + sample
+                        LSL.collected_data[stream_type] += [flattened_data_row]
 
     @staticmethod
     def __save_collected_data(path: str):
@@ -144,24 +146,17 @@ class LSL:
         """
 
         if LSL.collected_data:
-            # Determine channel counts
-            eeg_channel_count = LSL.streams['EEG'].info().channel_count() if LSL.streams['EEG'] else 0
-            accelerometer_channel_count = LSL.streams['Accelerometer'].info().channel_count() \
-                if LSL.streams['Accelerometer'] else 0
-            # fft_channel_count = LSL.streams['FFT'].info().channel_count() if LSL.streams['FFT'] else 0
+            for stream_type in LSL.streams.keys():
+                channel_count = LSL.streams[stream_type].info().channel_count() if LSL.streams[stream_type] else 0
 
-            # Define column headers
-            columns = ['Timestamp'] + \
-                      [f'EEG_{i + 1}' for i in range(eeg_channel_count)] + \
-                      [f'Accelerometer_{i + 1}' for i in range(accelerometer_channel_count)] + \
-                      ['Label']
-            # [f'FFT_{i + 1}' for i in range(fft_channel_count)] + \
+                # Define column headers
+                columns = ['Timestamp'] + ['Label'] + [f'{stream_type}_{i + 1}' for i in range(channel_count)]
 
-            # Convert collected data to a DataFrame, format with columns above, and write to CSV
-            df = pd.DataFrame(LSL.collected_data, columns=columns)
-            df['Timestamp'] = pd.to_datetime(df['Timestamp'])
-            df = df.sort_values(by='Timestamp')
-            df.to_csv(os.path.join(path, config.FILENAME), index=False)
-            print("Collected data saved.")
+                # Convert collected data to a DataFrame, format with columns above, and write to CSV
+                df = pd.DataFrame(LSL.collected_data[stream_type], columns=columns)
+                df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+                df = df.sort_values(by='Timestamp')
+                df.to_csv(os.path.join(path, f"{stream_type}_data.csv"), index=False)
+                print(f"Collected {stream_type} data saved.")
         else:
             print("No data to save.")
