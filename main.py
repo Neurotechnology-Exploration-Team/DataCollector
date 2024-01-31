@@ -9,7 +9,7 @@ class DataCollectorApp:
     """
 
     @staticmethod
-    def run_test(test_name):
+    def run_test(test_name: str):
         """
         Runs the specified test in a separate thread and collects data.
 

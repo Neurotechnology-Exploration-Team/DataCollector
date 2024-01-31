@@ -91,7 +91,7 @@ class LSL:
     #
 
     @staticmethod
-    def __lsl_to_system_time(lsl_timestamp):  # TODO idk what type lsl_timestamp is
+    def __lsl_to_system_time(lsl_timestamp):
         """
         Converts an LSL timestamp to system time.
         """

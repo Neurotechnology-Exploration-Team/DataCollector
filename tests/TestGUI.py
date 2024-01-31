@@ -23,6 +23,7 @@ class TestGUI:
 
     participant_ID = ""
     session_ID = ""
+
     @staticmethod
     def init_gui():
         """
@@ -39,20 +40,20 @@ class TestGUI:
         TestGUI.__prompt_participant_info()
 
     @staticmethod
-    def add_button(test_name, test_lambda):
+    def add_button(test_name: str, test_lambda):
         """
         Adds a button to the test window with its name and function to run.
 
         :param test_name: The name of the test that the button will be assigned to.
-        :param test_lambda: The function that the test will be ran with.
+        :param test_lambda: The function that the test will be ran with (no arguments).
         """
-        # COnfigure button
+        # Configure button
         btn = tk.Button(TestGUI.control_window, text=test_name)
         btn.config(command=test_lambda, bg='red')
         btn.pack()
 
         # Configure test state
-        TestGUI.tests[test_name] = { 'lambda': test_lambda, 'button': btn, 'trial': 0, 'completed': False}
+        TestGUI.tests[test_name] = {'lambda': test_lambda, 'button': btn, 'trial': 0, 'completed': False}
         print("Added test: " + test_name)
 
     @staticmethod
@@ -65,6 +66,7 @@ class TestGUI:
         # Confirm data
         TestGUI.__show_data_and_confirm(test_data_path)
 
+        # Return if test is
         return TestGUI.tests[TestGUI.current_test]['completed']
 
     @staticmethod
@@ -72,7 +74,7 @@ class TestGUI:
         """
         A function to disable buttons while a test is running.
 
-        :param test_name: The name of the current test running
+        :param test_name: The name of the current test running (to enable the indicator).
         """
         for test in TestGUI.tests.keys():
             TestGUI.tests[test]['button'].config(state="disabled")
@@ -234,9 +236,6 @@ class TestGUI:
 
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
-
-
-
 
     @staticmethod
     def __enable_scroll(canvas):
