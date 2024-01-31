@@ -134,7 +134,7 @@ class LSL:
 
                         # Flatten the data row into a single list
                         flattened_data_row = [data_row['Timestamp']] + [data_row['Label']] + sample
-                        LSL.collected_data[stream_type] += flattened_data_row
+                        LSL.collected_data[stream_type] += [flattened_data_row]
 
     @staticmethod
     def __save_collected_data(path: str):
