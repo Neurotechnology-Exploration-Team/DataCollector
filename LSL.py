@@ -31,9 +31,10 @@ class LSL:
         # Variables to hold streams, data, and the collection thread
         LSL.streams = {}
         LSL.collected_data = {}
-        for stream_type in config.STREAM_TYPES:
-            LSL.streams[stream_type] = None
-            LSL.collected_data[stream_type] = []
+        for stream_type, enabled in config.SUPPORTED_STREAMS.items():
+            if enabled:
+                LSL.streams[stream_type] = None
+                LSL.collected_data[stream_type] = []
 
         # Set up timestamp conversion using a constant offset
         lsl_start_time = datetime.fromtimestamp(pylsl.local_clock())

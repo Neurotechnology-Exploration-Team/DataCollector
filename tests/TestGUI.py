@@ -98,6 +98,7 @@ class TestGUI:
     def __show_data_and_confirm(test_data_path: str):
         """
         Popup the data confirmation window and check if it should be accepted or rejected.
+        If enabled for collection, EEG and accelerometer graphs will be displayed.
 
         :param test_data_path: The path to the test data CSV.
         """
@@ -124,9 +125,12 @@ class TestGUI:
         TestGUI.__enable_scroll(canvas)
 
         # Read in and merge all data from the trial into a single dataframe
+        # This should ignore NaN values, so graphs will not go to zero unless value is actually zero
         frames = []
-        for stream_type in config.STREAM_TYPES:
-            frames.append(pd.read_csv(os.path.join(test_data_path, f"{stream_type}_data.csv")))
+        for stream_type, enabled in config.SUPPORTED_STREAMS.items():
+            if enabled and stream_type != 'FFT':
+                frames.append(pd.read_csv(os.path.join(test_data_path, f"{stream_type}_data.csv")))
+
         data_df = pd.concat(frames, axis=1)
 
         # Figure out how many graphs we can fit on the screen
@@ -137,22 +141,24 @@ class TestGUI:
             graphs_per_row = 1
 
         # Loop through each EEG and draw the graphs
-        idx = 0
-        for idx, col in enumerate(data_df.filter(like='EEG')):
-            fig, ax = plt.subplots(figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
-            ax.plot(data_df[col])
-            ax.set_title(f'{col} Data')
-            FigureCanvasTkAgg(fig, master=scrollable_frame).get_tk_widget().grid(row=idx // graphs_per_row,
-                                                                                 column=idx % graphs_per_row)
+        if config.SUPPORTED_STREAMS['EEG']:
+            idx = 0
+            for idx, col in enumerate(data_df.filter(like='EEG')):
+                fig, ax = plt.subplots(figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
+                ax.plot(data_df[col])
+                ax.set_title(f'{col} Data')
+                FigureCanvasTkAgg(fig, master=scrollable_frame).get_tk_widget().grid(row=idx // graphs_per_row,
+                                                                                     column=idx % graphs_per_row)
 
         # Now draw the accelerometer graph at the end
-        accel_data = data_df.filter(like='Accelerometer').mean(axis=1)
-        fig2, ax2 = plt.subplots(
-            figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
-        ax2.plot(accel_data)
-        ax2.set_title('Accelerometer Data')
-        FigureCanvasTkAgg(fig2, master=scrollable_frame).get_tk_widget().grid(row=(idx + 1) // graphs_per_row,
-                                                                              column=(idx + 1) % graphs_per_row)
+        if config.SUPPORTED_STREAMS['Accelerometer']:
+            accel_data = data_df.filter(like='Accelerometer').mean(axis=1)
+            fig2, ax2 = plt.subplots(
+                figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
+            ax2.plot(accel_data)
+            ax2.set_title('Accelerometer Data')
+            FigureCanvasTkAgg(fig2, master=scrollable_frame).get_tk_widget().grid(row=(idx + 1) // graphs_per_row,
+                                                                                  column=(idx + 1) % graphs_per_row)
 
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")

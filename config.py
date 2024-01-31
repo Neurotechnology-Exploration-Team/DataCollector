@@ -7,7 +7,9 @@ HEIGHT_PER_GRAPH = 80
 # LSL configuration
 LSL_RESOLUTION_TIMEOUT = 10.0  # Timeout (in seconds) for an LSL stream
 DISCARD_ZERO_VALUES = False
-STREAM_TYPES = ['EEG', 'Accelerometer']  # Accelerometer, FFT
+SUPPORTED_STREAMS = {'EEG': True,
+                     'Accelerometer': False,
+                     'FFT': False}
 
 # Test length
 DATA_PADDING_DURATION = 1.0  # How many seconds to wait before starting and ending a test
