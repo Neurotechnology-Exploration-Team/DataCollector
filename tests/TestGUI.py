@@ -130,7 +130,6 @@ class TestGUI:
         for stream_type, enabled in config.SUPPORTED_STREAMS.items():
             if enabled and stream_type != 'FFT':
                 frames.append(pd.read_csv(os.path.join(test_data_path, f"{stream_type}_data.csv")))
-
         data_df = pd.concat(frames, axis=1)
 
         # Figure out how many graphs we can fit on the screen

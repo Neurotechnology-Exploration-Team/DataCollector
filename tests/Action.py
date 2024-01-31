@@ -1,30 +1,29 @@
 import random
 import tkinter as tk
 
+import config
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
 
 class Action(TestThread):
     """
-    The Blink test that extends the TestThread class. Each method should call its super() equivalent to ensure data collection and thread management.
+    The Action test that extends the TestThread class. Each method should call its super() equivalent to ensure data
+    collection and thread management.
     """
 
     def __init__(self, action_name):
         """
-        Initializes and creates the blink label in the display window.
+        Initializes and creates the Action label in the display window.
 
         :param action_name: The name of the action.
-        :param trial_number: The trial number of the action.
         """
-        self.label = action_name
         super().__init__(action_name)
 
-        self.action_label = tk.Label(TestGUI.display_window, text=self.label, font=("Helvetica", 16))
+        # Setup blinking label
+        self.action_label = tk.Label(TestGUI.display_window, text=self.name, font=("Helvetica", 16))
         self.action_label.pack()
-
-        self.action = True
-        self.name = action_name
+        self.action_enabled = True  # Flag for when to stop blinking action label
 
     def run(self):
         """
@@ -33,9 +32,15 @@ class Action(TestThread):
         super().run()
 
         def toggle_action():
-            if self.action:
+            """
+            Function to toggle blinking action label with random intervals.
+            """
+            if self.action_enabled:
                 self.action_label.config(fg="black" if self.action_label.cget("fg") == "white" else "white")
-                TestGUI.display_window.after(random.randint(1000, 3000), toggle_action)  # Schedule the next toggle
+                # Schedule the next toggle
+                TestGUI.display_window.after(
+                    random.randint(config.MIN_BLINK_DURATION, config.MAX_BLINK_DURATION),
+                    toggle_action)
 
         # Start the blinking effect
         toggle_action()
@@ -44,7 +49,7 @@ class Action(TestThread):
         """
         Toggles blinking flag and destroys label.
         """
-        self.action = False
+        self.action_enabled = False
         self.action_label.destroy()
 
         super().stop()
