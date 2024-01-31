@@ -4,7 +4,7 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from NoiseReduction import butter_bandpass_filter
+from postprocessing.NoiseReduction import butter_bandpass_filter
 import config
 
 
