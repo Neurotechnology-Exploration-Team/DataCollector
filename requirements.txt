@@ -1,3 +1,4 @@
 matplotlib==3.8.2
 pandas==2.1.4
 pylsl==1.16.2
+scipy

@@ -4,7 +4,7 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
+from postprocessing.NoiseReduction import butter_bandpass_filter
 import config
 
 
@@ -136,7 +136,8 @@ class TestGUI:
         idx = 0
         for idx, col in enumerate(data_df.filter(like='EEG')):
             fig, ax = plt.subplots(figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
-            ax.plot(data_df[col])
+            filtered_data = butter_bandpass_filter(data_df[col],order=6)
+            ax.plot(filtered_data)
             ax.set_title(f'{col} Data')
             FigureCanvasTkAgg(fig, master=scrollable_frame).get_tk_widget().grid(row=idx // graphs_per_row,
                                                                                  column=idx % graphs_per_row)
