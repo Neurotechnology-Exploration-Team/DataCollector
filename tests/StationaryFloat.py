@@ -18,9 +18,10 @@ class StationaryFloat(TestThread):
         Initializes and creates the blink label in the display window.
         """
         super().__init__()
-
-        self.float_label = tk.Label(TestGUI.display_window, text="Stationary Floating", font=("Helvetica", 16))
-        self.float_label.pack()
+        self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'stop white.PNG')
+        self.image = tk.PhotoImage(file=self.image_directory)
+        self.float_label = tk.Label(TestGUI.display_window, file=self.image, borderwidth=0)
+        self.float_label.place(relx = 0.5, rely = 0.5, anchor='center')
 
 
 

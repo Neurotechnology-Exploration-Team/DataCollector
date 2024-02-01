@@ -16,8 +16,9 @@ class TestGUI:
     control_window = None
     display_window = None
 
-    test_buttons = {}
-    test_status = {}
+    # Setup test states: A dictionary with test name keys corresponding to sub-dictionaries with lambda, button,
+    # trial_number, and completed parameters
+    tests = {}
     current_test = None
 
     subject_number = ""
@@ -42,12 +43,17 @@ class TestGUI:
     def add_button(test_name, test_lambda):
         """
         Adds a button to the test window with its name and function to run.
+
+        :param test_name: The name of the test that the button will be assigned to.
+        :param test_lambda: The function that the test will be ran with.
         """
+        # COnfigure button
         btn = tk.Button(TestGUI.control_window, text=test_name)
         btn.config(command=test_lambda, bg='red')
         btn.pack()
-        TestGUI.test_buttons[test_name] = btn
-        TestGUI.test_status[test_name] = False
+
+        # Configure test state
+        TestGUI.tests[test_name] = { 'lambda': test_lambda, 'button': btn, 'trial': 0, 'completed': False}
         print("Added test: " + test_name)
 
     @staticmethod
@@ -57,20 +63,23 @@ class TestGUI:
 
         :param test_data_path: The path to the current test data FOLDER.
         """
+        # Confirm data
         TestGUI.__show_data_and_confirm(os.path.join(test_data_path, config.FILENAME))
 
-        return TestGUI.test_status[TestGUI.current_test]
+        return TestGUI.tests[TestGUI.current_test]['completed']
 
     @staticmethod
     def disable_buttons(test_name):
         """
         A function to disable buttons while a test is running.
+
+        :param test_name: The name of the current test running
         """
-        for button in TestGUI.test_buttons.values():
-            button.config(state="disabled")
+        for test in TestGUI.tests.keys():
+            TestGUI.tests[test]['button'].config(state="disabled")
 
         TestGUI.current_test = test_name
-        TestGUI.test_buttons[TestGUI.current_test].config(bg="yellow")
+        TestGUI.tests[TestGUI.current_test]['button'].config(bg="yellow")
 
     #
     # HELPER METHODS
@@ -82,9 +91,9 @@ class TestGUI:
         A function to enable buttons after a test has been completed.
         """
         # Reset the buttons
-        for test in TestGUI.test_buttons.keys():
-            if not TestGUI.test_status[test]:  # If test is not complete, re-enable button
-                TestGUI.test_buttons[test].config(state="normal")
+        for test in TestGUI.tests.keys():
+            if not TestGUI.tests[test]['completed']:  # If test is not complete, re-enable button
+                TestGUI.tests[test]['button'].config(state="normal")
 
     @staticmethod
     def __show_data_and_confirm(test_data_path: str):
@@ -169,9 +178,9 @@ class TestGUI:
         popup.destroy()
 
         # Set button color to green and disable to mark that the test has been completed
-        TestGUI.test_buttons[TestGUI.current_test].config(bg="green")
-        TestGUI.test_buttons[TestGUI.current_test].config(state="disabled")
-        TestGUI.test_status[TestGUI.current_test] = True
+        TestGUI.tests[TestGUI.current_test]['button'].config(bg="green")
+        TestGUI.tests[TestGUI.current_test]['button'].config(state="disabled")
+        TestGUI.tests[TestGUI.current_test]['completed'] = True
 
         TestGUI.__enable_buttons()
 
@@ -184,7 +193,7 @@ class TestGUI:
         """
         # Close window and then clear all the data
         popup.destroy()
-        TestGUI.test_buttons[TestGUI.current_test].config(bg="red")
+        TestGUI.tests[TestGUI.current_test]['button'].config(bg="red")
         TestGUI.__enable_buttons()
 
     @staticmethod

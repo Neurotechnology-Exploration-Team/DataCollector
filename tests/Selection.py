@@ -21,8 +21,8 @@ class Selection(TestThread):
         super().__init__()
         self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'select white.PNG')
         self.image = tk.PhotoImage(file=self.image_directory)
-        self.image_label = tk.Label(TestGUI.display_window, image=self.image)
-        self.image_label.pack()
+        self.image_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
+        self.image_label.place(relx = 0.5, rely = 0.5, anchor='center')
 
 
 

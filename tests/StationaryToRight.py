@@ -22,8 +22,10 @@ class StationaryToRight(TestThread):
         super().__init__()
         self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'right.PNG')
         self.image = tk.PhotoImage(file=self.image_directory)
-        self.float_label = tk.Label(TestGUI.display_window, text="Stationary Floating", font=("Helvetica", 16))
-        self.image_label = tk.Label(TestGUI.display_window, image=self.image)
+        self.image2_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'stop white.PNG')
+        self.image2 = tk.PhotoImage(file=self.image2_directory)
+        self.float_label = tk.Label(TestGUI.display_window, image=self.image2, borderwidth=0)
+        self.image_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
 
         self.show_float = True
         self.show_selection = False
@@ -41,21 +43,21 @@ class StationaryToRight(TestThread):
         super().run()
         def toggle():
             # empty function for now
-            self.image_label.pack_forget()
-            self.float_label.pack_forget()
+            self.image_label.place_forget()
+            self.float_label.place_forget()
             print ("In the toggle function here are the values")
             print ("Show float", self.show_float)
             print ("Show Selection", self.show_selection)
             if self.show_float:
                 print ("Showing the float")
-                self.float_label.pack()
+                self.float_label.place(relx = 0.5, rely = 0.5, anchor='center')
                 self.show_float = False
                 self.next_float = False
                 self.next_selection = True
                 TestGUI.display_window.after(3000, toggle)  # Schedule the next toggle
             elif self.show_selection:
                 print ("Showing the selection")
-                self.image_label.pack()
+                self.image_label.place(relx = 0.5, rely = 0.5, anchor='center')
                 self.show_selection = False
                 self.next_float = True
                 self.next_selection = False

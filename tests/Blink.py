@@ -19,8 +19,8 @@ class Blink(TestThread):
         """
         super().__init__()
 
-        self.blink_label = tk.Label(TestGUI.display_window, text="Blinking Text", font=("Helvetica", 16))
-        self.blink_label.pack()
+        self.blink_label = tk.Label(TestGUI.display_window, text="Blinking Text", font=("Helvetica", 16), borderwidth=0, highlightthickness = 0, background='black')
+        self.blink_label.place(relx = 0.5, rely = 0.5, anchor='center')
 
         # random thing to add to make sure this is working
 
@@ -35,7 +35,7 @@ class Blink(TestThread):
 
         def toggle_blink():
             if self.blinking:
-                self.blink_label.config(fg="black" if self.blink_label.cget("fg") == "white" else "white")
+                self.blink_label.config(fg="white" if self.blink_label.cget("fg") == "black" else "black")
                 TestGUI.display_window.after(random.randint(1000, 3000), toggle_blink)  # Schedule the next toggle
 
         # Start the blinking effect
