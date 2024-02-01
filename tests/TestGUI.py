@@ -33,6 +33,7 @@ class TestGUI:
 
         TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
         TestGUI.display_window.title("Display")
+        TestGUI.display_window.configure(background='black')
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
 
         TestGUI.__prompt_subject_number()

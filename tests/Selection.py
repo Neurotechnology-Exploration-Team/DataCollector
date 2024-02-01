@@ -9,7 +9,7 @@ from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
 
-class FloatRight(TestThread):
+class Selection(TestThread):
     """
     The Blink test that extends the TestThread class. Each method should call its super() equivalent to ensure data collection and thread management.
     """
@@ -19,7 +19,7 @@ class FloatRight(TestThread):
         Initializes and creates the blink label in the display window.
         """
         super().__init__()
-        self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'right.PNG')
+        self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'select white.PNG')
         self.image = tk.PhotoImage(file=self.image_directory)
         self.image_label = tk.Label(TestGUI.display_window, image=self.image)
         self.image_label.pack()
