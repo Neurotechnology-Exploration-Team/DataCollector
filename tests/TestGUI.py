@@ -41,7 +41,7 @@ class TestGUI:
         TestGUI.disable_close_button(TestGUI.display_window)
 
         TestGUI.close_button = tk.Button(TestGUI.control_window, text="EXIT TESTING", height=5, width=30)
-        TestGUI.close_button.config(command=lambda: TestGUI.exit())
+        TestGUI.close_button.config(command=lambda: TestGUI.__exit())
         TestGUI.close_button.pack(side="bottom", pady=100)
 
         TestGUI.__prompt_participant_info()
@@ -180,8 +180,12 @@ class TestGUI:
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
+        def confirm_data():
+            popup.destroy()
+            TestGUI.tests[TestGUI.current_test]['completed'] = True
+
         # Create buttons to accept and deny the data
-        confirm_button = tk.Button(scrollable_frame, text="Confirm Data", command=lambda: TestGUI.__confirm_data(popup))
+        confirm_button = tk.Button(scrollable_frame, text="Confirm Data", command=lambda: confirm_data())
         confirm_button.grid(row=(idx + 2) // graphs_per_row, column=0, pady=10)
 
         deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: popup.destroy())
@@ -190,16 +194,6 @@ class TestGUI:
         # Force popup to be on top & halt program execution
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
-
-    @staticmethod
-    def __confirm_data(popup):
-        """
-        Run if the accept button is pressed
-
-        :param popup: Popup window which must be closed
-        """
-        popup.destroy()
-        TestGUI.tests[TestGUI.current_test]['completed'] = True
 
     @staticmethod
     def __prompt_participant_info():
@@ -234,13 +228,21 @@ class TestGUI:
         TestGUI.control_window.wait_window(popup)
 
     @staticmethod
-    def exit():
+    def __exit():
+        """
+        Helper function that handles the exit behavior of the GUI.
+        """
         TestGUI.display_window.destroy()
         TestGUI.control_window.destroy()
         exit(0)
 
     @staticmethod
     def disable_close_button(window):
+        """
+        Helper function that disables the close/X button of the specified window.
+
+        :param window: The window to disable the closing of.
+        """
         def disable_event():
             pass
 
