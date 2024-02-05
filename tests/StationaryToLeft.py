@@ -9,6 +9,7 @@ from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 import time
 
+import config
 
 class StationaryToLeft(TestThread):
     """
@@ -53,14 +54,14 @@ class StationaryToLeft(TestThread):
                 self.show_float = False
                 self.next_float = False
                 self.next_selection = True
-                TestGUI.display_window.after(3000, toggle)  # Schedule the next toggle
+                TestGUI.display_window.after(random.randint(config.TRANSITION_LOW_INTERVALS, config.TRANSITION_HIGH_INTERVALS), toggle)  # Schedule the next toggle
             elif self.show_selection:
                 print ("Showing the selection")
                 self.image_label.place(relx = 0.5, rely = 0.5, anchor='center')
                 self.show_selection = False
                 self.next_float = True
                 self.next_selection = False
-                TestGUI.display_window.after(3000, toggle)
+                TestGUI.display_window.after(random.randint(config.TRANSITION_LOW_INTERVALS, config.TRANSITION_HIGH_INTERVALS), toggle)
             elif self.next_float:
                 self.show_float = True
                 self.show_selection = False

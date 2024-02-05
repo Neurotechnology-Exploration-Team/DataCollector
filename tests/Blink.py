@@ -7,6 +7,7 @@ import tkinter as tk
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
+import config
 
 class Blink(TestThread):
     """
@@ -36,7 +37,7 @@ class Blink(TestThread):
         def toggle_blink():
             if self.blinking:
                 self.blink_label.config(fg="white" if self.blink_label.cget("fg") == "black" else "black")
-                TestGUI.display_window.after(random.randint(1000, 3000), toggle_blink)  # Schedule the next toggle
+                TestGUI.display_window.after(random.randint(config.TEST_LOW_INTERVALS, config.TEST_HIGH_INTERVALS), toggle_blink)  # Schedule the next toggle
 
         # Start the blinking effect
         toggle_blink()

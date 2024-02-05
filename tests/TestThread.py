@@ -37,8 +37,13 @@ class TestThread(threading.Thread):
 
         LSL.start_label(self.name)
 
-        # Schedule to stop the test after 15 seconds
-        TestGUI.display_window.after(config.TEST_DURATION, self.stop)
+
+        # The type of test determines how long the test should run for
+        if "To" in self.name:
+            TestGUI.display_window.after(config.TRANSITION_TEST_DURATION, self.stop)
+        else:
+            TestGUI.display_window.after(config.TEST_DURATION, self.stop)
+
 
         return  # End thread
 

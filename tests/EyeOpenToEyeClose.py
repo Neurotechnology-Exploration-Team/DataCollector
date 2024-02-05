@@ -9,6 +9,8 @@ from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 import time
 
+import config
+
 
 class EyeOpenToEyeClose(TestThread):
     """
@@ -22,8 +24,8 @@ class EyeOpenToEyeClose(TestThread):
         super().__init__()
         self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'right.PNG')
         self.image = tk.PhotoImage(file=self.image_directory)
-        self.float_label = tk.Label(TestGUI.display_window, text="Eyes Closed", font=("Helvetica", 16), background='black')
-        self.image_label = tk.Label(TestGUI.display_window, text="Eyes Open", font=("Helvetica", 16), background='black')
+        self.float_label = tk.Label(TestGUI.display_window, text="Eyes Closed", font=("Helvetica", 16), borderwidth=0, highlightthickness = 0, background='black', fg='white')
+        self.image_label = tk.Label(TestGUI.display_window, text="Eyes Open", font=("Helvetica", 16), borderwidth=0, highlightthickness = 0, background='black', fg='white')
 
         self.show_float = True
         self.show_selection = False
@@ -52,14 +54,14 @@ class EyeOpenToEyeClose(TestThread):
                 self.show_float = False
                 self.next_float = False
                 self.next_selection = True
-                TestGUI.display_window.after(3000, toggle)  # Schedule the next toggle
+                TestGUI.display_window.after(random.randint(config.TEST_LOW_INTERVALS, config.TEST_HIGH_INTERVALS), toggle)  # Schedule the next toggle
             elif self.show_selection:
                 print ("Showing the selection")
                 self.image_label.place(relx = 0.5, rely = 0.5, anchor='center')
                 self.show_selection = False
                 self.next_float = True
                 self.next_selection = False
-                TestGUI.display_window.after(3000, toggle)
+                TestGUI.display_window.after(random.randint(config.TEST_LOW_INTERVALS, config.TEST_HIGH_INTERVALS), toggle)
             elif self.next_float:
                 self.show_float = True
                 self.show_selection = False
