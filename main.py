@@ -32,7 +32,7 @@ class DataCollectorApp:
 
         for test_name in test_names:
             # Add button to test
-            TestGUI.add_button(test_name, lambda name=test_name: DataCollectorApp.run_test(name))
+            TestGUI.add_test(test_name, lambda name=test_name: DataCollectorApp.run_test(name))
 
         TestGUI.control_window.mainloop()
 

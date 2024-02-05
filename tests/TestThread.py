@@ -36,7 +36,7 @@ class TestThread(threading.Thread):
         """
         All logic related to the control panel, starting collection, and calling the stop method after a certain duration.
         """
-        TestGUI.disable_buttons(self.name)
+        TestGUI.start_test(self.name)
 
         print(f"Starting test {self.name}: Trial {self.trial_number}")
 
@@ -64,11 +64,6 @@ class TestThread(threading.Thread):
         # Log finalized test status
         print(f"{TestGUI.current_test} - Trial {TestGUI.tests[TestGUI.current_test]['trial']}: {'Complete' if complete else 'Discarded'}")
 
-        # EXIT LOGIC TODO Add button
-        if TestThread.__all_tests_complete():
-            TestGUI.control_window.quit()
-            print("All tests complete.")
-
         if not complete:  # If test is not complete
             TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
 
@@ -79,15 +74,3 @@ class TestThread(threading.Thread):
         Overrides default stop method, as soon as stop event is set in stop() the test will auto kill itself.
         """
         return self._stop_event.is_set()
-
-    @staticmethod
-    def __all_tests_complete() -> bool:
-        """
-        Helper function to check the current state of all tests in the GUI.
-
-        :return: True if all tests are complete, false otherwise.
-        """
-        for test in TestGUI.tests.keys():
-            if not TestGUI.tests[test]['completed']:
-                return False
-        return True
