@@ -162,6 +162,7 @@ class TestGUI:
         deny_button.grid(row=(idx + 2) // graphs_per_row, column=1, pady=10)
 
         # TODO explicitly destroy the graphs
+        plt.close()
 
         # popup.mainloop()
         # Force popup to be on top & halt program execution

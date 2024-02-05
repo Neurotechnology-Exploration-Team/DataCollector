@@ -23,6 +23,8 @@ class TestThread(threading.Thread):
         self.test_path = os.path.join(config.DATA_PATH, TestGUI.subject_number, self.name)
         self.trial = 0
 
+        # self.name = self.actionName
+
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
 
     def run(self):
