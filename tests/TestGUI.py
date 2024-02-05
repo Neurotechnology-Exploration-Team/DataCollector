@@ -15,6 +15,7 @@ class TestGUI:
 
     control_window = None
     display_window = None
+    close_button = None
 
     # Setup test states: A dictionary with test name keys corresponding to sub-dictionaries with lambda, button,
     # trial_number, and completed parameters
@@ -29,13 +30,23 @@ class TestGUI:
         """
         MUST BE CALLED BEFORE ACCESSING ANY CLASS VARIABLES. Sets up the display window.
         """
+
+        def callback():
+            pass
+
         TestGUI.control_window = tk.Tk()
         TestGUI.control_window.title("Control Panel")
         TestGUI.__set_window_geometry(TestGUI.control_window, left_side=True)
+        TestGUI.control_window.protocol("WM_DELETE_WINDOW", callback())
 
         TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
         TestGUI.display_window.title("Display")
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
+        TestGUI.display_window.protocol("WM_DELETE_WINDOW", callback())
+
+        TestGUI.close_button = tk.Button(TestGUI.control_window, text="EXIT TESTING", height=5, width=30)
+        TestGUI.close_button.config(command=lambda: TestGUI.exit())
+        TestGUI.close_button.pack(side="bottom", pady=100)
 
         TestGUI.__prompt_participant_info()
 
@@ -66,6 +77,7 @@ class TestGUI:
         # Confirm data
         TestGUI.__show_data_and_confirm(test_data_path)
 
+        TestGUI.close_button.config(state="normal")
         # Reset the buttons
         for test in TestGUI.tests.keys():
             if not TestGUI.tests[test]['completed']:  # If test is not complete, re-enable button
@@ -89,6 +101,8 @@ class TestGUI:
         :param test_name: The name of the current test running (to enable the indicator).
         """
         # Disable all buttons
+        TestGUI.close_button.config(state="disabled")
+
         for test in TestGUI.tests.keys():
             TestGUI.tests[test]['button'].config(state="disabled")
 
@@ -179,7 +193,6 @@ class TestGUI:
         # Force popup to be on top & halt program execution
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
-        TestGUI.control_window.protocol("WM_DELETE_WINDOW", popup.destroy())
 
     @staticmethod
     def __confirm_data(popup):
@@ -221,6 +234,12 @@ class TestGUI:
 
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
+
+    @staticmethod
+    def exit():
+        TestGUI.display_window.destroy()
+        TestGUI.control_window.destroy()
+        exit(0)
 
     @staticmethod
     def __set_window_geometry(window, left_side=True):
