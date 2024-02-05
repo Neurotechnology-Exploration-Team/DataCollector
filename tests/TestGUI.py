@@ -108,7 +108,7 @@ class TestGUI:
         # Setup the window and canvas
         popup = tk.Toplevel()
         popup.wm_title("Data Confirmation")
-        popup.attributes('-fullscreen')  # TODO unix-based systems use -zoomed
+        popup.state('zoomed') # TODO unix-based systems use -zoomed
 
         canvas = tk.Canvas(popup)
         scrollbar = tk.Scrollbar(popup, orient="vertical", command=canvas.yview)
