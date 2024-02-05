@@ -4,7 +4,7 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
+from postprocessing.NoiseReduction import butter_bandpass_filter
 import config
 
 
@@ -21,7 +21,8 @@ class TestGUI:
     tests = {}
     current_test = None
 
-    subject_number = ""
+    participant_ID = ""
+    session_ID = ""
 
     @staticmethod
     def init_gui():
@@ -36,23 +37,23 @@ class TestGUI:
         TestGUI.display_window.title("Display")
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
 
-        TestGUI.__prompt_subject_number()
+        TestGUI.__prompt_participant_info()
 
     @staticmethod
-    def add_button(test_name, test_lambda):
+    def add_button(test_name: str, test_lambda):
         """
         Adds a button to the test window with its name and function to run.
 
         :param test_name: The name of the test that the button will be assigned to.
-        :param test_lambda: The function that the test will be ran with.
+        :param test_lambda: The function that the test will be ran with (no arguments).
         """
-        # COnfigure button
+        # Configure button
         btn = tk.Button(TestGUI.control_window, text=test_name)
         btn.config(command=test_lambda, bg='red')
         btn.pack()
 
         # Configure test state
-        TestGUI.tests[test_name] = { 'lambda': test_lambda, 'button': btn, 'trial': 0, 'completed': False}
+        TestGUI.tests[test_name] = {'lambda': test_lambda, 'button': btn, 'trial': 0, 'completed': False}
         print("Added test: " + test_name)
 
     @staticmethod
@@ -63,8 +64,9 @@ class TestGUI:
         :param test_data_path: The path to the current test data FOLDER.
         """
         # Confirm data
-        TestGUI.__show_data_and_confirm(os.path.join(test_data_path, config.FILENAME))
+        TestGUI.__show_data_and_confirm(test_data_path)
 
+        # Return if test is
         return TestGUI.tests[TestGUI.current_test]['completed']
 
     @staticmethod
@@ -72,7 +74,7 @@ class TestGUI:
         """
         A function to disable buttons while a test is running.
 
-        :param test_name: The name of the current test running
+        :param test_name: The name of the current test running (to enable the indicator).
         """
         for test in TestGUI.tests.keys():
             TestGUI.tests[test]['button'].config(state="disabled")
@@ -98,6 +100,7 @@ class TestGUI:
     def __show_data_and_confirm(test_data_path: str):
         """
         Popup the data confirmation window and check if it should be accepted or rejected.
+        If enabled for collection, EEG and accelerometer graphs will be displayed.
 
         :param test_data_path: The path to the test data CSV.
         """
@@ -123,7 +126,13 @@ class TestGUI:
         # Make it scrollable so we don't have to click the tiny scrollbar
         TestGUI.__enable_scroll(canvas)
 
-        data_df = pd.read_csv(test_data_path)
+        # Read in and merge all data from the trial into a single dataframe
+        # This should ignore NaN values, so graphs will not go to zero unless value is actually zero
+        frames = []
+        for stream_type, enabled in config.SUPPORTED_STREAMS.items():
+            if enabled and stream_type != 'FFT':
+                frames.append(pd.read_csv(os.path.join(test_data_path, f"{stream_type}_data.csv")))
+        data_df = pd.concat(frames, axis=1)
 
         # Figure out how many graphs we can fit on the screen
         screen_width = popup.winfo_screenwidth()
@@ -133,22 +142,25 @@ class TestGUI:
             graphs_per_row = 1
 
         # Loop through each EEG and draw the graphs
-        idx = 0
-        for idx, col in enumerate(data_df.filter(like='EEG')):
-            fig, ax = plt.subplots(figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
-            ax.plot(data_df[col])
-            ax.set_title(f'{col} Data')
-            FigureCanvasTkAgg(fig, master=scrollable_frame).get_tk_widget().grid(row=idx // graphs_per_row,
-                                                                                 column=idx % graphs_per_row)
+        if config.SUPPORTED_STREAMS['EEG']:
+            idx = 0
+            for idx, col in enumerate(data_df.filter(like='EEG')):
+                fig, ax = plt.subplots(figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
+                filtered_data = butter_bandpass_filter(data_df[col], order=6)
+                ax.plot(filtered_data)
+                ax.set_title(f'{col} Data')
+                FigureCanvasTkAgg(fig, master=scrollable_frame).get_tk_widget().grid(row=idx // graphs_per_row,
+                                                                                     column=idx % graphs_per_row)
 
         # Now draw the accelerometer graph at the end
-        accel_data = data_df.filter(like='Accelerometer').mean(axis=1)
-        fig2, ax2 = plt.subplots(
-            figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
-        ax2.plot(accel_data)
-        ax2.set_title('Accelerometer Data')
-        FigureCanvasTkAgg(fig2, master=scrollable_frame).get_tk_widget().grid(row=(idx + 1) // graphs_per_row,
-                                                                              column=(idx + 1) % graphs_per_row)
+        if config.SUPPORTED_STREAMS['Accelerometer']:
+            accel_data = data_df.filter(like='Accelerometer').mean(axis=1)
+            fig2, ax2 = plt.subplots(
+                figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
+            ax2.plot(accel_data)
+            ax2.set_title('Accelerometer Data')
+            FigureCanvasTkAgg(fig2, master=scrollable_frame).get_tk_widget().grid(row=(idx + 1) // graphs_per_row,
+                                                                                  column=(idx + 1) % graphs_per_row)
 
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
@@ -196,31 +208,33 @@ class TestGUI:
         TestGUI.__enable_buttons()
 
     @staticmethod
-    def __prompt_subject_number():
+    def __prompt_participant_info():
         """
-        Creates a mandatory popup to prompt the user for the subject number and sets TestGUI.subject_number to the result.
+        Creates a mandatory popup to prompt the user for the participant number and session,
+        and sets TestGUI.participant_number and TestGUI.session to the result.
+        Info that has to be collected: Participant:P001 Session:S001
         """
 
         popup = tk.Toplevel(TestGUI.control_window)
-        popup.wm_title("Enter Subject Number")
+        popup.wm_title("Enter Participant Information")
         TestGUI.control_window.eval(f'tk::PlaceWindow {str(popup)} center')
 
-        # datatype of menu text
-        subject = tk.StringVar()
-        subject.set("01")
+        participant = tk.StringVar(value="P001")
+        session = tk.StringVar(value="S001")
 
         def submit():
-            TestGUI.subject_number = subject.get()
-            print(f"Subject Number: {TestGUI.subject_number}")
+            TestGUI.participant_ID = participant.get()
+            TestGUI.session_ID = session.get()
+            print(f"Participant: {TestGUI.participant_ID}, Session: {TestGUI.session_ID}")
+
             popup.destroy()
 
-        drop = tk.OptionMenu(popup, subject, *[str(i).zfill(2) for i in range(1, config.NUMBER_OF_SUBJECTS + 1)])
-        drop.pack()
+        tk.Entry(popup, textvariable=participant).pack()
+        tk.Entry(popup, textvariable=session).pack()
 
         submit_button = tk.Button(popup, text='Begin', command=submit)
         submit_button.pack()
 
-        # Force popup to be on top & halt program execution
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
 
