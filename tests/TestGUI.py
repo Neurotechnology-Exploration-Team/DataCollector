@@ -31,18 +31,18 @@ class TestGUI:
         MUST BE CALLED BEFORE ACCESSING ANY CLASS VARIABLES. Sets up the display window.
         """
 
-        def callback():
+        def disable_event():
             pass
 
         TestGUI.control_window = tk.Tk()
         TestGUI.control_window.title("Control Panel")
         TestGUI.__set_window_geometry(TestGUI.control_window, left_side=True)
-        TestGUI.control_window.protocol("WM_DELETE_WINDOW", callback())
+        TestGUI.control_window.protocol("WM_DELETE_WINDOW", disable_event)
 
         TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
         TestGUI.display_window.title("Display")
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
-        TestGUI.display_window.protocol("WM_DELETE_WINDOW", callback())
+        TestGUI.display_window.protocol("WM_DELETE_WINDOW", disable_event)
 
         TestGUI.close_button = tk.Button(TestGUI.control_window, text="EXIT TESTING", height=5, width=30)
         TestGUI.close_button.config(command=lambda: TestGUI.exit())
