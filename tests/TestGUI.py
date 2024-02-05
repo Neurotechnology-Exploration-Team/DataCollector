@@ -30,19 +30,15 @@ class TestGUI:
         """
         MUST BE CALLED BEFORE ACCESSING ANY CLASS VARIABLES. Sets up the display window.
         """
-
-        def disable_event():
-            pass
-
         TestGUI.control_window = tk.Tk()
         TestGUI.control_window.title("Control Panel")
         TestGUI.__set_window_geometry(TestGUI.control_window, left_side=True)
-        TestGUI.control_window.protocol("WM_DELETE_WINDOW", disable_event)
+        TestGUI.disable_close_button(TestGUI.control_window)
 
         TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
         TestGUI.display_window.title("Display")
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
-        TestGUI.display_window.protocol("WM_DELETE_WINDOW", disable_event)
+        TestGUI.disable_close_button(TestGUI.display_window)
 
         TestGUI.close_button = tk.Button(TestGUI.control_window, text="EXIT TESTING", height=5, width=30)
         TestGUI.close_button.config(command=lambda: TestGUI.exit())
@@ -126,6 +122,7 @@ class TestGUI:
         popup = tk.Toplevel()
         popup.wm_title("Data Confirmation")
         popup.state('zoomed')
+        TestGUI.disable_close_button(popup)
 
         canvas = tk.Canvas(popup)
         scrollbar = tk.Scrollbar(popup, orient="vertical", command=canvas.yview)
@@ -213,6 +210,7 @@ class TestGUI:
         """
 
         popup = tk.Toplevel(TestGUI.control_window)
+        TestGUI.disable_close_button(popup)
         popup.wm_title("Enter Participant Information")
         TestGUI.control_window.eval(f'tk::PlaceWindow {str(popup)} center')
 
@@ -240,6 +238,13 @@ class TestGUI:
         TestGUI.display_window.destroy()
         TestGUI.control_window.destroy()
         exit(0)
+
+    @staticmethod
+    def disable_close_button(window):
+        def disable_event():
+            pass
+
+        window.protocol("WM_DELETE_WINDOW", disable_event)
 
     @staticmethod
     def __set_window_geometry(window, left_side=True):
