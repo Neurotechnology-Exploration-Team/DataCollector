@@ -19,8 +19,8 @@ class BrowFrowed(TestThread):
         """
         super().__init__()
 
-        self.brow_label = tk.Label(TestGUI.display_window, text="Brow Frowed", font=("Helvetica", 16))
-        self.brow_label.pack()
+        self.brow_label = tk.Label(TestGUI.display_window, text="Brow Frowed", font=("Helvetica", 16), borderwidth=0, highlightthickness = 0, background='black', fg='white')
+        self.brow_label.place(relx = 0.5, rely = 0.5, anchor='center')
 
 
 

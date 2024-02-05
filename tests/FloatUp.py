@@ -21,10 +21,8 @@ class FloatUp(TestThread):
         super().__init__()
         self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'up.PNG')
         self.image = tk.PhotoImage(file=self.image_directory)
-        self.float_label = tk.Label(TestGUI.display_window, text="Float Up", font=("Helvetica", 16))
-        self.image_label = tk.Label(TestGUI.display_window, image=self.image)
-        self.float_label.pack()
-        self.image_label.pack()
+        self.image_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
+        self.image_label.place(relx = 0.5, rely = 0.5, anchor='center')
 
 
 
@@ -42,6 +40,5 @@ class FloatUp(TestThread):
         """
         Toggles blinking flag and destroys label.
         """
-        self.float_label.destroy()
         self.image_label.destroy()
         super().stop()

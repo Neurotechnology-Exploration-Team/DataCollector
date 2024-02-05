@@ -19,8 +19,8 @@ class EyesOpen(TestThread):
         """
         super().__init__()
 
-        self.eye_label = tk.Label(TestGUI.display_window, text="Eyes Open", font=("Helvetica", 16))
-        self.eye_label.pack()
+        self.eye_label = tk.Label(TestGUI.display_window, text="Eyes Open", font=("Helvetica", 16), background='black')
+        self.eye_label.place(relx = 0.5, rely = 0.5, anchor='center')
 
 
 
