@@ -121,8 +121,12 @@ class TestGUI:
         # Setup the window and canvas
         popup = tk.Toplevel()
         popup.wm_title("Data Confirmation")
-        popup.state('zoomed')
         TestGUI.disable_close_button(popup)
+
+        if os.name == "posix":  # Needs to be different for unix
+            popup.state('-zoomed')
+        else:
+            popup.state('zoomed')
 
         canvas = tk.Canvas(popup)
         scrollbar = tk.Scrollbar(popup, orient="vertical", command=canvas.yview)
