@@ -144,7 +144,7 @@ class LSL:
 
                 # Convert collected data to a DataFrame, format with columns above, and write to CSV
                 df = pd.DataFrame(LSL.collected_data[stream_type], columns=columns)
-                df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+                df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='mixed')#'%Y-%m-%d %H:%M:%S.%f')
                 df = df.sort_values(by='Timestamp')
                 df.to_csv(os.path.join(path, f"{stream_type}_data.csv"), index=False)
                 print(f"Collected {stream_type} data saved.")
