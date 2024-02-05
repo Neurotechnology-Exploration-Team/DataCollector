@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Fullscreen mode config flag
 
+## [4.3.1-a] - 1/31/2024
+
+### Fixed
+- Timestamps derived from LSL stream now match up to system time using an updated offset from pylsl.
+  - The precision of these estimates should be below 1 ms (empirically within +/-0.2 ms).
+
 ## [4.3.0-a] - 1/31/2024
 
 ### Added
