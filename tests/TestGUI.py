@@ -66,11 +66,23 @@ class TestGUI:
         # Confirm data
         TestGUI.__show_data_and_confirm(test_data_path)
 
-        # Return if test is
+        # Reset the buttons
+        for test in TestGUI.tests.keys():
+            if not TestGUI.tests[test]['completed']:  # If test is not complete, re-enable button
+                TestGUI.tests[test]['button'].config(state="normal")
+                TestGUI.tests[test]['button'].config(bg="red")
+            else:  # If test is complete, set to green
+                TestGUI.tests[test]['button'].config(state="disabled")
+                TestGUI.tests[test]['button'].config(bg="green")
+
+        # Clear graphs from memory
+        plt.close()
+
+        # Return true if test is complete
         return TestGUI.tests[TestGUI.current_test]['completed']
 
     @staticmethod
-    def disable_buttons(test_name):
+    def start_test(test_name):
         """
         A function to disable buttons while a test is running.
 
@@ -85,16 +97,6 @@ class TestGUI:
     #
     # HELPER METHODS
     #
-
-    @staticmethod
-    def __enable_buttons():
-        """
-        A function to enable buttons after a test has been completed.
-        """
-        # Reset the buttons
-        for test in TestGUI.tests.keys():
-            if not TestGUI.tests[test]['completed']:  # If test is not complete, re-enable button
-                TestGUI.tests[test]['button'].config(state="normal")
 
     @staticmethod
     def __show_data_and_confirm(test_data_path: str):
@@ -124,7 +126,7 @@ class TestGUI:
         canvas.configure(yscrollcommand=scrollbar.set)
 
         # Make it scrollable so we don't have to click the tiny scrollbar
-        TestGUI.__enable_scroll(canvas)
+        canvas.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1 * (event.delta / 120)), "units"))
 
         # Read in and merge all data from the trial into a single dataframe
         # This should ignore NaN values, so graphs will not go to zero unless value is actually zero
@@ -169,15 +171,13 @@ class TestGUI:
         confirm_button = tk.Button(scrollable_frame, text="Confirm Data", command=lambda: TestGUI.__confirm_data(popup))
         confirm_button.grid(row=(idx + 2) // graphs_per_row, column=0, pady=10)
 
-        deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: TestGUI.__deny_data(popup))
+        deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: popup.destroy())
         deny_button.grid(row=(idx + 2) // graphs_per_row, column=1, pady=10)
 
-        # TODO explicitly destroy the graphs
-
-        # popup.mainloop()
         # Force popup to be on top & halt program execution
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
+        TestGUI.control_window.protocol("WM_DELETE_WINDOW", popup.destroy())
 
     @staticmethod
     def __confirm_data(popup):
@@ -187,25 +187,7 @@ class TestGUI:
         :param popup: Popup window which must be closed
         """
         popup.destroy()
-
-        # Set button color to green and disable to mark that the test has been completed
-        TestGUI.tests[TestGUI.current_test]['button'].config(bg="green")
-        TestGUI.tests[TestGUI.current_test]['button'].config(state="disabled")
         TestGUI.tests[TestGUI.current_test]['completed'] = True
-
-        TestGUI.__enable_buttons()
-
-    @staticmethod
-    def __deny_data(popup):
-        """
-        Run if the deny button is pressed
-
-        :param popup: Popup window which must be closed
-        """
-        # Close window and then clear all the data
-        popup.destroy()
-        TestGUI.tests[TestGUI.current_test]['button'].config(bg="red")
-        TestGUI.__enable_buttons()
 
     @staticmethod
     def __prompt_participant_info():
@@ -237,15 +219,6 @@ class TestGUI:
 
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
-
-    @staticmethod
-    def __enable_scroll(canvas):
-        """
-        Function to enable scrolling using the mouse wheel
-
-        NOTE: There may be a better solution for this, this is what I could find easily online
-        """
-        canvas.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1 * (event.delta / 120)), "units"))
 
     @staticmethod
     def __set_window_geometry(window, left_side=True):

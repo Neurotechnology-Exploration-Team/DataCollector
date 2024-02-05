@@ -36,7 +36,7 @@ class TestThread(threading.Thread):
         """
         All logic related to the control panel, starting collection, and calling the stop method after a certain duration.
         """
-        TestGUI.disable_buttons(self.name)
+        TestGUI.start_test(self.name)
 
         print(f"Starting test {self.name}: Trial {self.trial_number}")
 
