@@ -76,4 +76,5 @@ $ python main.py
 
 - [Akhil Devarapalli](mailto:ad7171@rit.edu)
 - [Ian Dunn](mailto:itd3516@rit.edu)
+- [Mack Leonard](mailto:mml2034@rit.edu)
 - [Matt London](mailto:mrl2534@rit.edu)
