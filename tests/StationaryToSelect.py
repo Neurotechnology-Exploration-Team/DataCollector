@@ -86,6 +86,6 @@ class StationaryToSelect(TestThread):
         self.show_selection = False
         self.next_float = False
         self.next_selection = False
-        self.float_label.destroy()
-        self.image_label.destroy()
+        # self.float_label.destroy()
+        # self.image_label.destroy()
         super().stop()
