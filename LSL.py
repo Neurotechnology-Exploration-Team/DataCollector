@@ -39,10 +39,26 @@ class LSL:
             LSL.__find_and_initialize_stream(stream_type)
 
     @staticmethod
+    def clear_stream_buffers():
+        """
+        Clears the buffer of each LSL stream to ensure no old data is included in the new collection.
+        """
+        for stream_type, stream in LSL.streams.items():
+            if stream:
+                print(f"Clearing buffer for {stream_type} stream...")
+                # Continuously pull from the stream until no more samples are returned
+                while True:
+                    sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
+                    if not sample:  # If no sample is returned, the buffer is considered cleared
+                        break
+                print(f"{stream_type} stream buffer cleared.")
+
+    @staticmethod
     def start_collection():
         """
         Function to start data collection.
         """
+        LSL.clear_stream_buffers()
         print("Started data collection.")
         LSL.collecting = True
         for stream_type in LSL.collected_data.keys():
