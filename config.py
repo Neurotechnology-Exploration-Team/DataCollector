@@ -5,7 +5,12 @@ WIDTH_PER_GRAPH = 400
 HEIGHT_PER_GRAPH = 80
 
 # LSL configuration
-LSL_RESOLUTION_TIMEOUT = 10.0  # Timeout (in seconds) for an LSL stream
+LSL_RESOLUTION_TIMEOUT = 10.0   # Timeout (in seconds) for an LSL stream
+SUPPORTED_STREAMS = {           # Which streams to enable
+    'EEG': True,
+    'Accelerometer': False,
+    'FFT': False
+}
 
 # Test length
 DATA_PADDING_DURATION = 1.0  # How many seconds to wait before starting and ending a test
@@ -21,6 +26,5 @@ TRANSITION_HIGH_INTERVALS = 30000 # 30 SECONDS
 # Subject information
 NUMBER_OF_SUBJECTS = 10
 
-# Save path configuration (DATA_PATH/<id>/<test>/trial_<trial_number>/FILENAME)
-DATA_PATH = "./csv_downloads"
-FILENAME = "collected_data.csv"
+# Save path configuration (<DATA_PATH>/PXXX/SXXX/trial_XX/<STREAM_TYPE>_data.csv)
+DATA_PATH = "csv_downloads"

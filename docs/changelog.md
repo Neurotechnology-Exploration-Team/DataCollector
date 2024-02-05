@@ -5,6 +5,62 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.1-a] - 1/31/2024
+
+### Fixed
+- Timestamps derived from LSL stream now match up to system time using an updated offset from pylsl.
+  - The precision of these estimates should be below 1 ms (empirically within +/-0.2 ms).
+
+## [4.3.0-a] - 1/31/2024
+
+### Added
+- Two new configuration variables in `config.py`:
+  - Ability to enable/disable supported stream types
+  - Variable duration of blinking text
+
+### Changed
+- The collector now stores and collects data on a per-stream basis
+- LSL data is now stored in separate stream CSVs (i.e. `EEG_data.csv`), removing any 0 or NaN data points from misaligned sampling.
+
+## [4.2.0-a] - 1/31/2024
+
+### Added
+- Postprocessing bandpass filtering to reduce noise in displayed EEG graphs.
+
+## [4.1.0-a] - 1/29/2024
+
+### Added
+- Prompt for session number on startup
+
+### Changed
+- Renamed all references from "subject" to "participant"
+- Changed participant folder structure to include session number
+  - Stored as `<DATA_PATH>/PXXX/SXXX/trial_XX/<STREAM_TYPE>_date.csv`
+
+## [4.0.1-a] - 1/25/2024
+
+### Fixed
+- Fixed trial number hardcoded as 1.
+
+## [4.0.0-a] - 1/25/2024
+
+### Added
+- Test state tracking in `TestGUI` to implement trial numbers and test completed status.
+- Exit application when all tests are complete
+- Data now saves to `DATA_PATH/<id>/<test>/trial_<trial_number>/FILENAME` (see [config.py](../config.py) for additional configuration)
+
+### Changed
+- Refactored `Blink` (example test) into `Action` with more customizable parameters for blinking text.
+  - This will probably need to be updated in the future for more test variety
+
+### Added
+- Image assets for GUI tests
+
+## [3.2.0-a] - 1/25/2024
+
+### Added
+- Image assets for GUI tests
+
 ## [3.1.0-a] - 1/17/2024
 
 ### Added
