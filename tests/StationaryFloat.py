@@ -4,6 +4,8 @@ THIS IS AN EXAMPLE OF WHAT A TEST CLASS SHOULD LOOK LIKE. DUPLICATE THIS CLASS A
 import random
 import tkinter as tk
 
+import os
+
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
@@ -20,7 +22,7 @@ class StationaryFloat(TestThread):
         super().__init__()
         self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'stop white.PNG')
         self.image = tk.PhotoImage(file=self.image_directory)
-        self.float_label = tk.Label(TestGUI.display_window, file=self.image, borderwidth=0)
+        self.float_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
         self.float_label.place(relx = 0.5, rely = 0.5, anchor='center')
 
 
