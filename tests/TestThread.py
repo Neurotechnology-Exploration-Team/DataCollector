@@ -13,7 +13,7 @@ class TestThread(threading.Thread):
     A class that all tests should extend that holds all threading logic, initialization, and data logging.
     """
 
-    def __init__(self, action_name: str):
+    def __init__(self):
         """
         The constructor that sets up the test name and stop condition.
 
@@ -22,7 +22,7 @@ class TestThread(threading.Thread):
         super().__init__()
 
         # Setup name and trial number
-        self.name = action_name
+        self.name = self.__class__.__name__ # Test name is class name
         self.trial_number = TestGUI.tests[self.name]["trial"]
 
         # Setup save path and create directories
