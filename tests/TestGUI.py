@@ -40,7 +40,7 @@ class TestGUI:
         TestGUI.__prompt_participant_info()
 
     @staticmethod
-    def add_button(test_name: str, test_lambda):
+    def add_test(test_name: str, test_lambda):
         """
         Adds a button to the test window with its name and function to run.
 
@@ -88,9 +88,11 @@ class TestGUI:
 
         :param test_name: The name of the current test running (to enable the indicator).
         """
+        # Disable all buttons
         for test in TestGUI.tests.keys():
             TestGUI.tests[test]['button'].config(state="disabled")
 
+        # Indicate current test
         TestGUI.current_test = test_name
         TestGUI.tests[TestGUI.current_test]['button'].config(bg="yellow")
 
