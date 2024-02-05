@@ -233,9 +233,6 @@ class TestGUI:
         screen_width = window.winfo_screenwidth()
         screen_height = window.winfo_screenheight()
 
-        if config.FULL_SCREEN_MODE:
-            window.geometry(f"{screen_width}x{screen_height}+0+0")
-        else:
-            width = screen_width // 2
-            x = 0 if left_side else width
-            window.geometry(f"{width}x{screen_height}+{x}+0")
+        width = screen_width // 2
+        x = 0 if left_side else width
+        window.geometry(f"{width}x{screen_height}+{x}+0")
