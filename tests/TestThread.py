@@ -42,7 +42,7 @@ class TestThread(threading.Thread):
 
         LSL.start_collection()  # Start LSL collection
 
-        sleep(config.DATA_PADDING_DURATION)  # TODO verify that this works since things are on separate threads
+        sleep(config.DATA_PADDING_DURATION)
 
         LSL.start_label(self.name)
 

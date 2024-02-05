@@ -21,8 +21,6 @@ class LSL:
     collection_thread = None  # The current thread data is being collected on, if any
     collection_label = None  # The current label to be appended to the data, if any
 
-    timestamp_offset = None  # The offset between LSL and system timestamps. TODO is this still necessary
-
     @staticmethod
     def init_lsl_stream():
         """
@@ -35,11 +33,6 @@ class LSL:
             if enabled:
                 LSL.streams[stream_type] = None
                 LSL.collected_data[stream_type] = []
-
-        # Set up timestamp conversion using a constant offset
-        lsl_start_time = datetime.fromtimestamp(pylsl.local_clock())
-        system_start_time = datetime.now()
-        LSL.timestamp_offset = system_start_time - lsl_start_time
 
         # Initialize all required streams
         for stream_type in LSL.streams.keys():
@@ -91,13 +84,6 @@ class LSL:
     #
 
     @staticmethod
-    def __lsl_to_system_time(lsl_timestamp):
-        """
-        Converts an LSL timestamp to system time.
-        """
-        return datetime.fromtimestamp(lsl_timestamp + LSL.timestamp_offset.total_seconds())
-
-    @staticmethod
     def __find_and_initialize_stream(stream_type: str):
         """
         Function to find and initialize a specific LSL stream
@@ -111,6 +97,7 @@ class LSL:
         if len(streams_info) > 0:
             print(f"{stream_type} stream found.")
             LSL.streams[stream_type] = pylsl.StreamInlet(streams_info[0])
+            LSL.streams[stream_type].time_correction()  # Initialize time correction to accurately convert to system
         else:
             print(f"No {stream_type} stream found.")
             exit(1)
@@ -119,6 +106,11 @@ class LSL:
     def __collect_data():
         """
         Helper function to collect data in the LSL stream on a separate thread to run tests with.
+
+        This works using a constant while loop that continuously polls all LSL streams for samples. If a sample is not
+        returned from the poll, it will not be logged. The sample rate is currently as fast as possible with no buffer
+        for real-time data processing. Uses StreamInlet.time_correction() to convert LSL to system timestamps using a
+        constantly updated offset. The precision of these estimates should be below 1 ms (empirically within +/-0.2 ms).
         """
 
         while LSL.collecting:
@@ -126,14 +118,12 @@ class LSL:
                 data_row = {'Timestamp': None, 'Label': "" if not LSL.collection_label else LSL.collection_label}
 
                 if stream:
-                    # TODO adjust sample rate
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
                     if sample:
-                        if data_row['Timestamp'] is None:
-                            # Set timestamp from the first stream
-                            data_row['Timestamp'] = LSL.__lsl_to_system_time(timestamp)
+                        # Set timestamp from the first stream and add time correction offset
+                        data_row['Timestamp'] = timestamp + stream.time_correction()
 
-                        # Flatten the data row into a single list
+                        # Flatten the data row into a single list and append to collected data
                         flattened_data_row = [data_row['Timestamp']] + [data_row['Label']] + sample
                         LSL.collected_data[stream_type] += [flattened_data_row]
 
