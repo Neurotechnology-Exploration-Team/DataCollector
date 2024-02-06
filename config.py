@@ -16,7 +16,7 @@ DATA_PADDING_DURATION = 5.0  # How many seconds to wait before starting and endi
 TEST_DURATION = 5 * 1000
 TEST_LOW_INTERVALS = 1000
 TEST_HIGH_INTERVALS = 3000
-TRANSITION_TEST_DURATION = 100000 # 100 SECONDS
+TRANSITION_TEST_DURATION = 60000 # 60 SECONDS
 TRANSITION_LOW_INTERVALS = 10000 # 10 SECONDS
 TRANSITION_HIGH_INTERVALS = 30000 # 30 SECONDS
 
@@ -26,3 +26,24 @@ NUMBER_OF_SUBJECTS = 10
 
 # Save path configuration (<DATA_PATH>/PXXX/SXXX/trial_XX/<STREAM_TYPE>_data.csv)
 DATA_PATH = "csv_downloads"
+
+
+SWITCHING_TESTING = ['BlinkTrial',
+ 'EyeOpenCloseTrial',
+ 'BrowFrowToUnfrowTrial',
+ 'StopToUpTrial',
+ 'StopToDownTrial',
+ 'StopToLeftTrial',
+ 'StopToRightTrial',
+ 'StopToSelectTrial']
+
+CONST_TESTING = ['EyeOpenTrial',
+ 'EyeClosedTrial',
+ 'BrowFurrowedTrial',
+ 'BrowUnfurrowedTrial',
+ 'StopTrial',
+ 'LeftTrial',
+ 'RightTrial',
+ 'UpTrial',
+ 'DownTrial',
+ 'SelectTrial']

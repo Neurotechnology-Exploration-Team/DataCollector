@@ -131,7 +131,7 @@ class LSL:
 
         while LSL.collecting:
             for stream_type, stream in LSL.streams.items():
-                data_row = {'Timestamp': None, 'Label': "" if not LSL.collection_label else LSL.collection_label}
+                data_row = {'Timestamp': None, 'Label': "Resting" if not LSL.collection_label else LSL.collection_label}
 
                 if stream:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
