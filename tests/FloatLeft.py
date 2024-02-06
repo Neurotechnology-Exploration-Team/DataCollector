@@ -19,7 +19,7 @@ class FloatLeft(TestThread):
         Initializes and creates the blink label in the display window.
         """
         super().__init__()
-        self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'left.PNG')
+        self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'Left.png')
         self.image = tk.PhotoImage(file=self.image_directory)
         self.image_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
         self.image_label.place(relx = 0.5, rely = 0.5, anchor='center')

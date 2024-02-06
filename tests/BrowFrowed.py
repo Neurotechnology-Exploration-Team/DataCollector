@@ -4,6 +4,8 @@ THIS IS AN EXAMPLE OF WHAT A TEST CLASS SHOULD LOOK LIKE. DUPLICATE THIS CLASS A
 import random
 import tkinter as tk
 
+import os
+
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
@@ -19,7 +21,9 @@ class BrowFrowed(TestThread):
         """
         super().__init__()
 
-        self.brow_label = tk.Label(TestGUI.display_window, text="Brow Frowed", font=("Helvetica", 16), borderwidth=0, highlightthickness = 0, background='black', fg='white')
+        self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'BrowFurrow.png')
+        self.image = tk.PhotoImage(file=self.image_directory)
+        self.brow_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
         self.brow_label.place(relx = 0.5, rely = 0.5, anchor='center')
 
 

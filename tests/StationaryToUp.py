@@ -22,7 +22,7 @@ class StationaryToUp(TestThread):
         Initializes and creates the blink label in the display window.
         """
         super().__init__()
-        self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'up.PNG')
+        self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'Up.png')
         self.image = tk.PhotoImage(file=self.image_directory)
         self.image2_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'stop white.PNG')
         self.image2 = tk.PhotoImage(file=self.image2_directory)

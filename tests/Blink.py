@@ -4,6 +4,8 @@ THIS IS AN EXAMPLE OF WHAT A TEST CLASS SHOULD LOOK LIKE. DUPLICATE THIS CLASS A
 import random
 import tkinter as tk
 
+import os
+
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
@@ -20,12 +22,13 @@ class Blink(TestThread):
         """
         super().__init__()
 
-        self.blink_label = tk.Label(TestGUI.display_window, text="Blinking Text", font=("Helvetica", 16), borderwidth=0, highlightthickness = 0, background='black')
-        self.blink_label.place(relx = 0.5, rely = 0.5, anchor='center')
+        self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'Blink.png')
+        self.image = tk.PhotoImage(file=self.image_directory)
+        self.blink_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
 
         # random thing to add to make sure this is working
 
-
+        self.keep_going = True
         self.blinking = True
 
     def run(self):
@@ -35,10 +38,15 @@ class Blink(TestThread):
         super().run()
 
         def toggle_blink():
-            if self.blinking:
-                self.blink_label.config(fg="white" if self.blink_label.cget("fg") == "black" else "black")
+            if self.blinking and self.keep_going:
+                self.blink_label.place(relx = 0.5, rely = 0.5, anchor='center')
+                # self.blink_label.config(fg="white" if self.blink_label.cget("fg") == "black" else "black")
+                self.blinking = False
                 TestGUI.display_window.after(random.randint(config.TEST_LOW_INTERVALS, config.TEST_HIGH_INTERVALS), toggle_blink)  # Schedule the next toggle
-
+            else:
+                self.blink_label.place_forget()
+                self.blinking = True
+                TestGUI.display_window.after(random.randint(config.TEST_LOW_INTERVALS, config.TEST_HIGH_INTERVALS), toggle_blink)
         # Start the blinking effect
         toggle_blink()
 
@@ -47,6 +55,6 @@ class Blink(TestThread):
         Toggles blinking flag and destroys label.
         """
         self.blinking = False
-        self.blink_label.destroy()
+        self.keep_going = False
 
         super().stop()

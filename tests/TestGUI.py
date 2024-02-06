@@ -122,20 +122,12 @@ class TestGUI:
         # Setup the window and canvas
         popup = tk.Toplevel()
         popup.wm_title("Data Confirmation")
-<<<<<<< HEAD
-        popup.state('zoomed') # TODO unix-based systems use -zoomed
-=======
-<<<<<<< HEAD
-        popup.attributes('-fullscreen')  # TODO unix-based systems use -zoomed
-=======
         TestGUI.disable_close_button(popup)
 
         if os.name == "posix":  # Needs to be different for unix
-            popup.state('-zoomed')
+            popup.attributes('-fullscreen')
         else:
             popup.state('zoomed')
->>>>>>> 583fe9ef2e1dc73028962d90e741a04aec2dfa83
->>>>>>> dev
 
         canvas = tk.Canvas(popup)
         scrollbar = tk.Scrollbar(popup, orient="vertical", command=canvas.yview)
@@ -204,13 +196,6 @@ class TestGUI:
         deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: popup.destroy())
         deny_button.grid(row=(idx + 2) // graphs_per_row, column=1, pady=10)
 
-<<<<<<< HEAD
-        # TODO explicitly destroy the graphs
-        plt.close()
-
-        # popup.mainloop()
-=======
->>>>>>> 583fe9ef2e1dc73028962d90e741a04aec2dfa83
         # Force popup to be on top & halt program execution
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
