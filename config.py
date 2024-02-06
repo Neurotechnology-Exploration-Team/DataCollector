@@ -11,7 +11,7 @@ SUPPORTED_STREAMS = {           # Which streams to enable
 }
 
 # Test length
-DATA_PADDING_DURATION = 1.0  # How many seconds to wait before starting and ending a test
+DATA_PADDING_DURATION = 5.0  # How many seconds to wait before starting and ending a test
 # TEST_DURATION = 5 * 1000  # How many milliseconds the test should take. Default to 30 for trials
 TEST_DURATION = 5 * 1000
 TEST_LOW_INTERVALS = 1000
