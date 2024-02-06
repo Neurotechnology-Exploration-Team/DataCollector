@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.1-b] - 2/05/2024
+### Added
+  - The following Test Cases have been added
+    - Brow Frowed to Unfrowed
+    - Brow Frowed
+    - Brow Unfrowed
+    - Eyes Open to Eyes Closed
+    - Eyes Closed
+    - Eyes Opened
+    - Float Down/ Up / Left / Right
+    - Selection
+    - Stationary Float
+    - Stationy Float to Float Down/ Float Up /Float Right / Float Left
+   
+  - Added Dynamic timing for test duration based on type of test being conducted.
+
+
 ## [4.3.1-a] - 1/31/2024
 
 ### Fixed
