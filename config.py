@@ -1,5 +1,3 @@
-FULL_SCREEN_MODE = False  # Whether to run the test in one or two windows (?)
-
 # Graph confirmation configuration
 WIDTH_PER_GRAPH = 400
 HEIGHT_PER_GRAPH = 80
