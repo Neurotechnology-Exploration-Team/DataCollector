@@ -121,7 +121,7 @@ class LSL:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
                     if sample:
                         # Set timestamp from the first stream and add time correction offset
-                        data_row['Timestamp'] = timestamp + stream.time_correction()
+                        data_row['Timestamp'] = str(datetime.today()) + str(datetime.fromtimestamp(timestamp + stream.time_correction()))
 
                         # Flatten the data row into a single list and append to collected data
                         flattened_data_row = [data_row['Timestamp']] + [data_row['Label']] + sample
@@ -144,7 +144,7 @@ class LSL:
 
                 # Convert collected data to a DataFrame, format with columns above, and write to CSV
                 df = pd.DataFrame(LSL.collected_data[stream_type], columns=columns)
-                df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+                df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='mixed')#'%Y-%m-%d %H:%M:%S.%f')
                 df = df.sort_values(by='Timestamp')
                 df.to_csv(os.path.join(path, f"{stream_type}_data.csv"), index=False)
                 print(f"Collected {stream_type} data saved.")
