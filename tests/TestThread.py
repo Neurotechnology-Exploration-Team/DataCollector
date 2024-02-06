@@ -13,23 +13,22 @@ class TestThread(threading.Thread):
     A class that all tests should extend that holds all threading logic, initialization, and data logging.
     """
 
-    def __init__(self, action_name, trial_number):
+    def __init__(self, action_name: str):
         """
         The constructor that sets up the test name and stop condition.
 
         :param action_name: The name of the action.
-        :param trial_number: The trial number of the action.
         """
         super().__init__()
 
+        # Setup name and trial number
         self.name = action_name
-        self.trial_number = trial_number
+        self.trial_number = TestGUI.tests[self.name]["trial"]
 
-        test_path = os.path.join(config.DATA_PATH, TestGUI.subject_number, self.name)
+        # Setup save path and create directories
+        test_path = os.path.join(config.DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID, self.name)
         self.current_path = os.path.join(str(test_path), f"trial_{str(self.trial_number).zfill(2)}")
         os.makedirs(self.current_path, exist_ok=True)
-
-        self.callback = None  # Callback for when a test is complete
 
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
 
@@ -37,13 +36,13 @@ class TestThread(threading.Thread):
         """
         All logic related to the control panel, starting collection, and calling the stop method after a certain duration.
         """
-        TestGUI.disable_buttons(self.name)
+        TestGUI.start_test(self.name)
 
         print(f"Starting test {self.name}: Trial {self.trial_number}")
 
         LSL.start_collection()  # Start LSL collection
 
-        sleep(config.DATA_PADDING_DURATION)  # TODO verify that this works since things are on separate threads
+        sleep(config.DATA_PADDING_DURATION)
 
         LSL.start_label(self.name)
 
@@ -65,8 +64,8 @@ class TestThread(threading.Thread):
         # Log finalized test status
         print(f"{TestGUI.current_test} - Trial {TestGUI.tests[TestGUI.current_test]['trial']}: {'Complete' if complete else 'Discarded'}")
 
-        if self.callback is not None:
-            self.callback(complete)
+        if not complete:  # If test is not complete
+            TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
 
         self._stop_event.set()  # Set the stop event so Python auto-kills the thread
 
@@ -75,9 +74,3 @@ class TestThread(threading.Thread):
         Overrides default stop method, as soon as stop event is set in stop() the test will auto kill itself.
         """
         return self._stop_event.is_set()
-
-    def set_callback(self, callback):
-        """
-        A function to set the callback for the test that takes in a boolean parameter completed.
-        """
-        self.callback = callback

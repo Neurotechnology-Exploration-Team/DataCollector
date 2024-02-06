@@ -4,6 +4,54 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [4.4.1-a] - 2/5/2024
+### Fixed
+- Timestamps of the collected data have been updated to match up with the exact millisecond the data is recorded
+  - Format of how the timestamps were being written to the CSV file has been modified
+
+## [4.4.0-a] - 2/5/2024
+
+### Added
+- Exit test button that handles all exit behavior.
+
+### Fixed
+- Fixed broken graph zooming on Unix-based systems.
+- Fixed **all** window closing behaviors causing issues with the test lifecycle.
+
+### Removed
+- Fullscreen mode config flag
+
+## [4.3.1-a] - 1/31/2024
+
+### Fixed
+- Timestamps derived from LSL stream now match up to system time using an updated offset from pylsl.
+  - The precision of these estimates should be below 1 ms (empirically within +/-0.2 ms).
+
+## [4.3.0-a] - 1/31/2024
+
+### Added
+- Two new configuration variables in `config.py`:
+  - Ability to enable/disable supported stream types
+  - Variable duration of blinking text
+
+### Changed
+- The collector now stores and collects data on a per-stream basis
+- LSL data is now stored in separate stream CSVs (i.e. `EEG_data.csv`), removing any 0 or NaN data points from misaligned sampling.
+
+## [4.2.0-a] - 1/31/2024
+
+### Added
+- Postprocessing bandpass filtering to reduce noise in displayed EEG graphs.
+
+## [4.1.0-a] - 1/29/2024
+
+### Added
+- Prompt for session number on startup
+
+### Changed
+- Renamed all references from "subject" to "participant"
+- Changed participant folder structure to include session number
+  - Stored as `<DATA_PATH>/PXXX/SXXX/trial_XX/<STREAM_TYPE>_date.csv`
 
 ## [4.0.1-a] - 1/25/2024
 
