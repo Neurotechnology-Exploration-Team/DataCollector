@@ -114,91 +114,39 @@ class TestGUI:
     @staticmethod
     def __show_data_and_confirm(test_data_path: str):
         """
-        Popup the data confirmation window and check if it should be accepted or rejected.
-        If enabled for collection, EEG and accelerometer graphs will be displayed.
-
-        :param test_data_path: The path to the test data CSV.
+        Popup the data confirmation window to check if it should be accepted or rejected,
+        without displaying graphs.
         """
-        # Setup the window and canvas
         popup = tk.Toplevel()
         popup.wm_title("Data Confirmation")
         TestGUI.disable_close_button(popup)
-
-        if os.name == "posix":  # Needs to be different for unix
-            popup.attributes('-fullscreen')
-        else:
-            popup.state('zoomed')
-
-        canvas = tk.Canvas(popup)
-        scrollbar = tk.Scrollbar(popup, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas)
-
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(
-                scrollregion=canvas.bbox("all")
-            )
-        )
-
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
-
-        # Make it scrollable so we don't have to click the tiny scrollbar
-        canvas.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1 * (event.delta / 120)), "units"))
-
-        # Read in and merge all data from the trial into a single dataframe
-        # This should ignore NaN values, so graphs will not go to zero unless value is actually zero
-        frames = []
-        for stream_type, enabled in config.SUPPORTED_STREAMS.items():
-            if enabled and stream_type != 'FFT':
-                frames.append(pd.read_csv(os.path.join(test_data_path, f"{stream_type}_data.csv")))
-        data_df = pd.concat(frames, axis=1)
-
-        # Figure out how many graphs we can fit on the screen
-        screen_width = popup.winfo_screenwidth()
-        graphs_per_row = screen_width // config.WIDTH_PER_GRAPH
-
-        if graphs_per_row == 0:
-            graphs_per_row = 1
-
-        # Loop through each EEG and draw the graphs
-        if config.SUPPORTED_STREAMS['EEG']:
-            idx = 0
-            for idx, col in enumerate(data_df.filter(like='EEG')):
-                fig, ax = plt.subplots(figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
-                filtered_data = butter_bandpass_filter(data_df[col], order=6)
-                ax.plot(filtered_data)
-                ax.set_title(f'{col} Data')
-                FigureCanvasTkAgg(fig, master=scrollable_frame).get_tk_widget().grid(row=idx // graphs_per_row,
-                                                                                     column=idx % graphs_per_row)
-
-        # Now draw the accelerometer graph at the end
-        if config.SUPPORTED_STREAMS['Accelerometer']:
-            accel_data = data_df.filter(like='Accelerometer').mean(axis=1)
-            fig2, ax2 = plt.subplots(
-                figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
-            ax2.plot(accel_data)
-            ax2.set_title('Accelerometer Data')
-            FigureCanvasTkAgg(fig2, master=scrollable_frame).get_tk_widget().grid(row=(idx + 1) // graphs_per_row,
-                                                                                  column=(idx + 1) % graphs_per_row)
-
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-
-        def confirm_data():
-            popup.destroy()
-            TestGUI.tests[TestGUI.current_test]['completed'] = True
-
-        # Create buttons to accept and deny the data
-        confirm_button = tk.Button(scrollable_frame, text="Confirm Data", command=lambda: confirm_data())
-        confirm_button.grid(row=(idx + 2) // graphs_per_row, column=0, pady=10)
-
-        deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: popup.destroy())
-        deny_button.grid(row=(idx + 2) // graphs_per_row, column=1, pady=10)
-
-        # Force popup to be on top & halt program execution
+        popup.geometry("400x200")
+        msg = tk.Label(popup, text="Do you confirm the test data?", font=("Arial", 12))
+        msg.pack(pady=20)
+        confirm_button = tk.Button(popup, text="Confirm", command=lambda: TestGUI.__handle_confirm(popup, True))
+        deny_button = tk.Button(popup, text="Deny", command=lambda: TestGUI.__handle_confirm(popup, False))
+        confirm_button.pack(side="left", padx=20, pady=20)
+        deny_button.pack(side="right", padx=20, pady=20)
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
+
+    @staticmethod
+    def __handle_confirm(popup, confirmed):
+        """
+        Handle the confirmation or denial of data.
+        """
+        if confirmed:
+            print("Data confirmed.")
+        else:
+            print("Data denied.")
+        TestGUI.tests[TestGUI.current_test]['completed'] = confirmed
+        popup.destroy()
+        TestGUI.close_button.config(state="normal")
+        for test_name, test_info in TestGUI.tests.items():
+            if not test_info['completed']:
+                test_info['button'].config(state="normal", bg="red")
+            else:
+                test_info['button'].config(state="disabled", bg="green")
 
     @staticmethod
     def __prompt_participant_info():
