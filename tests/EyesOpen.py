@@ -42,7 +42,7 @@ class EyesOpen(TestThread):
         super().run()
 
         def toggle():
-            if self.trail == config.TRAILS_PER_ACTION:
+            if self.trail == config.TRIALS_PER_ACTION:
                 TestGUI.display_window.after(1, self.stop)
 
             if self.eyes and self.keep_going:

@@ -48,14 +48,12 @@ class StationaryToUp(TestThread):
         """
         super().run()
         def toggle():
-            # empty function for now
             self.image_label.place_forget()
             self.float_label.place_forget()
-            print ("In the toggle function here are the values")
-            print ("Show float", self.show_float)
-            print ("Show Selection", self.show_selection)
-
-            if self.total_trails == (config.TRAILS_PER_ACTION * 2):
+            #print ("In the toggle function here are the values")
+            #print ("Show float", self.show_float)
+            #print ("Show Selection", self.show_selection)
+            if self.total_trails == (config.TRIAL_PER_ACTION * 2):
                 TestGUI.display_window.after(1, self.stop)
 
             if self.show_float:

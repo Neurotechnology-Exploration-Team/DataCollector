@@ -56,7 +56,7 @@ class EyeOpenToEyeClose(TestThread):
             print ("Show float", self.show_closed)
             print ("Show Selection", self.show_open)
 
-            if self.total_trails == (config.TRAILS_PER_ACTION * 2):
+            if self.total_trails == (config.TRIALS_PER_ACTION * 2):
                 TestGUI.display_window.after(1, self.stop)
 
             if self.show_closed:
