@@ -38,3 +38,4 @@ class Blink(TestThread):
         blink_label.place(relx=0.5, rely=0.5, anchor='center')
         TestGUI.display_window.after(1000, blink_label.destroy)
         # self.blink_label.config(fg="white" if self.blink_label.cget("fg") == "black" else "black")
+
