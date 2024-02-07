@@ -1,4 +1,6 @@
+import abc
 import os.path
+import random
 import threading
 from time import sleep
 
@@ -20,7 +22,7 @@ class TestThread(threading.Thread):
         super().__init__()
 
         # Setup name and trial number
-        self.name = self.__class__.__name__ # Test name is class name
+        self.name = self.__class__.__name__  # Test name is class name
         self.trial_number = TestGUI.tests[self.name]["trial"]
 
         # Setup save path and create directories
@@ -28,6 +30,11 @@ class TestThread(threading.Thread):
         self.current_path = os.path.join(str(test_path), f"trial_{str(self.trial_number).zfill(2)}")
         os.makedirs(self.current_path, exist_ok=True)
 
+        self.iteration = 0
+        # The type of test determines how many iterations the test should run for
+        self.max_iterations = config.ITERATIONS_PER_ACTION * 2 if "To" in self.name else config.ITERATIONS_PER_ACTION
+
+        self.running = True
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
 
     def run(self):
@@ -40,17 +47,23 @@ class TestThread(threading.Thread):
 
         LSL.start_collection()  # Start LSL collection
 
-        sleep(config.DATA_PADDING_DURATION) # This gives the data collection a five second padding of rest
+        sleep(config.DATA_PADDING_DURATION)  # This gives the data collection a five second padding of rest
 
         LSL.start_label(self.name)
 
-        # The type of test determines how long the test should run for
-        if "To" in self.name:
-            TestGUI.display_window.after(config.TRANSITION_TEST_DURATION, self.stop)
-        else:
-            TestGUI.display_window.after(config.TEST_DURATION, self.stop)
+        self.run_iteration()
 
         return  # End thread
+
+    def run_iteration(self):
+        if self.iteration == self.max_iterations:
+            self.running = False
+
+        if not self.running:
+            # Stop test thread
+            TestGUI.display_window.after(1, self.stop)
+        else:
+            self.iteration += 1
 
     def stop(self):
         """
@@ -63,7 +76,8 @@ class TestThread(threading.Thread):
 
         complete = TestGUI.confirm_current_test(self.current_path)
         # Log finalized test status
-        print(f"{TestGUI.current_test} - Trial {TestGUI.tests[TestGUI.current_test]['trial']}: {'Complete' if complete else 'Discarded'}")
+        print(
+            f"{TestGUI.current_test} - Trial {TestGUI.tests[TestGUI.current_test]['trial']}: {'Complete' if complete else 'Discarded'}")
 
         if not complete:  # If test is not complete
             TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!

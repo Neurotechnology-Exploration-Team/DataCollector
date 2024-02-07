@@ -30,7 +30,7 @@ class EyesOpen(TestThread):
         self.keep_going = True
         self.eyes = True
 
-        self.interval_time = random.randint(config.TEST_LOW_INTERVALS, config.TEST_HIGH_INTERVALS)
+        self.interval_time = random.randint(config.TEST_MIN_INTERVAL, config.TEST_MAX_INTERVAL)
 
         self.trail = 0
 
@@ -42,7 +42,7 @@ class EyesOpen(TestThread):
         super().run()
 
         def toggle():
-            if self.trail == config.TRIALS_PER_ACTION:
+            if self.trail == config.ITERATIONS_PER_ACTION:
                 TestGUI.display_window.after(1, self.stop)
 
             if self.eyes and self.keep_going:

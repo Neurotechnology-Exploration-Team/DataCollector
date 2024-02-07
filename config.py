@@ -12,15 +12,9 @@ SUPPORTED_STREAMS = {           # Which streams to enable
 
 # Test length
 DATA_PADDING_DURATION = 5.0  # How many seconds to wait before starting and ending a test
-# TEST_DURATION = 5 * 1000  # How many milliseconds the test should take. Default to 30 for trials
-TEST_DURATION = 160000
-TEST_LOW_INTERVALS = 2500
-TEST_HIGH_INTERVALS = 6000
-TRANSITION_TEST_DURATION = 280000 # 60 SECONDS
-TRANSITION_LOW_INTERVALS = 2500 # 2.5 SECONDS
-TRANSITION_HIGH_INTERVALS = 6000 # 6 SECONDS
-TRIAL_PER_ACTION = 20
-
+TEST_MIN_INTERVAL = 2500
+TEST_MAX_INTERVAL = 6000
+ITERATIONS_PER_ACTION = 20
 
 # Subject information
 NUMBER_OF_SUBJECTS = 10
