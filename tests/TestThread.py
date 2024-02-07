@@ -16,8 +16,6 @@ class TestThread(threading.Thread):
     def __init__(self):
         """
         The constructor that sets up the test name and stop condition.
-
-        :param action_name: The name of the action.
         """
         super().__init__()
 
@@ -46,13 +44,11 @@ class TestThread(threading.Thread):
 
         LSL.start_label(self.name)
 
-
         # The type of test determines how long the test should run for
         if "To" in self.name:
             TestGUI.display_window.after(config.TRANSITION_TEST_DURATION, self.stop)
         else:
             TestGUI.display_window.after(config.TEST_DURATION, self.stop)
-
 
         return  # End thread
 
