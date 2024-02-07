@@ -31,6 +31,9 @@ class Blink(TestThread):
         self.keep_going = True
         self.blinking = True
 
+        self.interval_time = random.randint(config.TEST_LOW_INTERVALS, config.TEST_HIGH_INTERVALS)
+        self.trial = 0
+
     def run(self):
         """
         Holds the logic to toggle blinking. TestThread will automatically call stop after the duration has ended.
@@ -38,15 +41,23 @@ class Blink(TestThread):
         super().run()
 
         def toggle_blink():
+
+            if self.trial == config.TRAILS_PER_ACTION:
+                TestGUI.display_window.after(1, self.stop)
+
             if self.blinking and self.keep_going:
                 self.blink_label.place(relx = 0.5, rely = 0.5, anchor='center')
                 # self.blink_label.config(fg="white" if self.blink_label.cget("fg") == "black" else "black")
                 self.blinking = False
                 TestGUI.display_window.after(random.randint(config.TEST_LOW_INTERVALS, config.TEST_HIGH_INTERVALS), toggle_blink)  # Schedule the next toggle
+                self.trial += 1
             else:
                 self.blink_label.place_forget()
                 self.blinking = True
-                TestGUI.display_window.after(random.randint(config.TEST_LOW_INTERVALS, config.TEST_HIGH_INTERVALS), toggle_blink)
+                TestGUI.display_window.after(1000, toggle_blink)
+
+            print (self.trial)
+
         # Start the blinking effect
         toggle_blink()
 
@@ -56,5 +67,5 @@ class Blink(TestThread):
         """
         self.blinking = False
         self.keep_going = False
-
+        self.trial = 0
         super().stop()

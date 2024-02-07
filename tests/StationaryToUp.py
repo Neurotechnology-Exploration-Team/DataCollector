@@ -5,11 +5,11 @@ import random
 import tkinter as tk
 import os
 
-import config
-
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 import time
+
+import config
 
 
 class StationaryToUp(TestThread):
@@ -35,6 +35,10 @@ class StationaryToUp(TestThread):
         self.next_selection = False
 
 
+        self.interval = random.randint(config.TRANSITION_LOW_INTERVALS, config.TRANSITION_HIGH_INTERVALS)
+
+        self.total_trails = 0
+
 
 
 
@@ -50,30 +54,36 @@ class StationaryToUp(TestThread):
             print ("In the toggle function here are the values")
             print ("Show float", self.show_float)
             print ("Show Selection", self.show_selection)
+
+            if self.total_trails == (config.TRAILS_PER_ACTION * 2):
+                TestGUI.display_window.after(1, self.stop)
+
             if self.show_float:
                 print ("Showing the float")
                 self.float_label.place(relx = 0.5, rely = 0.5, anchor='center')
                 self.show_float = False
                 self.next_float = False
                 self.next_selection = True
-                TestGUI.display_window.after(random.randint(config.TRANSITION_LOW_INTERVALS, config.TRANSITION_HIGH_INTERVALS), toggle)  # Schedule the next toggle
+                TestGUI.display_window.after(self.interval, toggle)  # Schedule the next toggle
+                self.total_trails += 1
             elif self.show_selection:
                 print ("Showing the selection")
                 self.image_label.place(relx = 0.5, rely = 0.5, anchor='center')
                 self.show_selection = False
                 self.next_float = True
                 self.next_selection = False
-                TestGUI.display_window.after(random.randint(config.TRANSITION_LOW_INTERVALS, config.TRANSITION_HIGH_INTERVALS), toggle)
+                TestGUI.display_window.after(self.interval, toggle)
+                self.total_trails += 1
             elif self.next_float:
                 self.show_float = True
                 self.show_selection = False
                 TestGUI.display_window.bell()
-                TestGUI.display_window.after(1500, toggle)
+                TestGUI.display_window.after(1000, toggle)
             elif self.next_selection:
                 self.show_float = False
                 self.show_selection = True
                 TestGUI.display_window.bell()
-                TestGUI.display_window.after(1500, toggle)
+                TestGUI.display_window.after(1000, toggle)
 
 
         toggle()
@@ -88,4 +98,6 @@ class StationaryToUp(TestThread):
         self.next_selection = False
         self.float_label.destroy()
         self.image_label.destroy()
+        self.interval = 0
+        self.total_trails = 0
         super().stop()

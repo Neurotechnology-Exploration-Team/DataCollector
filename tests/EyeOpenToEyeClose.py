@@ -37,7 +37,9 @@ class EyeOpenToEyeClose(TestThread):
         self.next_close = False
         self.next_open = False
 
+        self.interval = random.randint(config.TRANSITION_LOW_INTERVALS, config.TRANSITION_HIGH_INTERVALS)
 
+        self.total_trails = 0
 
 
 
@@ -53,30 +55,36 @@ class EyeOpenToEyeClose(TestThread):
             print ("In the toggle function here are the values")
             print ("Show float", self.show_closed)
             print ("Show Selection", self.show_open)
+
+            if self.total_trails == (config.TRAILS_PER_ACTION * 2):
+                TestGUI.display_window.after(1, self.stop)
+
             if self.show_closed:
                 print ("Showing the float")
                 self.closed_label.place(relx = 0.5, rely = 0.5, anchor='center')
                 self.show_closed = False
                 self.next_close = False
                 self.next_open = True
-                TestGUI.display_window.after(random.randint(config.TEST_LOW_INTERVALS, config.TEST_HIGH_INTERVALS), toggle)  # Schedule the next toggle
+                TestGUI.display_window.after(self.interval, toggle)  # Schedule the next toggle
+                self.total_trails += 1
             elif self.show_open:
                 print ("Showing the selection")
                 self.open_label.place(relx = 0.5, rely = 0.5, anchor='center')
                 self.show_open = False
                 self.next_close = True
                 self.next_open = False
-                TestGUI.display_window.after(random.randint(config.TEST_LOW_INTERVALS, config.TEST_HIGH_INTERVALS), toggle)
+                TestGUI.display_window.after(self.interval, toggle)
+                self.total_trails += 1
             elif self.next_close:
                 self.show_closed = True
                 self.show_open = False
                 TestGUI.display_window.bell()
-                TestGUI.display_window.after(1500, toggle)
+                TestGUI.display_window.after(1000, toggle)
             elif self.next_open:
                 self.show_closed = False
                 self.show_open = True
                 TestGUI.display_window.bell()
-                TestGUI.display_window.after(1500, toggle)
+                TestGUI.display_window.after(1000, toggle)
 
 
         toggle()
@@ -89,6 +97,8 @@ class EyeOpenToEyeClose(TestThread):
         self.show_open = False
         self.next_close = False
         self.next_open = False
+        self.interval = 0
+        self.total_trails = 0
         self.closed_label.destroy()
         self.open_label.destroy()
         super().stop()
