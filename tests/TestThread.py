@@ -31,7 +31,7 @@ class TestThread(threading.Thread):
         os.makedirs(self.current_path, exist_ok=True)
 
         self.iteration = 0
-        # The type of test determines how many iterations the test should run for
+        # The type of test determines how many iterations the test should run for Blink is times 2
         self.max_iterations = config.ITERATIONS_PER_ACTION * 2 if "To" in self.name else config.ITERATIONS_PER_ACTION
 
         self.running = True
