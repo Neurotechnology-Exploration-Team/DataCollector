@@ -42,7 +42,7 @@ class Blink(TestThread):
 
         def toggle_blink():
 
-            if self.trial == config.TRAILS_PER_ACTION:
+            if self.trial == config.TRIALS_PER_ACTION:
                 TestGUI.display_window.after(1, self.stop)
 
             if self.blinking and self.keep_going:
