@@ -3,7 +3,7 @@ THIS IS AN EXAMPLE OF WHAT A TEST CLASS SHOULD LOOK LIKE. DUPLICATE THIS CLASS A
 """
 import random
 import tkinter as tk
-
+from LSL import LSL
 import os
 
 from tests.TestGUI import TestGUI
@@ -33,8 +33,14 @@ class Blink(TestThread):
             # Setup next interval
             interval = random.randint(config.TEST_MIN_INTERVAL, config.TEST_MAX_INTERVAL)
             TestGUI.display_window.after(interval, self.run_iteration)
-
+            
+        LSL.start_label("Blinking")
         blink_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
         blink_label.place(relx=0.5, rely=0.5, anchor='center')
-        TestGUI.display_window.after(1000, blink_label.destroy)
-        # self.blink_label.config(fg="white" if self.blink_label.cget("fg") == "black" else "black")
+
+        def stop_iteration():   # Using this to destroy the blink label but also to start the labeler as Rest for default rest state
+            blink_label.destroy()
+            LSL.stop_label()
+        TestGUI.display_window.after(1000, stop_iteration)
+
+

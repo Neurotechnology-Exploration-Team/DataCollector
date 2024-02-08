@@ -49,7 +49,7 @@ class TestThread(threading.Thread):
 
         sleep(config.DATA_PADDING_DURATION)  # This gives the data collection a five second padding of rest
 
-        LSL.start_label(self.name)
+        #LSL.start_label(self.name)
 
         self.run_iteration()
 
