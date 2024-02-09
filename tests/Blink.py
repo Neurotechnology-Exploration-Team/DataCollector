@@ -1,5 +1,5 @@
-import tkinter as tk
 import os
+import tkinter as tk
 
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
@@ -13,8 +13,6 @@ class Blink(TestThread):
     They will be fully blinking when a cue is presented (eye close and open).
     Their eyes should always be open unless told to blink by the program.
     If they mistakenly blink too much or fail to blink, repeat the trial.
-
-    TODO Auditory stimulus?
     """
 
     def __init__(self):

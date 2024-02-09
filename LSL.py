@@ -92,8 +92,9 @@ class LSL:
         """
         Function to stop labelling each data frame and revert to no label
         """
-        print(f"Stopped Labeling Data: {LSL.collection_label}")
-        LSL.collection_label = None
+        if LSL.collection_label:
+            print(f"Stopped Labeling Data: {LSL.collection_label}")
+            LSL.collection_label = None
 
     #
     # HELPER METHODS

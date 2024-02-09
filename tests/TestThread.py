@@ -3,9 +3,8 @@ import random
 import threading
 from time import sleep
 
-from LSL import LSL
-
 import config
+from LSL import LSL
 from tests.TestGUI import TestGUI
 
 

@@ -1,5 +1,5 @@
-import tkinter as tk
 import os
+import tkinter as tk
 
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread

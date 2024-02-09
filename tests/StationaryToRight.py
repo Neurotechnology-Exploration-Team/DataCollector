@@ -1,7 +1,7 @@
-import tkinter as tk
-from LSL import LSL
 import os
+import tkinter as tk
 
+from LSL import LSL
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
