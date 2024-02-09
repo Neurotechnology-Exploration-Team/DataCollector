@@ -8,6 +8,12 @@ from tests.TestThread import TestThread
 class FloatLeft(TestThread):
     """
     The Float Left test that extends the TestThread class.
+
+    Explain to the subject they will be imagining themselves floating leftward in space.
+    A visual stimulus will appear on the screen reminding the subject of the correct action.
+    No auditory stimulus will be presented.
+
+    TODO Label for entire time?
     """
 
     def __init__(self):

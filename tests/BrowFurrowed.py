@@ -8,6 +8,12 @@ from tests.TestThread import TestThread
 class BrowFurrowed(TestThread):
     """
     The Brow Furrowed test that extends the TestThread class.
+
+    Explain to the subject they will be starting with their eyes open and brow furrowed.
+    Explain to the subject they will maintain a clear mind with eyes open and continue to furrow their brow.
+    No auditory stimulus will be presented.
+
+    TODO Label for entire time furrowed?
     """
 
     def __init__(self):

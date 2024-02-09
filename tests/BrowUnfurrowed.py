@@ -8,6 +8,12 @@ from tests.TestThread import TestThread
 class BrowUnfurrowed(TestThread):
     """
     The Brow Unfurrowed test that extends the TestThread class.
+
+    Explain to the subject they will be starting with their brow unfurrowed and eyes open.
+    Explain to the subject they will maintain a clear mind with eyes open and continue to unfurrow their brow.
+    No auditory stimulus will be presented.
+
+    TODO Label for entire time unfurrowed?
     """
 
     def __init__(self):

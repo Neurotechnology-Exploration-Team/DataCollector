@@ -8,6 +8,10 @@ from tests.TestThread import TestThread
 class EyesOpen(TestThread):
     """
     The Eyes Open test that extends the TestThread class.
+
+    Explain to the subject they will be starting with their eyes open.
+    Explain to the subject they will maintain a clear mind (try not to think about or focus on anything in particular) with eyes open.
+    No auditory stimulus will be presented.
     """
 
     def __init__(self):

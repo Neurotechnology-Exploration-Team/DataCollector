@@ -8,6 +8,13 @@ from tests.TestThread import TestThread
 class Blink(TestThread):
     """
     The Blink test that extends the TestThread class.
+
+    Explain to the subject they will be starting with their eyes open.
+    They will be fully blinking when a cue is presented (eye close and open).
+    Their eyes should always be open unless told to blink by the program.
+    If they mistakenly blink too much or fail to blink, repeat the trial.
+
+    TODO Auditory stimulus?
     """
 
     def __init__(self):
