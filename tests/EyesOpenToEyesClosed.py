@@ -1,19 +1,21 @@
 import os
 import tkinter as tk
 
+from playsound import playsound
+
 from LSL import LSL
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
 
-class EyeOpenToEyeClosed(TestThread):
+class EyesOpenToEyesClosed(TestThread):
     """
     The Eyes Open to Eyes Closed test that extends the TestThread class.
 
     Explain to the subject they will be starting with their eyes closed.
     They will be switching between closed and open state when a cue is presented.
     The subject will know when to switch states by looking for two audiovisual cues denoting each action.
-    TODO Due to the nature of the trial it will not be possible to have a visual stimulus for the eye closed to open transition.
+    Due to the nature of the trial it will not be possible to have a visual stimulus for the eye closed to open transition.
     """
 
     def __init__(self):
@@ -44,6 +46,7 @@ class EyeOpenToEyeClosed(TestThread):
             self.current_label = tk.Label(TestGUI.display_window, image=self.closed_image, borderwidth=0)
 
         self.firstImage = not self.firstImage
+        playsound(self.sound_path, block=False)  # block=False prevents the audio file from blocking the program
         self.current_label.place(relx=0.5, rely=0.5, anchor='center')
 
     def stop_iteration(self):

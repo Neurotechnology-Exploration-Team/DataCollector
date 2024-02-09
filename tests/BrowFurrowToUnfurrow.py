@@ -1,6 +1,8 @@
 import os
 import tkinter as tk
 
+from playsound import playsound
+
 from LSL import LSL
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
@@ -12,7 +14,7 @@ class BrowFurrowToUnfurrow(TestThread):
 
     Explain to the subject they will be starting with their brow unfurrowed and eyes closed.
     They will be furrowing their brow when a cue is presented and then unfurrowing their brow when the next cue is presented.
-    TODO The subject will know when to switch states by looking for two audiovisual cues denoting each action.
+    The subject will know when to switch states by looking for two audiovisual cues denoting each action.
     """
 
     def __init__(self):
@@ -43,6 +45,7 @@ class BrowFurrowToUnfurrow(TestThread):
             self.current_label = tk.Label(TestGUI.display_window, image=self.unfurrow_image, borderwidth=0)
 
         self.firstImage = not self.firstImage
+        playsound(self.sound_path, block=False)  # block=False prevents the audio file from blocking the program
         self.current_label.place(relx=0.5, rely=0.5, anchor='center')
 
     def stop_iteration(self):

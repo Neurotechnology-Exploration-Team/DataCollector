@@ -3,6 +3,8 @@ import random
 import threading
 from time import sleep
 
+from playsound import playsound
+
 import config
 from LSL import LSL
 from tests.TestGUI import TestGUI
@@ -36,6 +38,8 @@ class TestThread(threading.Thread):
         # TODO Pretty sure this is correct but it could be the other way around
         self.max_iterations = config.ITERATIONS_PER_ACTION * 2 if transition else config.ITERATIONS_PER_ACTION
         self.current_label = None
+
+        self.sound_path = "C:\\Users\\techw\\OneDrive\\Documents\\NXT\\DataCollector\\assets\\beep.mp3"
 
         self.running = True
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
@@ -83,7 +87,7 @@ class TestThread(threading.Thread):
         if not self.is_transition_test:
             LSL.start_label(self.name)
 
-        TestGUI.display_window.after(1000, self.stop_iteration)
+        TestGUI.display_window.after(config.ITERATION_DURATION, self.stop_iteration)
 
     def stop_iteration(self):
         """
