@@ -13,7 +13,6 @@ class StationaryToUp(TestThread):
     Explain to the subject they will be imagining themselves floating still and then floating up, alternating based on audiovisual stimulus directing the correct action.
     They will be switching between still and floating up state when a cue is presented.
     TODO The subject will know when to switch states by looking for two audiovisual cues denoting each action.
-    TODO Label for entire transition state?
     """
 
     def __init__(self):

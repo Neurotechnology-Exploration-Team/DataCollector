@@ -12,8 +12,6 @@ class Selection(TestThread):
     Explain to the subject they will be imagining themselves floating still and grabbing a ball in space in front of them; they should not stop grabbing the ball or floating at any time.
     A visual stimulus will appear on the screen reminding the subject of the correct action.
     No auditory stimulus will be presented.
-
-    TODO Label entire time?
     """
 
     def __init__(self):

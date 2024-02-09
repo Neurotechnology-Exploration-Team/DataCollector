@@ -89,7 +89,7 @@ class TestThread(threading.Thread):
         """
         Override this method with super().stop_iteration() to create behavior at the end of each test iteration.
         """
-        LSL.stop_label()
+        pass
 
     def stop(self):
         """

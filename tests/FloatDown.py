@@ -11,9 +11,7 @@ class FloatDown(TestThread):
 
     Explain to the subject they will be imagining themselves floating downward in space.
     A visual stimulus will appear on the screen reminding the subject of the correct action.
-    No auditory stimulus will be presented.
-
-    TODO Label entire time?
+    No auditory stimulus will be presented.\
     """
 
     def __init__(self):

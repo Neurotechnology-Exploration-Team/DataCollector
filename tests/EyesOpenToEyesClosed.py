@@ -14,7 +14,6 @@ class EyeOpenToEyeClosed(TestThread):
     They will be switching between closed and open state when a cue is presented.
     The subject will know when to switch states by looking for two audiovisual cues denoting each action.
     TODO Due to the nature of the trial it will not be possible to have a visual stimulus for the eye closed to open transition.
-    TODO Label for entire transition state?
     """
 
     def __init__(self):

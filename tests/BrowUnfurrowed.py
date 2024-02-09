@@ -12,8 +12,6 @@ class BrowUnfurrowed(TestThread):
     Explain to the subject they will be starting with their brow unfurrowed and eyes open.
     Explain to the subject they will maintain a clear mind with eyes open and continue to unfurrow their brow.
     No auditory stimulus will be presented.
-
-    TODO Label for entire time unfurrowed?
     """
 
     def __init__(self):

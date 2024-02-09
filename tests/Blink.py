@@ -1,6 +1,7 @@
 import os
 import tkinter as tk
 
+from LSL import LSL
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
@@ -41,3 +42,4 @@ class Blink(TestThread):
         super().stop_iteration()
 
         self.blink_label.destroy()
+        LSL.stop_label()

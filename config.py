@@ -14,7 +14,7 @@ SUPPORTED_STREAMS = {           # Which streams to enable
 DATA_PADDING_DURATION = 5.0  # How many seconds to wait before starting and ending a test
 TEST_MIN_INTERVAL = 2500
 TEST_MAX_INTERVAL = 6000
-ITERATIONS_PER_ACTION = 20
+ITERATIONS_PER_ACTION = 4
 
 # Subject information
 NUMBER_OF_SUBJECTS = 10

@@ -13,7 +13,6 @@ class StationaryToSelect(TestThread):
     Explain to the subject they will be imagining themselves floating still and then grabbing a ball in space in front of them, alternating on a change in visual stimulus and presentation of auditory stimulus.
     They will be switching between still and ball grabbing state when a cue is presented.
     TODO The subject will know when to switch states by looking for two audiovisual cues denoting each action.
-    TODO Label for entire transition state?
     """
 
     def __init__(self):

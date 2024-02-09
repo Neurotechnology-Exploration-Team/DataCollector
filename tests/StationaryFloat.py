@@ -11,8 +11,6 @@ class StationaryFloat(TestThread):
 
     Explain to the subject they will be imagining themselves floating still in space.
     No auditory stimulus will be presented.
-
-    TODO Label for entire time?
     """
 
     def __init__(self):
