@@ -6,12 +6,12 @@ from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
 
-class StationaryToDown(TestThread):
+class BrowFurrowToUnfurrow(TestThread):
     """
-    The Stationary Float To Float Down test that extends the TestThread class.
+    The Brow Furrow to Unfurrowed test that extends the TestThread class.
 
-    Explain to the subject they will be imagining themselves floating still and then floating down, alternating based on audiovisual stimulus directing the correct action.
-    They will be switching between still and floating down state when a cue is presented.
+    Explain to the subject they will be starting with their brow unfurrowed and eyes closed.
+    They will be furrowing their brow when a cue is presented and then unfurrowing their brow when the next cue is presented.
     TODO The subject will know when to switch states by looking for two audiovisual cues denoting each action.
     TODO Label for entire transition state?
     """
@@ -21,11 +21,11 @@ class StationaryToDown(TestThread):
         Initializes and creates the transition labels in the display window.
         """
         super().__init__(transition=True)
-        action_image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'Down.png')
-        stop_image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'stop white.png')
+        furrow_image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'BrowFurrow.png')
+        unfurrow_image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'BrowUnfurrow.PNG')
 
-        self.action_image = tk.PhotoImage(file=action_image_directory)
-        self.stop_image = tk.PhotoImage(file=stop_image_directory)
+        self.furrow_image = tk.PhotoImage(file=furrow_image_directory)
+        self.unfurrow_image = tk.PhotoImage(file=unfurrow_image_directory)
 
         self.firstImage = True
         self.current_label = None
@@ -37,11 +37,11 @@ class StationaryToDown(TestThread):
         super().start_iteration()
 
         if self.firstImage:
-            LSL.start_label("Stop")
-            self.current_label = tk.Label(TestGUI.display_window, image=self.stop_image, borderwidth=0)
+            LSL.start_label("Brow Furrowed")
+            self.current_label = tk.Label(TestGUI.display_window, image=self.furrow_image, borderwidth=0)
         else:
-            LSL.start_label("Down")
-            self.current_label = tk.Label(TestGUI.display_window, image=self.action_image, borderwidth=0)
+            LSL.start_label("Brow Unfurrowed")
+            self.current_label = tk.Label(TestGUI.display_window, image=self.unfurrow_image, borderwidth=0)
 
         self.firstImage = not self.firstImage
         self.current_label.place(relx=0.5, rely=0.5, anchor='center')
@@ -53,3 +53,4 @@ class StationaryToDown(TestThread):
         super().stop_iteration()
 
         self.current_label.destroy()
+
