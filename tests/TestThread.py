@@ -1,4 +1,3 @@
-import abc
 import os.path
 import random
 import threading
@@ -15,15 +14,18 @@ class TestThread(threading.Thread):
     A class that all tests should extend that holds all threading logic, initialization, and data logging.
     """
 
-    def __init__(self):
+    def __init__(self, transition=False):
         """
         The constructor that sets up the test name and stop condition.
+
+        :param transition: True if the test is a transition test, false otherwise.
         """
         super().__init__()
 
         # Setup name and trial number
         self.name = self.__class__.__name__  # Test name is class name
         self.trial_number = TestGUI.tests[self.name]["trial"]
+        self.is_transition_test = transition
 
         # Setup save path and create directories
         test_path = os.path.join(config.DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID, self.name)
@@ -31,8 +33,10 @@ class TestThread(threading.Thread):
         os.makedirs(self.current_path, exist_ok=True)
 
         self.iteration = 0
-        # The type of test determines how many iterations the test should run for Blink is times 2
-        self.max_iterations = config.ITERATIONS_PER_ACTION * 2 if "To" in self.name else config.ITERATIONS_PER_ACTION
+        # The type of test determines how many iterations the test should run for
+        # TODO Pretty sure this is correct but it could be the other way around
+        self.max_iterations = config.ITERATIONS_PER_ACTION * 2 if transition else config.ITERATIONS_PER_ACTION
+        self.current_label = None
 
         self.running = True
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
@@ -49,21 +53,44 @@ class TestThread(threading.Thread):
 
         sleep(config.DATA_PADDING_DURATION)  # This gives the data collection a five second padding of rest
 
-        #LSL.start_label(self.name)
+        def loop():
+            """
+            Main loop that runs and schedules the next iteration of the test
+            """
+            if self.iteration == self.max_iterations:
+                self.running = False
 
-        self.run_iteration()
+            if self.running:
+                # Setup next interval
+                interval = random.randint(config.TEST_MIN_INTERVAL, config.TEST_MAX_INTERVAL)
+                TestGUI.display_window.after(interval, loop)
+
+                self.start_iteration()
+            else:
+                # Stop test thread
+                TestGUI.display_window.after(1, self.stop)
+
+            self.iteration += 1
+
+        loop()
 
         return  # End thread
 
-    def run_iteration(self):
-        if self.iteration == self.max_iterations:
-            self.running = False
+    def start_iteration(self):
+        """
+        Override this method with super().start_iteration() to create behavior at the beginning of each test iteration.
+        """
+        # If transition test, labelling needs to be done manually for now
+        if not self.is_transition_test:
+            LSL.start_label(self.name)
 
-        if not self.running:
-            # Stop test thread
-            TestGUI.display_window.after(1, self.stop)
-        else:
-            self.iteration += 1
+        TestGUI.display_window.after(1000, self.stop_iteration)
+
+    def stop_iteration(self):
+        """
+        Override this method with super().stop_iteration() to create behavior at the end of each test iteration.
+        """
+        LSL.stop_label()
 
     def stop(self):
         """

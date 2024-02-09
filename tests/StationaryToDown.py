@@ -21,32 +21,29 @@ class StationaryToDown(TestThread):
         """
         Initializes and creates the blink label in the display window.
         """
-        super().__init__()
-        self.action_image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'Down.PNG')
-        self.action_image = tk.PhotoImage(file=self.action_image_directory)
-        self.stop_image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'stop white.PNG')
-        self.stop_image = tk.PhotoImage(file=self.stop_image_directory)
+        super().__init__(transition=True)
+        action_image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'Down.PNG')
+        self.action_image = tk.PhotoImage(file=action_image_directory)
+        stop_image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'stop white.PNG')
+        self.stop_image = tk.PhotoImage(file=stop_image_directory)
         self.firstImage = True
 
+        self.current_label = None
 
-    def run_iteration(self):
-        super().run_iteration()
-        current_Label = None
-        if self.running:
-            # Setup next interval
-            interval = random.randint(config.TEST_MIN_INTERVAL, config.TEST_MAX_INTERVAL)
-            TestGUI.display_window.after(interval, self.run_iteration)
+    def start_iteration(self):
+        super().start_iteration()
 
         if self.firstImage:
             LSL.start_label("Stop")
-            current_Label = tk.Label(TestGUI.display_window, image=self.stop_image, borderwidth=0)
+            self.current_label = tk.Label(TestGUI.display_window, image=self.stop_image, borderwidth=0)
         else:
             LSL.start_label("Down")
-            current_Label =  tk.Label(TestGUI.display_window, image=self.action_image, borderwidth=0)
-        
+            self.current_label = tk.Label(TestGUI.display_window, image=self.action_image, borderwidth=0)
+
         self.firstImage = not self.firstImage
-        def stop_iteration():   # Using this to destroy the blink label but also to start the labeler as Rest for default rest state
-                    current_Label.destroy()
-                    LSL.stop_label()
-        current_Label.place(relx=0.5, rely=0.5, anchor='center')
-        TestGUI.display_window.after(1000, stop_iteration)
+        self.current_label.place(relx=0.5, rely=0.5, anchor='center')
+
+    def stop_iteration(self):
+        super().stop_iteration()
+
+        self.current_label.destroy()
