@@ -1,12 +1,5 @@
-"""
-THIS IS AN EXAMPLE OF WHAT A TEST CLASS SHOULD LOOK LIKE. DUPLICATE THIS CLASS AND UPDATE LABELS, ETC TO CREATE A NEW TEST.
-"""
-import random
-import tkinter as tk
-
 import os
-
-import config
+import tkinter as tk
 
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
@@ -14,59 +7,32 @@ from tests.TestThread import TestThread
 
 class FloatRight(TestThread):
     """
-    The Blink test that extends the TestThread class. Each method should call its super() equivalent to ensure data collection and thread management.
+    The Float Right test that extends the TestThread class.
     """
 
     def __init__(self):
         """
-        Initializes and creates the blink label in the display window.
+        Initializes the image assets for the display window.
         """
         super().__init__()
 
-        self.image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'Right.png')
-        self.image = tk.PhotoImage(file=self.image_directory)
+        image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'Right.png')
+        self.image = tk.PhotoImage(file=image_directory)
+        self.float_label = None
+
+    def start_iteration(self):
+        """
+        Creates and displays a new label for each iteration.
+        """
+        super().start_iteration()
+
         self.float_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
+        self.float_label.place(relx=0.5, rely=0.5, anchor='center')
 
-        self.keep_going = True
-        self.float = True
-
-        self.interval_time = random.randint(config.TEST_MIN_INTERVAL, config.TEST_MAX_INTERVAL)
-
-        self.trail = 0
-
-
-    def run(self):
+    def stop_iteration(self):
         """
-        Holds the logic to toggle blinking. TestThread will automatically call stop after the duration has ended.
+        Destroys the label after each iteration.
         """
-        super().run()
+        super().stop_iteration()
 
-        def toggle():
-            if self.trail == config.ITERATIONS_PER_ACTION:
-                TestGUI.display_window.after(1, self.stop)
-
-            if self.float and self.keep_going:
-                self.float_label.place(relx = 0.5, rely = 0.5, anchor='center')
-                self.float = False
-                TestGUI.display_window.after(self.interval_time, toggle)
-                self.trail += 1
-            else:
-                self.float_label.place_forget()
-                self.float = True
-                TestGUI.display_window.after(1000, toggle)
-
-            print (self.trail)
-
-        toggle()
-
-
-
-    def stop(self):
-        """
-        Toggles blinking flag and destroys label.
-        """
         self.float_label.destroy()
-        self.keep_going = False
-        self.float = False
-        self.trail = 0
-        super().stop()

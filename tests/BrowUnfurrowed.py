@@ -5,9 +5,9 @@ from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
 
-class EyesOpen(TestThread):
+class BrowUnfurrowed(TestThread):
     """
-    The Eyes Open test that extends the TestThread class.
+    The Brow Unfurrowed test that extends the TestThread class.
     """
 
     def __init__(self):
@@ -16,9 +16,9 @@ class EyesOpen(TestThread):
         """
         super().__init__()
 
-        image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'EyesOpen.png')
+        image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'BrowUnfurrow.png')
         self.image = tk.PhotoImage(file=image_directory)
-        self.eye_label = None
+        self.brow_label = None
 
     def start_iteration(self):
         """
@@ -26,8 +26,8 @@ class EyesOpen(TestThread):
         """
         super().start_iteration()
 
-        self.eye_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
-        self.eye_label.place(relx=0.5, rely=0.5, anchor='center')
+        self.brow_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
+        self.brow_label.place(relx=0.5, rely=0.5, anchor='center')
 
     def stop_iteration(self):
         """
@@ -35,4 +35,4 @@ class EyesOpen(TestThread):
         """
         super().stop_iteration()
 
-        self.eye_label.destroy()
+        self.brow_label.destroy()

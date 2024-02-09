@@ -5,9 +5,9 @@ from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
 
-class EyesOpen(TestThread):
+class EyesClosed(TestThread):
     """
-    The Eyes Open test that extends the TestThread class.
+    The Eyes Closed test that extends the TestThread class.
     """
 
     def __init__(self):
@@ -16,7 +16,7 @@ class EyesOpen(TestThread):
         """
         super().__init__()
 
-        image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'EyesOpen.png')
+        image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'EyesClosed.png')
         self.image = tk.PhotoImage(file=image_directory)
         self.eye_label = None
 
