@@ -3,7 +3,7 @@ import random
 import threading
 from time import sleep
 
-from playsound import playsound
+from pygame import mixer
 
 import config
 from LSL import LSL
@@ -15,18 +15,15 @@ class TestThread(threading.Thread):
     A class that all tests should extend that holds all threading logic, initialization, and data logging.
     """
 
-    def __init__(self, transition=False):
+    def __init__(self, name):
         """
         The constructor that sets up the test name and stop condition.
-
-        :param transition: True if the test is a transition test, false otherwise.
         """
         super().__init__()
 
         # Setup name and trial number
-        self.name = self.__class__.__name__  # Test name is class name
+        self.name = name
         self.trial_number = TestGUI.tests[self.name]["trial"]
-        self.is_transition_test = transition
 
         # Setup save path and create directories
         test_path = os.path.join(config.DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID, self.name)
@@ -34,12 +31,10 @@ class TestThread(threading.Thread):
         os.makedirs(self.current_path, exist_ok=True)
 
         self.iteration = 0
-        # The type of test determines how many iterations the test should run for
-        # TODO Pretty sure this is correct but it could be the other way around
-        self.max_iterations = config.ITERATIONS_PER_ACTION * 2 if transition else config.ITERATIONS_PER_ACTION
         self.current_label = None
 
-        self.sound_path = "C:\\Users\\techw\\OneDrive\\Documents\\NXT\\DataCollector\\assets\\beep.mp3"
+        mixer.init()
+        self.sound = mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'beep.mp3'))
 
         self.running = True
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
@@ -60,7 +55,7 @@ class TestThread(threading.Thread):
             """
             Main loop that runs and schedules the next iteration of the test
             """
-            if self.iteration == self.max_iterations:
+            if self.iteration == config.ITERATIONS_PER_ACTION:
                 self.running = False
 
             if self.running:
@@ -83,10 +78,6 @@ class TestThread(threading.Thread):
         """
         Override this method with super().start_iteration() to create behavior at the beginning of each test iteration.
         """
-        # If transition test, labelling needs to be done manually for now
-        if not self.is_transition_test:
-            LSL.start_label(self.name)
-
         TestGUI.display_window.after(config.ITERATION_DURATION, self.stop_iteration)
 
     def stop_iteration(self):
@@ -119,3 +110,6 @@ class TestThread(threading.Thread):
         Overrides default stop method, as soon as stop event is set in stop() the test will auto kill itself.
         """
         return self._stop_event.is_set()
+
+    def playsound(self):
+        self.sound.play()

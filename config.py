@@ -17,6 +17,33 @@ TEST_MAX_INTERVAL = 6000       # The maximum duration between intervals
 ITERATIONS_PER_ACTION = 2      # How many iterations run per action (default 20, change for testing)
 ITERATION_DURATION = 1 * 1000  # How many milliseconds a test iteration appears for
 
+TESTS = {
+    "Transition": {
+        "Stationary Float to Select": ["Stop.png", "Select.png"],  # TODO right image?
+        "Stationary Float to Float Left": ["Stop.png", "Left.png"],  # TODO right image?
+        "Stationary Float to Float Right": ["Stop.png", "Right.png"],  # TODO right image?
+        "Stationary Float to Float Up": ["Stop.png", "Up.png"],  # TODO right image?
+        "Stationary Float to Float Down": ["Stop.png", "Down.png"],  # TODO right image?
+        "Eyes Open and Close": ["EyesOpen.png", "EyesClosed.png"],
+        "Brow Furrow and Unfurrow": ["BrowFurrow.png", "BrowUnfurrow.png"]
+    },
+    "Constant": {
+        "Eyes Open": "EyesOpen.png",
+        "Eyes Closed": "EyesClosed.png",
+        "Brow Furrow": "BrowFurrow.png",
+        "Brow Unfurrow": "BrowUnfurrow.png",
+        "Stationary Floating": "Stop.png",  # TODO right image?
+        "Float Left": "Left.png",
+        "Float Right": "Right.png",
+        "Float Up": "Up.png",
+        "Float Down": "Down.png",
+        "Select": "Stop.png"  # TODO right image?
+    },
+    "Blink": [
+        "Blink"
+    ]
+}
+
 # Subject information
 NUMBER_OF_SUBJECTS = 10
 
