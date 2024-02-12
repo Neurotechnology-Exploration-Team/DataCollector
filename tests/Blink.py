@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-
+from pygame import mixer
 from LSL import LSL
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
@@ -21,7 +21,8 @@ class Blink(TestThread):
         Initializes the image assets for the display window.
         """
         super().__init__()
-
+        mixer.init()
+        self.sound = mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'beep.mp3'))
         image_directory = os.path.join(os.path.dirname(__file__), '..', 'assets', 'Blink.png')
         self.image = tk.PhotoImage(file=image_directory)
         self.blink_label = None
@@ -31,8 +32,9 @@ class Blink(TestThread):
         Creates and displays a new label for each iteration.
         """
         super().start_iteration()
-
+        
         self.blink_label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
+        self.sound.play()
         self.blink_label.place(relx=0.5, rely=0.5, anchor='center')
 
     def stop_iteration(self):
