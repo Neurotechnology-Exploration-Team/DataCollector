@@ -26,10 +26,10 @@ class DataCollectorApp:
         test = None
 
         if test_type == "Transition":
-            assets = config.TESTS["transition"][test_name]
+            assets = config.TESTS[test_type][test_name]
             test = test_class(test_name, os.path.join('.', 'assets', assets[0]), os.path.join('.', 'assets', assets[1]))
         elif test_type == "Constant":
-            asset = config.TESTS["constant"][test_name]
+            asset = config.TESTS[test_type][test_name]
             test = test_class(test_name, os.path.join('.', 'assets', asset))
         elif test_type == "Blink":
             test = test_class(test_name)
@@ -52,7 +52,8 @@ class DataCollectorApp:
         for test_type in config.TESTS.keys():
             for test_name in config.TESTS[test_type]:
                 # Add button to test
-                TestGUI.add_test(test_name, lambda name=test_name: DataCollectorApp.run_test(test_name, test_type))
+                TestGUI.add_test(test_name,
+                                 lambda n=test_name, t=test_type: DataCollectorApp.run_test(n, t))
 
         TestGUI.control_window.mainloop()
 

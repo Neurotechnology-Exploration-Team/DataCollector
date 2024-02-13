@@ -22,8 +22,9 @@ class TransitionTest(TestThread):
         self.image_1 = tk.PhotoImage(file=image_directory_1)
         self.image_2 = tk.PhotoImage(file=image_directory_2)
 
+        # TODO fix labels
         self.label_1 = name.split("To")[0]
-        self.label_2 = label_2
+        self.label_2 = name.split("To")[1]
 
         self.firstImage = True
         self.current_label = None
