@@ -4,6 +4,7 @@ import os
 import config
 from LSL import LSL
 from tests.TestGUI import TestGUI
+from tests.TestThread import TestThread
 
 
 class DataCollectorApp:
@@ -12,7 +13,7 @@ class DataCollectorApp:
     """
 
     @staticmethod
-    def run_test(test_name: str, test_type: str):
+    def run_test(test_name: str, test_type: str) -> TestThread:
         """
         Runs the specified test in a separate thread and collects data.
         :param test_name: Name of the test being run
@@ -38,6 +39,7 @@ class DataCollectorApp:
             pass
 
         test.start()  # Start test thread
+        return test
 
     @staticmethod
     def run():

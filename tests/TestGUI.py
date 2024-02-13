@@ -11,11 +11,12 @@ class TestGUI:
     control_window = None
     display_window = None
     close_button = None
+    abort_button = None
 
     # Setup test states: A dictionary with test name keys corresponding to sub-dictionaries with lambda, button,
     # trial_number, and completed parameters
     tests = {}
-    current_test = None
+    current_thread = None
 
     participant_ID = ""
     session_ID = ""
@@ -25,20 +26,30 @@ class TestGUI:
         """
         MUST BE CALLED BEFORE ACCESSING ANY CLASS VARIABLES. Sets up the display window.
         """
+        # Control window
         TestGUI.control_window = tk.Tk()
         TestGUI.control_window.title("Control Panel")
         TestGUI.__set_window_geometry(TestGUI.control_window, left_side=True)
         TestGUI.disable_close_button(TestGUI.control_window)
 
+        # Test display window (child of control)
         TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
         TestGUI.display_window.title("Display")
         TestGUI.display_window.configure(background='black')
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
         TestGUI.disable_close_button(TestGUI.display_window)
 
-        TestGUI.close_button = tk.Button(TestGUI.control_window, text="EXIT TESTING", height=5, width=30)
-        TestGUI.close_button.config(command=lambda: TestGUI.__exit())
-        TestGUI.close_button.pack(side="bottom", pady=100)
+        # Test lifecycle buttons (child of control)
+        frame = tk.Frame(TestGUI.control_window)
+        frame.pack(side="bottom", pady=100)
+
+        TestGUI.abort_button = tk.Button(frame, text="ABORT TEST", height=4, width=30, state="disabled",
+                                         command=lambda: TestGUI.current_thread.stop())
+        TestGUI.abort_button.pack(side="left")
+
+        TestGUI.close_button = tk.Button(frame, text="EXIT TESTING", height=4, width=30,
+                                         command=lambda: TestGUI.__exit())
+        TestGUI.close_button.pack(side="right")
 
         TestGUI.__prompt_participant_info()
 
@@ -60,16 +71,15 @@ class TestGUI:
         print("Added test: " + test_name)
 
     @staticmethod
-    def confirm_current_test(test_data_path: str) -> bool:
+    def confirm_current_test() -> bool:
         """
         Run the test and prompt the user to confirm or deny the data.
-
-        :param test_data_path: The path to the current test data FOLDER.
         """
         # Confirm data
-        TestGUI.__show_data_and_confirm(test_data_path)
+        TestGUI.__show_data_and_confirm()
 
         TestGUI.close_button.config(state="normal")
+        TestGUI.abort_button.config(state="disabled")
         # Reset the buttons
         for test in TestGUI.tests.keys():
             if not TestGUI.tests[test]['completed']:  # If test is not complete, re-enable button
@@ -83,31 +93,32 @@ class TestGUI:
         plt.close()
 
         # Return true if test is complete
-        return TestGUI.tests[TestGUI.current_test]['completed']
+        return TestGUI.tests[TestGUI.current_thread.name]['completed']
 
     @staticmethod
-    def start_test(test_name):
+    def start_test(test_thread):
         """
         A function to disable buttons while a test is running.
 
-        :param test_name: The name of the current test running (to enable the indicator).
+        :param test_thread: The thread object of the current test running (to enable the indicator).
         """
         # Disable all buttons
         TestGUI.close_button.config(state="disabled")
+        TestGUI.abort_button.config(state="normal")
 
         for test in TestGUI.tests.keys():
             TestGUI.tests[test]['button'].config(state="disabled")
 
         # Indicate current test
-        TestGUI.current_test = test_name
-        TestGUI.tests[TestGUI.current_test]['button'].config(bg="yellow")
+        TestGUI.current_thread = test_thread
+        TestGUI.tests[TestGUI.current_thread.name]['button'].config(bg="yellow")
 
     #
     # HELPER METHODS
     #
 
     @staticmethod
-    def __show_data_and_confirm(test_data_path: str):
+    def __show_data_and_confirm():
         """
         Popup the data confirmation window to check if it should be accepted or rejected,
         without displaying graphs.
@@ -116,7 +127,7 @@ class TestGUI:
         popup.wm_title("Data Confirmation")
         TestGUI.disable_close_button(popup)
         popup.geometry("400x200")
-        msg = tk.Label(popup, text="Do you confirm the test data?", font=("Arial", 12))
+        msg = tk.Label(popup, text="Confirm Test Data", font=("Arial", 12))
         msg.pack(pady=20)
         confirm_button = tk.Button(popup, text="Confirm", command=lambda: TestGUI.__handle_confirm(popup, True))
         deny_button = tk.Button(popup, text="Deny", command=lambda: TestGUI.__handle_confirm(popup, False))
@@ -134,9 +145,8 @@ class TestGUI:
             print("Data confirmed.")
         else:
             print("Data denied.")
-        TestGUI.tests[TestGUI.current_test]['completed'] = confirmed
+        TestGUI.tests[TestGUI.current_thread.name]['completed'] = confirmed
         popup.destroy()
-        TestGUI.close_button.config(state="normal")
         for test_name, test_info in TestGUI.tests.items():
             if not test_info['completed']:
                 test_info['button'].config(state="normal", bg="red")

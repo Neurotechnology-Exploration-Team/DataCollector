@@ -43,7 +43,7 @@ class TestThread(threading.Thread):
         """
         All logic related to the control panel, starting collection, and calling the stop method after a certain duration.
         """
-        TestGUI.start_test(self.name)
+        TestGUI.start_test(self)
 
         print(f"Starting test {self.name}: Trial {self.trial_number}")
 
@@ -80,6 +80,9 @@ class TestThread(threading.Thread):
         """
         TestGUI.display_window.after(config.ITERATION_DURATION, self.stop_iteration)
 
+        if not self.running:
+            self.stop()
+
     def stop_iteration(self):
         """
         Override this method with super().stop_iteration() to create behavior at the end of each test iteration.
@@ -90,15 +93,19 @@ class TestThread(threading.Thread):
         """
         All logic relating to shutting down the test thread and stopping data collection.
         """
+        if not self.running:
+            self._stop_event.set()
+            return
+
         LSL.stop_label()  # Stop labelling
         sleep(config.DATA_PADDING_DURATION)  # Wait to collect junk data
 
         LSL.stop_collection(self.current_path)  # Stop collecting
 
-        complete = TestGUI.confirm_current_test(self.current_path)
+        complete = TestGUI.confirm_current_test()
+        current_test = TestGUI.current_thread.name
         # Log finalized test status
-        print(
-            f"{TestGUI.current_test} - Trial {TestGUI.tests[TestGUI.current_test]['trial']}: {'Complete' if complete else 'Discarded'}")
+        print(f"{current_test} - Trial {TestGUI.tests[current_test]['trial']}: {'Complete' if complete else 'Discarded'}")
 
         if not complete:  # If test is not complete
             TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!

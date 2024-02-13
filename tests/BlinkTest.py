@@ -9,7 +9,6 @@ class BlinkTest(TestThread):
     The Blink test that extends the TestThread class.
 
     Audio only
-    TODO Test
     """
 
     def __init__(self, name):
