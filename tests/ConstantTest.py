@@ -1,6 +1,9 @@
 import os
+import random
 import tkinter as tk
+from time import sleep
 
+import config
 from LSL import LSL
 from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
@@ -9,41 +12,50 @@ from tests.TestThread import TestThread
 class ConstantTest(TestThread):
     """
     No auditory stimulus will be presented.
-
-    TODO Add 10sec break
     """
 
     def __init__(self, name):
         """
         Initializes the image assets for the display window.
         """
-        super().__init__(name, 60000)
+        super().__init__(name)
 
         self.pause_image = tk.PhotoImage(file=os.path.join('assets', 'stop red.PNG'))
         self.label = None
 
-    def start_iteration(self):
+    def run_test(self):
         """
-        Creates and displays a new label for each iteration.
+        Main loop that runs and schedules the next iteration of the test
         """
-        super().start_iteration()
+        if self.iteration == config.ITERATIONS_PER_ACTION:
+            self.running = False
 
-        self.label = tk.Label(TestGUI.display_window, text=self.name, borderwidth=0)
-        self.label.place(relx=0.5, rely=0.5, anchor='center')
+        if self.running:
+            LSL.start_label(self.name)
 
-        LSL.start_label(self.name)
-        TestGUI.display_window.after(1000, self.label.destroy)
-
-        def pause():
-            LSL.stop_label()
-            self.label = tk.Label(TestGUI.display_window, image=self.pause_image, borderwidth=0)
+            self.label = tk.Label(TestGUI.display_window, text=self.name, borderwidth=0)
             self.label.place(relx=0.5, rely=0.5, anchor='center')
 
-        TestGUI.display_window.after(40000, pause)
+            TestGUI.display_window.after(3000, self.label.destroy)
 
-    def stop_iteration(self):
-        """
-        Destroys the label after each iteration.
-        """
-        if self.label:
-            self.label.destroy()
+            def resume():
+                if self.running:
+                    self.label.destroy()
+                    TestGUI.display_window.after(1000, self.run_test)  # TODO config
+
+            def pause():
+                LSL.stop_label()
+                if self.running:
+                    self.label = tk.Label(TestGUI.display_window, image=self.pause_image, borderwidth=0)
+                    self.label.place(relx=0.5, rely=0.5, anchor='center')
+                    TestGUI.display_window.after(5000, resume)  # Resume after 5 seconds TODO config, default 5
+
+            TestGUI.display_window.after(20000, pause)  # Pause after 20 seconds TODO config, default 20
+            self.iteration += 1
+        else:
+            # Stop test thread
+            self.running = False
+
+            LSL.stop_label()
+            self.stop()
+            TestGUI.display_window.after(1, self.stop)

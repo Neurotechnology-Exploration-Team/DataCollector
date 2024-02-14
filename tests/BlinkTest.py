@@ -1,8 +1,5 @@
-import os
 import random
 from time import sleep
-
-from pygame import mixer
 
 import config
 from LSL import LSL
@@ -22,8 +19,6 @@ class BlinkTest(TestThread):
         Initializes the image assets for the display window.
         """
         super().__init__(name)  # TODO change to an arbitrary number, this should be 30 blinks
-
-        self.blinking = False
 
     def run_test(self):
         """
@@ -45,7 +40,7 @@ class BlinkTest(TestThread):
             TestGUI.display_window.after(interval, self.run_test)
         else:
             # Stop test thread
-            self.blinking = False
+            self.running = False
 
             LSL.stop_label()
             self.stop()
