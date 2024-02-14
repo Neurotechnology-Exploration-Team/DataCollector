@@ -50,7 +50,7 @@ class TransitionTest(TestThread):
                 self.current_label.destroy()
                 self.run_test()
 
-            TestGUI.display_window.after(10000, swap)  # TODO how long per transition state + config
+            self.test_job_id = TestGUI.display_window.after(10000, swap)  # TODO how long per transition state + config
 
             self.iteration += 1
         else:
@@ -60,4 +60,3 @@ class TransitionTest(TestThread):
 
             LSL.stop_label()
             self.stop()
-            TestGUI.display_window.after(1, self.stop)

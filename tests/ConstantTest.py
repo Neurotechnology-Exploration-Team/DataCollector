@@ -36,21 +36,21 @@ class ConstantTest(TestThread):
             self.label = tk.Label(TestGUI.display_window, text=self.name, borderwidth=0)
             self.label.place(relx=0.5, rely=0.5, anchor='center')
 
-            TestGUI.display_window.after(3000, self.label.destroy)
+            self.test_job_id = TestGUI.display_window.after(3000, self.label.destroy)
 
             def resume():
                 if self.running:
                     self.label.destroy()
-                    TestGUI.display_window.after(1000, self.run_test)  # TODO config
+                    self.test_job_id = TestGUI.display_window.after(1000, self.run_test)  # TODO config
 
             def pause():
                 LSL.stop_label()
                 if self.running:
                     self.label = tk.Label(TestGUI.display_window, image=self.pause_image, borderwidth=0)
                     self.label.place(relx=0.5, rely=0.5, anchor='center')
-                    TestGUI.display_window.after(5000, resume)  # Resume after 5 seconds TODO config, default 5
+                    self.test_job_id = TestGUI.display_window.after(5000, resume)  # Resume after 5 seconds TODO config, default 5
 
-            TestGUI.display_window.after(20000, pause)  # Pause after 20 seconds TODO config, default 20
+            self.test_job_id = TestGUI.display_window.after(20000, pause)  # Pause after 20 seconds TODO config, default 20
             self.iteration += 1
         else:
             # Stop test thread
@@ -58,4 +58,3 @@ class ConstantTest(TestThread):
 
             LSL.stop_label()
             self.stop()
-            TestGUI.display_window.after(1, self.stop)

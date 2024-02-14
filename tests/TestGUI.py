@@ -44,7 +44,7 @@ class TestGUI:
         frame.pack(side="bottom", pady=100)
 
         TestGUI.abort_button = tk.Button(frame, text="ABORT TEST", height=4, width=30, state="disabled",
-                                         command=lambda: TestGUI.current_thread.stop())
+                                         command=lambda: TestGUI.current_thread.abort())
         TestGUI.abort_button.pack(side="left")
 
         TestGUI.close_button = tk.Button(frame, text="EXIT TESTING", height=4, width=30,

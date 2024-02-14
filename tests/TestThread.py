@@ -32,6 +32,7 @@ class TestThread(threading.Thread):
 
         self.iteration = 0
         self.running = True
+        self.test_job_id = None
 
         mixer.init()
         self.sound = mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'beep.mp3'))
@@ -63,10 +64,6 @@ class TestThread(threading.Thread):
         """
         All logic relating to shutting down the test thread and stopping data collection.
         """
-        # TODO add abort flag
-        # if not self.running:
-        #     self._stop_event.set()
-        #     return
 
         LSL.stop_label()  # Stop labelling
         sleep(config.DATA_PADDING_DURATION)  # Wait to collect junk data
@@ -76,12 +73,27 @@ class TestThread(threading.Thread):
         complete = TestGUI.confirm_current_test()
         current_test = TestGUI.current_thread.name
         # Log finalized test status
-        print(f"{current_test} - Trial {TestGUI.tests[current_test]['trial']}: {'Complete' if complete else 'Discarded'}")
+        print(
+            f"{current_test} - Trial {TestGUI.tests[current_test]['trial']}: {'Complete' if complete else 'Discarded'}")
 
         if not complete:  # If test is not complete
             TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
 
         self._stop_event.set()  # Set the stop event so Python auto-kills the thread
+
+    def abort(self):
+        """
+        Function to abort test and save current data to new trial
+        """
+        # Remove all children of display window
+        for child in TestGUI.display_window.winfo_children():
+            child.destroy()
+
+        # Cancel currently running timer
+        TestGUI.display_window.after_cancel(self.test_job_id)
+        self.test_job_id = None
+
+        self.stop()
 
     def stopped(self):
         """

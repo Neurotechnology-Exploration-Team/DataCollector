@@ -37,11 +37,10 @@ class BlinkTest(TestThread):
             sleep(0.5)  # Wait extra after blinking TODO config
             LSL.stop_label()
 
-            TestGUI.display_window.after(interval, self.run_test)
+            self.test_job_id = TestGUI.display_window.after(interval, self.run_test)
         else:
             # Stop test thread
             self.running = False
 
             LSL.stop_label()
             self.stop()
-            TestGUI.display_window.after(1, self.stop)
