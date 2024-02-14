@@ -17,7 +17,7 @@ class DataCollectorApp:
         """
         Runs the specified test in a separate thread and collects data.
         :param test_name: Name of the test being run
-
+        :param test_type: Type of the test being run: Blink, Constant, or Transition
         TODO error handling
         """
         # Dynamically import the test from tests package & construct it w/ no parameters
@@ -30,8 +30,8 @@ class DataCollectorApp:
             assets = config.TESTS[test_type][test_name]
             test = test_class(test_name, os.path.join('.', 'assets', assets[0]), os.path.join('.', 'assets', assets[1]))
         elif test_type == "Constant":
-            asset = config.TESTS[test_type][test_name]
-            test = test_class(test_name, os.path.join('.', 'assets', asset))
+            asset = config.TESTS[test_type][test_name]  # No picture needed as of now
+            test = test_class(test_name)
         elif test_type == "Blink":
             test = test_class(test_name)
         else:

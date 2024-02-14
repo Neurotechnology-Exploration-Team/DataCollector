@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 
 from LSL import LSL
@@ -12,13 +13,13 @@ class ConstantTest(TestThread):
     TODO Add 10sec break
     """
 
-    def __init__(self, name, image_directory):
+    def __init__(self, name):
         """
         Initializes the image assets for the display window.
         """
-        super().__init__(name)
+        super().__init__(name, 60000)
 
-        self.image = tk.PhotoImage(file=image_directory)
+        self.pause_image = tk.PhotoImage(file=os.path.join('assets', 'stop red.PNG'))
         self.label = None
 
     def start_iteration(self):
@@ -27,14 +28,22 @@ class ConstantTest(TestThread):
         """
         super().start_iteration()
 
-        self.label = tk.Label(TestGUI.display_window, image=self.image, borderwidth=0)
+        self.label = tk.Label(TestGUI.display_window, text=self.name, borderwidth=0)
         self.label.place(relx=0.5, rely=0.5, anchor='center')
 
         LSL.start_label(self.name)
+        TestGUI.display_window.after(1000, self.label.destroy)
+
+        def pause():
+            LSL.stop_label()
+            self.label = tk.Label(TestGUI.display_window, image=self.pause_image, borderwidth=0)
+            self.label.place(relx=0.5, rely=0.5, anchor='center')
+
+        TestGUI.display_window.after(40000, pause)
 
     def stop_iteration(self):
         """
         Destroys the label after each iteration.
         """
-
-        self.label.destroy()
+        if self.label:
+            self.label.destroy()

@@ -31,12 +31,11 @@ class TestThread(threading.Thread):
         os.makedirs(self.current_path, exist_ok=True)
 
         self.iteration = 0
-        self.current_label = None
+        self.running = True
 
         mixer.init()
         self.sound = mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'beep.mp3'))
 
-        self.running = True
         self._stop_event = threading.Event()  # Setup stop event to auto kill thread
 
     def run(self):
@@ -51,51 +50,23 @@ class TestThread(threading.Thread):
 
         sleep(config.DATA_PADDING_DURATION)  # This gives the data collection a five second padding of rest
 
-        def loop():
-            """
-            Main loop that runs and schedules the next iteration of the test
-            """
-            if self.iteration == config.ITERATIONS_PER_ACTION:
-                self.running = False
+        LSL.start_label(self.name)
 
-            if self.running:
-                # Setup next interval
-                interval = random.randint(config.TEST_MIN_INTERVAL, config.TEST_MAX_INTERVAL)
-                TestGUI.display_window.after(interval, loop)
-
-                self.start_iteration()
-            else:
-                # Stop test thread
-                TestGUI.display_window.after(1, self.stop)
-
-            self.iteration += 1
-
-        loop()
+        self.run_test()
 
         return  # End thread
 
-    def start_iteration(self):
-        """
-        Override this method with super().start_iteration() to create behavior at the beginning of each test iteration.
-        """
-        TestGUI.display_window.after(config.ITERATION_DURATION, self.stop_iteration)
-
-        if not self.running:
-            self.stop()
-
-    def stop_iteration(self):
-        """
-        Override this method with super().stop_iteration() to create behavior at the end of each test iteration.
-        """
+    def run_test(self):
         pass
 
     def stop(self):
         """
         All logic relating to shutting down the test thread and stopping data collection.
         """
-        if not self.running:
-            self._stop_event.set()
-            return
+        # TODO add abort flag
+        # if not self.running:
+        #     self._stop_event.set()
+        #     return
 
         LSL.stop_label()  # Stop labelling
         sleep(config.DATA_PADDING_DURATION)  # Wait to collect junk data

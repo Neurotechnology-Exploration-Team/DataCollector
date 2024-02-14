@@ -17,7 +17,7 @@ class TransitionTest(TestThread):
         """
         Initializes and creates the transition labels in the display window.
         """
-        super().__init__(name)
+        super().__init__(name, 15*1000)
 
         self.image_1 = tk.PhotoImage(file=image_directory_1)
         self.image_2 = tk.PhotoImage(file=image_directory_2)

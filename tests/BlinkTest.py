@@ -1,6 +1,12 @@
 import os
+import random
+from time import sleep
+
 from pygame import mixer
+
+import config
 from LSL import LSL
+from tests.TestGUI import TestGUI
 from tests.TestThread import TestThread
 
 
@@ -15,22 +21,32 @@ class BlinkTest(TestThread):
         """
         Initializes the image assets for the display window.
         """
-        super().__init__(name)
+        super().__init__(name)  # TODO change to an arbitrary number, this should be 30 blinks
 
-    def start_iteration(self):
+        self.blinking = False
+
+    def run_test(self):
         """
-        Creates and displays a new label for each iteration.
+        Main loop that runs and schedules the next iteration of the test
         """
-        super().start_iteration()
+        if self.iteration == config.ITERATIONS_PER_ACTION:
+            self.running = False
 
-        self.playsound()
+        if self.running:
+            # Blink & setup next interval
+            LSL.start_label(self.name)
+            self.playsound()
+            self.iteration += 1
 
-        LSL.start_label(self.name)
+            interval = random.randint(config.BLINK_MIN_INTERVAL, config.BLINK_MAX_INTERVAL)
+            sleep(0.5)  # Wait extra after blinking TODO config
+            LSL.stop_label()
 
-    def stop_iteration(self):
-        """
-        Destroys the label after each iteration.
-        """
-        super().stop_iteration()
+            TestGUI.display_window.after(interval, self.run_test)
+        else:
+            # Stop test thread
+            self.blinking = False
 
-        LSL.stop_label()
+            LSL.stop_label()
+            self.stop()
+            TestGUI.display_window.after(1, self.stop)
