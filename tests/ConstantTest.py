@@ -21,7 +21,7 @@ class ConstantTest(TestThread):
         super().__init__(name)
 
         self.pause_image = tk.PhotoImage(file=os.path.join('assets', 'stop red.PNG'))
-        self.label = None
+        self.text = None
 
     def run_test(self):
         """
@@ -33,21 +33,18 @@ class ConstantTest(TestThread):
         if self.running:
             LSL.start_label(self.name)
 
-            self.label = tk.Label(TestGUI.display_window, text=self.name, borderwidth=0)
-            self.label.place(relx=0.5, rely=0.5, anchor='center')
-
-            self.test_job_id = TestGUI.display_window.after(3000, self.label.destroy)
+            self.text = TestGUI.place_text(self.name)
+            self.test_job_id = TestGUI.display_window.after(3000, TestGUI.destroy_current_element)
 
             def resume():
                 if self.running:
-                    self.label.destroy()
+                    TestGUI.destroy_current_element()
                     self.test_job_id = TestGUI.display_window.after(1000, self.run_test)  # TODO config
 
             def pause():
                 LSL.stop_label()
                 if self.running:
-                    self.label = tk.Label(TestGUI.display_window, image=self.pause_image, borderwidth=0)
-                    self.label.place(relx=0.5, rely=0.5, anchor='center')
+                    self.text = TestGUI.place_image(self.pause_image)
                     self.test_job_id = TestGUI.display_window.after(5000, resume)  # Resume after 5 seconds TODO config, default 5
 
             self.test_job_id = TestGUI.display_window.after(20000, pause)  # Pause after 20 seconds TODO config, default 20

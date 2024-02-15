@@ -10,8 +10,11 @@ class TestGUI:
 
     control_window = None
     display_window = None
+    display_canvas = None
     close_button = None
     abort_button = None
+
+    current_display_element = None
 
     # Setup test states: A dictionary with test name keys corresponding to sub-dictionaries with lambda, button,
     # trial_number, and completed parameters
@@ -38,6 +41,9 @@ class TestGUI:
         TestGUI.display_window.configure(background='black')
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
         TestGUI.disable_close_button(TestGUI.display_window)
+
+        TestGUI.display_canvas = tk.Canvas(TestGUI.display_window, width=400, height=400, bg='black')
+        TestGUI.display_canvas.pack(expand=True, fill=tk.BOTH)
 
         # Test lifecycle buttons (child of control)
         frame = tk.Frame(TestGUI.control_window)
@@ -220,3 +226,39 @@ class TestGUI:
         width = screen_width // 2
         x = 0 if left_side else width
         window.geometry(f"{width}x{screen_height}+{x}+0")
+
+    @staticmethod
+    def place_image(image):
+        """
+        Helper function to place an image in the middle of the display window. Returns the ID of the image object
+        for destruction.
+
+        :param image: The Tkinter image to place
+        """
+        if TestGUI.current_display_element is not None:
+            TestGUI.destroy_current_element()
+
+        x = TestGUI.display_canvas.winfo_width() / 2
+        y = TestGUI.display_canvas.winfo_height() / 2
+        TestGUI.current_display_element = TestGUI.display_canvas.create_image(x, y, anchor=tk.CENTER, image=image)
+
+    @staticmethod
+    def place_text(text):
+        """
+        Helper function to place text in the middle of the display window. Returns the ID of the text object
+        for destruction.
+
+        :param text: The text to place
+        """
+        if TestGUI.current_display_element is not None:
+            TestGUI.destroy_current_element()
+
+        x = TestGUI.display_canvas.winfo_width() / 2
+        y = TestGUI.display_canvas.winfo_height() / 2
+        TestGUI.current_display_element = TestGUI.display_canvas.create_text(x, y, anchor=tk.CENTER, text=text,
+                                                                             fill='white', font='Helvetica 25 bold')
+
+    @staticmethod
+    def destroy_current_element():
+        if TestGUI.current_display_element is not None:
+            TestGUI.display_canvas.delete(TestGUI.current_display_element)

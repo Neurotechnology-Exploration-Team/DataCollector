@@ -25,7 +25,7 @@ class TransitionTest(TestThread):
         self.label_2 = name.split(split)[1]
 
         self.firstImage = True
-        self.current_label = None
+        self.current_image = None
 
     def run_test(self):
         """
@@ -37,17 +37,15 @@ class TransitionTest(TestThread):
         if self.running:
             if self.firstImage:
                 LSL.start_label(self.label_1)
-                self.current_label = tk.Label(TestGUI.display_window, image=self.image_1, borderwidth=0)
+                self.current_image = TestGUI.place_image(self.image_1)
             else:
                 LSL.start_label(self.label_2)
-                self.current_label = tk.Label(TestGUI.display_window, image=self.image_2, borderwidth=0)
+                self.current_image = TestGUI.place_image(self.image_2)
 
             self.playsound()
-            self.current_label.place(relx=0.5, rely=0.5, anchor='center')
 
             def swap():
                 self.firstImage = not self.firstImage
-                self.current_label.destroy()
                 self.run_test()
 
             self.test_job_id = TestGUI.display_window.after(10000, swap)  # TODO how long per transition state + config
@@ -56,7 +54,7 @@ class TransitionTest(TestThread):
         else:
             # Stop test thread
             self.running = False
-            self.current_label.destroy()
+            TestGUI.destroy_current_element()
 
             LSL.stop_label()
             self.stop()
