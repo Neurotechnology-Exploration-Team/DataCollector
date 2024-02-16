@@ -18,13 +18,10 @@ class DataCollectorApp:
         Runs the specified test in a separate thread and collects data.
         :param test_name: Name of the test being run
         :param test_type: Type of the test being run: Blink, Constant, or Transition
-        TODO error handling
         """
         # Dynamically import the test from tests package & construct it w/ no parameters
         class_name = f"{test_type}Test"
         test_class = getattr(importlib.import_module(f"tests.{class_name}"), class_name)
-
-        test = None
 
         if test_type == "Transition":
             assets = config.TESTS[test_type][test_name]
@@ -36,7 +33,7 @@ class DataCollectorApp:
             test = test_class(test_name)
         else:
             # Invalid test type
-            pass
+            raise ValueError(f"Unknown test type: {test_type}")
 
         test.start()  # Start test thread
         return test
@@ -50,7 +47,7 @@ class DataCollectorApp:
         LSL.init_lsl_stream()
         TestGUI.init_gui()
 
-        # Add each test button to the GUI that calls the run_test method above w/ the test name
+        # Add each test button to the GUI that calls the run_test method above w/ the test name and type
         for test_type in config.TESTS.keys():
             for test_name in config.TESTS[test_type]:
                 # Add button to test

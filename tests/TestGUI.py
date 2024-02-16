@@ -1,20 +1,19 @@
 import tkinter as tk
 
-import matplotlib.pyplot as plt
-
 
 class TestGUI:
     """
     Holds all logic relating to creating the GUI, adding buttons/windows, and the test confirmation window.
     """
 
+    # Window variables
     control_window = None
     display_window = None
-    display_canvas = None
+    display_canvas = None  # The canvas on the display window to display images/text
     close_button = None
     abort_button = None
 
-    current_display_element = None
+    current_display_element = None  # The ID of the current element being displayed on display_canvas
 
     # Setup test states: A dictionary with test name keys corresponding to sub-dictionaries with lambda, button,
     # trial_number, and completed parameters
@@ -42,6 +41,7 @@ class TestGUI:
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
         TestGUI.disable_close_button(TestGUI.display_window)
 
+        # Display canvas filling the entire display window
         TestGUI.display_canvas = tk.Canvas(TestGUI.display_window, width=400, height=400, bg='black')
         TestGUI.display_canvas.pack(expand=True, fill=tk.BOTH)
 
@@ -84,9 +84,10 @@ class TestGUI:
         # Confirm data
         TestGUI.__show_data_and_confirm()
 
+        # Reset the buttons
         TestGUI.close_button.config(state="normal")
         TestGUI.abort_button.config(state="disabled")
-        # Reset the buttons
+
         for test in TestGUI.tests.keys():
             if not TestGUI.tests[test]['completed']:  # If test is not complete, re-enable button
                 TestGUI.tests[test]['button'].config(state="normal")
@@ -94,9 +95,6 @@ class TestGUI:
             else:  # If test is complete, set to green
                 TestGUI.tests[test]['button'].config(state="disabled")
                 TestGUI.tests[test]['button'].config(bg="green")
-
-        # Clear graphs from memory
-        plt.close()
 
         # Return true if test is complete
         return TestGUI.tests[TestGUI.current_thread.name]['completed']
@@ -260,5 +258,8 @@ class TestGUI:
 
     @staticmethod
     def destroy_current_element():
+        """
+        Helper function to remove the current element (text or image) from the display canvas.
+        """
         if TestGUI.current_display_element is not None:
             TestGUI.display_canvas.delete(TestGUI.current_display_element)

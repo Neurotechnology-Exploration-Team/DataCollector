@@ -15,9 +15,6 @@ class BlinkTest(TestThread):
     """
 
     def __init__(self, name):
-        """
-        Initializes the image assets for the display window.
-        """
         super().__init__(name)
 
     def run_test(self):

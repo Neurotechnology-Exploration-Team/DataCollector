@@ -1,6 +1,3 @@
-"""
-This module contains the LSL class, responsible for handling LSL input, collection, and formatting.
-"""
 import os.path
 import threading
 from datetime import datetime
@@ -12,7 +9,8 @@ import config
 
 class LSL:
     """
-    A class to interface with a local network Laboratory Streaming Layer to collect EEG and Accelerometer data.
+    A class to interface with a local network Laboratory Streaming Layer to collect EEG data, responsible for handling
+    LSL input, collection, and formatting.
     """
 
     streams = None  # The LSL streams being tracked
@@ -117,7 +115,7 @@ class LSL:
             LSL.streams[stream_type] = pylsl.StreamInlet(streams_info[0])
             LSL.streams[stream_type].time_correction()  # Initialize time correction to accurately convert to system
         else:
-            print(f"No {stream_type} stream found.")
+            print(f"No {stream_type} stream found. Exiting Data Collector.")
             exit(1)
 
     @staticmethod
@@ -130,7 +128,6 @@ class LSL:
         for real-time data processing. Uses StreamInlet.time_correction() to convert LSL to system timestamps using a
         constantly updated offset. The precision of these estimates should be below 1 ms (empirically within +/-0.2 ms).
         """
-
         while LSL.collecting:
             for stream_type, stream in LSL.streams.items():
                 data_row = {'Timestamp': None, 'Label': "Resting" if not LSL.collection_label else LSL.collection_label}
@@ -152,7 +149,6 @@ class LSL:
 
         :param path: Path to the FOLDER that the data should be saved to
         """
-
         if LSL.collected_data:
             for stream_type in LSL.streams.keys():
                 channel_count = LSL.streams[stream_type].info().channel_count() if LSL.streams[stream_type] else 0

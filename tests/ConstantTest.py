@@ -1,7 +1,5 @@
 import os
-import random
 import tkinter as tk
-from time import sleep
 
 import config
 from LSL import LSL
@@ -11,12 +9,15 @@ from tests.TestThread import TestThread
 
 class ConstantTest(TestThread):
     """
-    No auditory stimulus will be presented.
+    The Constant test that extends the TestThread class. Uses text to describe action and a stop sign to indicate
+    breaks.
+
+    Visual (text and stop image) only
     """
 
     def __init__(self, name):
         """
-        Initializes the image assets for the display window.
+        Initializes the image asset for the display window.
         """
         super().__init__(name)
 
@@ -37,12 +38,19 @@ class ConstantTest(TestThread):
             self.test_job_id = TestGUI.display_window.after(3000, TestGUI.destroy_current_element)
 
             def resume():
+                """
+                Resumes the test after a labeling buffer for the specified duration.
+                """
                 if self.running:
                     TestGUI.destroy_current_element()
                     self.test_job_id = TestGUI.display_window.after(config.PAUSE_AFTER_TEST * 1000, self.run_test)
 
             def pause():
+                """
+                Stop labeling and show a stop sign to give the participant a break from the constant test.
+                """
                 LSL.stop_label()
+
                 if self.running:
                     self.text = TestGUI.place_image(self.pause_image)
                     self.test_job_id = TestGUI.display_window.after(config.CONSTANT_TEST_BREAK * 1000, resume)  # Resume

@@ -30,10 +30,12 @@ class TestThread(threading.Thread):
         self.current_path = os.path.join(str(test_path), f"trial_{str(self.trial_number).zfill(2)}")
         os.makedirs(self.current_path, exist_ok=True)
 
+        # Setup test details: iteration, the running state, and the ID of the current timer
         self.iteration = 0
         self.running = True
         self.test_job_id = None
 
+        # Setup beep using pygame
         mixer.init()
         self.sound = mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'beep.mp3'))
 
@@ -58,13 +60,15 @@ class TestThread(threading.Thread):
         return  # End thread
 
     def run_test(self):
-        pass
+        """
+        Main loop that runs and schedules the next iteration of the test
+        """
+        pass  # Override me to implement a new test 💀
 
     def stop(self):
         """
         All logic relating to shutting down the test thread and stopping data collection.
         """
-
         LSL.stop_label()  # Stop labelling
         sleep(config.DATA_PADDING_DURATION)  # Wait to collect junk data
 
@@ -73,8 +77,8 @@ class TestThread(threading.Thread):
         complete = TestGUI.confirm_current_test()
         current_test = TestGUI.current_thread.name
         # Log finalized test status
-        print(
-            f"{current_test} - Trial {TestGUI.tests[current_test]['trial']}: {'Complete' if complete else 'Discarded'}")
+        print(f"{current_test} - Trial {TestGUI.tests[current_test]['trial']}: "
+              f"{'Complete' if complete else 'Discarded'}")
 
         if not complete:  # If test is not complete
             TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
@@ -102,4 +106,7 @@ class TestThread(threading.Thread):
         return self._stop_event.is_set()
 
     def playsound(self):
+        """
+        Helper method to play the constant sinusoidal beep sound for auditory stimulus (assets/beep.mp3).
+        """
         self.sound.play()

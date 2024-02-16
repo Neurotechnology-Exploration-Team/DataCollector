@@ -8,18 +8,25 @@ from tests.TestThread import TestThread
 
 class TransitionTest(TestThread):
     """
+    The Transition test that extends the TestThread class. Uses images and beeps to swap from one state to another.
 
+    Visual (images) and auditory stimulus
     """
 
-    def __init__(self, name, image_directory_1, image_directory_2):
+    def __init__(self, name, image_path_1, image_path_2):
         """
         Initializes and creates the transition labels in the display window.
+
+        :param name: The name of the test. Should be "<state 1> to <state 2>" for correct labeling.
+        :param image_path_1: The path to the image of state 1
+        :param image_path_2: The path to the image of state 2
         """
         super().__init__(name)
 
-        self.image_1 = tk.PhotoImage(file=image_directory_1)
-        self.image_2 = tk.PhotoImage(file=image_directory_2)
+        self.image_1 = tk.PhotoImage(file=image_path_1)
+        self.image_2 = tk.PhotoImage(file=image_path_2)
 
+        # Derive labels from each half of the test name
         self.label_1 = name.split(" to ")[0]
         self.label_2 = name.split(" to ")[1]
 
@@ -34,6 +41,7 @@ class TransitionTest(TestThread):
             self.running = False
 
         if self.running:
+            # Display current image and start labeling based on flag
             if self.firstImage:
                 LSL.start_label(self.label_1)
                 self.current_image = TestGUI.place_image(self.image_1)
@@ -41,9 +49,12 @@ class TransitionTest(TestThread):
                 LSL.start_label(self.label_2)
                 self.current_image = TestGUI.place_image(self.image_2)
 
-            self.playsound()
+            self.playsound()  # Auditory stimulus
 
             def swap():
+                """
+                Function to swap the images for transition states.
+                """
                 self.firstImage = not self.firstImage
                 self.run_test()
 
