@@ -20,9 +20,8 @@ class TransitionTest(TestThread):
         self.image_1 = tk.PhotoImage(file=image_directory_1)
         self.image_2 = tk.PhotoImage(file=image_directory_2)
 
-        split = " to " if " to " in name else " and "
-        self.label_1 = name.split(split)[0]
-        self.label_2 = name.split(split)[1]
+        self.label_1 = name.split(" to ")[0]
+        self.label_2 = name.split(" to ")[1]
 
         self.firstImage = True
         self.current_image = None
@@ -48,7 +47,7 @@ class TransitionTest(TestThread):
                 self.firstImage = not self.firstImage
                 self.run_test()
 
-            self.test_job_id = TestGUI.display_window.after(10000, swap)  # TODO how long per transition state + config
+            self.test_job_id = TestGUI.display_window.after(config.TRANSITION_DURATION * 1000, swap)
 
             self.iteration += 1
         else:

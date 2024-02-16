@@ -1,44 +1,47 @@
-# Graph confirmation configuration
-WIDTH_PER_GRAPH = 400
-HEIGHT_PER_GRAPH = 80
-
 # LSL configuration
-LSL_RESOLUTION_TIMEOUT = 10.0   # Timeout (in seconds) for an LSL stream
-SUPPORTED_STREAMS = {           # Which streams to enable
+LSL_RESOLUTION_TIMEOUT = 10.0   # Timeout for connecting an LSL stream (seconds)
+SUPPORTED_STREAMS = {           # Which streams to enable/data to collect
     'EEG': True,
     'Accelerometer': False,
     'FFT': False
 }
 
 # Test length
-DATA_PADDING_DURATION = 5.0    # How many seconds to wait before starting and ending a test
-BLINK_MIN_INTERVAL = 2500       # The minimum duration between intervals
-BLINK_MAX_INTERVAL = 6000       # The maximum duration between intervals
-ITERATIONS_PER_ACTION = 5       # How many iterations run per action (default 30, change for testing)
+DATA_PADDING_DURATION = 5    # How long to wait before starting and ending a test (seconds)
+BLINK_MIN_INTERVAL = 2.5     # The minimum duration between intervals (seconds)
+BLINK_MAX_INTERVAL = 6       # The maximum duration between intervals (seconds)
+ITERATIONS_PER_ACTION = 30   # How many iterations run per action (default 30, change to 5 for testing)
+PAUSE_AFTER_TEST = 0.5       # How long to wait after each test iteration (seconds)
+TRANSITION_DURATION = 10     # How long to wait before swapping transition states (seconds)
+CONSTANT_TEST_DURATION = 20  # How long a constant test iteration should be (seconds)
+CONSTANT_TEST_BREAK = 5      # How long to break for during constant tests (seconds)
 
+#
+# The main list of all tests corresponding to type and their images.
+#
 TESTS = {
     "Transition": {
-        "Stationary Float to Select": ["Stop.png", "Select.png"],  # TODO right image?
-        "Stationary Float to Float Left": ["Stop.png", "Left.png"],  # TODO right image?
-        "Stationary Float to Float Right": ["Stop.png", "Right.png"],  # TODO right image?
-        "Stationary Float to Float Up": ["Stop.png", "Up.png"],  # TODO right image?
-        "Stationary Float to Float Down": ["Stop.png", "Down.png"],  # TODO right image?
-        "Eyes Open and Close": ["EyesOpen.png", "EyesClosed.png"],
-        "Brow Furrow and Unfurrow": ["BrowFurrow.png", "BrowUnfurrow.png"]
+        "Stationary Float to Select": ["Stop.png", "Select.png"],
+        "Stationary Float to Float Left": ["Stop.png", "Left.png"],
+        "Stationary Float to Float Right": ["Stop.png", "Right.png"],
+        "Stationary Float to Float Up": ["Stop.png", "Up.png"],
+        "Stationary Float to Float Down": ["Stop.png", "Down.png"],
+        "Eyes Open to Eyes Closed": ["EyesOpen.png", "EyesClosed.png"],
+        "Brow Furrow to Brow Unfurrow": ["BrowFurrow.png", "BrowUnfurrow.png"]
     },
-    "Constant": {  # Currently not used, only text is used
+    "Constant": {  # Images currently not used, only text is used
         "Eyes Open": "EyesOpen.png",
         "Eyes Closed": "EyesClosed.png",
         "Brow Furrow": "BrowFurrow.png",
         "Brow Unfurrow": "BrowUnfurrow.png",
-        "Stationary Floating": "Stop.png",  # TODO right image?
+        "Stationary Floating": "Stop.png",
         "Float Left": "Left.png",
         "Float Right": "Right.png",
         "Float Up": "Up.png",
         "Float Down": "Down.png",
-        "Select": "Stop.png"  # TODO right image?
+        "Select": "Select.png"
     },
-    "Blink": [
+    "Blink": [  # No images for blinking tests
         "Blink"
     ]
 }
@@ -47,4 +50,4 @@ TESTS = {
 NUMBER_OF_SUBJECTS = 10
 
 # Save path configuration (<DATA_PATH>/PXXX/SXXX/trial_XX/<STREAM_TYPE>_data.csv)
-DATA_PATH = "csv_downloads"
+SAVED_DATA_PATH = "csv_downloads"

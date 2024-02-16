@@ -26,7 +26,7 @@ class TestThread(threading.Thread):
         self.trial_number = TestGUI.tests[self.name]["trial"]
 
         # Setup save path and create directories
-        test_path = os.path.join(config.DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID, self.name)
+        test_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID, self.name)
         self.current_path = os.path.join(str(test_path), f"trial_{str(self.trial_number).zfill(2)}")
         os.makedirs(self.current_path, exist_ok=True)
 

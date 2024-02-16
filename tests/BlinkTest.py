@@ -18,7 +18,7 @@ class BlinkTest(TestThread):
         """
         Initializes the image assets for the display window.
         """
-        super().__init__(name)  # TODO change to an arbitrary number, this should be 30 blinks
+        super().__init__(name)
 
     def run_test(self):
         """
@@ -33,8 +33,8 @@ class BlinkTest(TestThread):
             self.playsound()
             self.iteration += 1
 
-            interval = random.randint(config.BLINK_MIN_INTERVAL, config.BLINK_MAX_INTERVAL)
-            sleep(0.5)  # Wait extra after blinking TODO config
+            interval = random.randint(config.BLINK_MIN_INTERVAL * 1000, config.BLINK_MAX_INTERVAL * 1000)
+            sleep(config.PAUSE_AFTER_TEST)  # Wait extra after blinking
             LSL.stop_label()
 
             self.test_job_id = TestGUI.display_window.after(interval, self.run_test)

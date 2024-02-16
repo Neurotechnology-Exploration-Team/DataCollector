@@ -39,15 +39,15 @@ class ConstantTest(TestThread):
             def resume():
                 if self.running:
                     TestGUI.destroy_current_element()
-                    self.test_job_id = TestGUI.display_window.after(1000, self.run_test)  # TODO config
+                    self.test_job_id = TestGUI.display_window.after(config.PAUSE_AFTER_TEST * 1000, self.run_test)
 
             def pause():
                 LSL.stop_label()
                 if self.running:
                     self.text = TestGUI.place_image(self.pause_image)
-                    self.test_job_id = TestGUI.display_window.after(5000, resume)  # Resume after 5 seconds TODO config, default 5
+                    self.test_job_id = TestGUI.display_window.after(config.CONSTANT_TEST_BREAK * 1000, resume)  # Resume
 
-            self.test_job_id = TestGUI.display_window.after(20000, pause)  # Pause after 20 seconds TODO config, default 20
+            self.test_job_id = TestGUI.display_window.after(config.CONSTANT_TEST_DURATION * 1000, pause)  # Pause
             self.iteration += 1
         else:
             # Stop test thread
