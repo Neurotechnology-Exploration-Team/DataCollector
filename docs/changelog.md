@@ -18,10 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed from each test having its own class to a template-based test system:
   - All tests extend a base `TestThread` class
   - `BlinkTest`, `ConstantTest`, and `TransitionTest` are three different test types with three different behaviors
+- Timestamps are now a constant millisecond value from an arbitrary point.
+  - See [the LSL documentation](https://labstreaminglayer.readthedocs.io/info/faqs.html?highlight=timestamp#lsl-local-clock) for the reasoning behind this.
 
 ### Fixed
 - All test images now appear with transparent backgrounds
-- Labeling and timestamps in saved CSV files
+- Labeling in saved CSV files
 
 ### Removed
 - `postprocessing` module as we no longer display graphs after collection

@@ -1,6 +1,7 @@
 import os.path
 import threading
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 import pandas as pd
 import pylsl
 
@@ -136,7 +137,7 @@ class LSL:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
                     if sample:
                         # Set timestamp from the first stream and add time correction offset
-                        data_row['Timestamp'] = str(datetime.today()) + str(datetime.fromtimestamp(timestamp + stream.time_correction()))
+                        data_row['Timestamp'] = timestamp
 
                         # Flatten the data row into a single list and append to collected data
                         flattened_data_row = [data_row['Timestamp']] + [data_row['Label']] + sample
