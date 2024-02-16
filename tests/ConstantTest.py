@@ -43,7 +43,7 @@ class ConstantTest(TestThread):
                 """
                 if self.running:
                     TestGUI.destroy_current_element()
-                    self.test_job_id = TestGUI.display_window.after(config.PAUSE_AFTER_TEST * 1000, self.run_test)
+                    self.test_job_id = TestGUI.display_window.after(int(config.PAUSE_AFTER_TEST * 1000), self.run_test)
 
             def pause():
                 """

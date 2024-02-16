@@ -7,14 +7,17 @@ SUPPORTED_STREAMS = {           # Which streams to enable/data to collect
 }
 
 # Test length
-DATA_PADDING_DURATION = 5    # How long to wait before starting and ending a test (seconds)
-BLINK_MIN_INTERVAL = 2.5     # The minimum duration between intervals (seconds)
-BLINK_MAX_INTERVAL = 6       # The maximum duration between intervals (seconds)
-ITERATIONS_PER_ACTION = 30   # How many iterations run per action (default 30, change to 5 for testing)
-PAUSE_AFTER_TEST = 0.5       # How long to wait after each test iteration (seconds)
-TRANSITION_DURATION = 10     # How long to wait before swapping transition states (seconds)
-CONSTANT_TEST_DURATION = 20  # How long a constant test iteration should be (seconds)
-CONSTANT_TEST_BREAK = 5      # How long to break for during constant tests (seconds)
+DATA_PADDING_DURATION = 5    # How long to wait before starting and ending a test (default 5 seconds)
+BLINK_MIN_INTERVAL = 2.5     # The minimum duration between intervals (default 2.5 seconds)
+BLINK_MAX_INTERVAL = 6       # The maximum duration between intervals (default 6 seconds)
+
+# TODO do we want this to be doubled for transition tests?
+ITERATIONS_PER_ACTION = 30   # How many iterations run per action (default 30 seconds)
+
+PAUSE_AFTER_TEST = 0.5       # How long to wait after each test iteration (default 0.5 seconds)
+TRANSITION_DURATION = 10     # How long to wait before swapping transition states (default 10 seconds)
+CONSTANT_TEST_DURATION = 20  # How long a constant test iteration should be (default 20 seconds)
+CONSTANT_TEST_BREAK = 5      # How long to break for during constant tests (default 5 seconds)
 
 #
 # The main list of all tests corresponding to type and their images.
