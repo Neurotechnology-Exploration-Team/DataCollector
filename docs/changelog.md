@@ -4,7 +4,32 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.0-b] - 2/16/2024
+> **THE TEST RELEASE** - all tests are now accurate and working to IRB specification.
+
+### Added
+- All test image assets
+- Abort test button
+- Audio cues for blinking and transition tests
+- Several new test timing variables to config
+
+### Changed
+- Changed from each test having its own class to a template-based test system:
+  - All tests extend a base `TestThread` class
+  - `BlinkTest`, `ConstantTest`, and `TransitionTest` are three different test types with three different behaviors
+- Timestamps are now a constant millisecond value from an arbitrary point.
+  - See [the LSL documentation](https://labstreaminglayer.readthedocs.io/info/faqs.html?highlight=timestamp#lsl-local-clock) for the reasoning behind this.
+
+### Fixed
+- All test images now appear with transparent backgrounds
+- Labeling in saved CSV files
+
+### Removed
+- `postprocessing` module as we no longer display graphs after collection
+
 ## [4.4.1-a] - 2/5/2024
+
 ### Fixed
 - Timestamps of the collected data have been updated to match up with the exact millisecond the data is recorded
   - Format of how the timestamps were being written to the CSV file has been modified

@@ -1,9 +1,7 @@
-"""
-This module contains the LSL class, responsible for handling LSL input, collection, and formatting.
-"""
 import os.path
 import threading
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 import pandas as pd
 import pylsl
 
@@ -12,7 +10,8 @@ import config
 
 class LSL:
     """
-    A class to interface with a local network Laboratory Streaming Layer to collect EEG and Accelerometer data.
+    A class to interface with a local network Laboratory Streaming Layer to collect EEG data, responsible for handling
+    LSL input, collection, and formatting.
     """
 
     streams = None  # The LSL streams being tracked
@@ -84,16 +83,18 @@ class LSL:
         """
         Function to start labelling each data frame until stop_label() is called
         """
-        LSL.collection_label = event
-        print(f"Labeling Data: {event}")
+        if not event == LSL.collection_label:
+            LSL.collection_label = event
+            print(f"Labeling Data: {event}")
 
     @staticmethod
     def stop_label():
         """
         Function to stop labelling each data frame and revert to no label
         """
-        print(f"Stopped Labeling Data: {LSL.collection_label}")
-        LSL.collection_label = None
+        if LSL.collection_label:
+            print(f"Stopped Labeling Data: {LSL.collection_label}")
+            LSL.collection_label = None
 
     #
     # HELPER METHODS
@@ -115,7 +116,7 @@ class LSL:
             LSL.streams[stream_type] = pylsl.StreamInlet(streams_info[0])
             LSL.streams[stream_type].time_correction()  # Initialize time correction to accurately convert to system
         else:
-            print(f"No {stream_type} stream found.")
+            print(f"No {stream_type} stream found. Exiting Data Collector.")
             exit(1)
 
     @staticmethod
@@ -128,7 +129,6 @@ class LSL:
         for real-time data processing. Uses StreamInlet.time_correction() to convert LSL to system timestamps using a
         constantly updated offset. The precision of these estimates should be below 1 ms (empirically within +/-0.2 ms).
         """
-
         while LSL.collecting:
             for stream_type, stream in LSL.streams.items():
                 data_row = {'Timestamp': None, 'Label': "Resting" if not LSL.collection_label else LSL.collection_label}
@@ -137,7 +137,7 @@ class LSL:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
                     if sample:
                         # Set timestamp from the first stream and add time correction offset
-                        data_row['Timestamp'] = str(datetime.today()) + str(datetime.fromtimestamp(timestamp + stream.time_correction()))
+                        data_row['Timestamp'] = timestamp
 
                         # Flatten the data row into a single list and append to collected data
                         flattened_data_row = [data_row['Timestamp']] + [data_row['Label']] + sample
@@ -150,7 +150,6 @@ class LSL:
 
         :param path: Path to the FOLDER that the data should be saved to
         """
-
         if LSL.collected_data:
             for stream_type in LSL.streams.keys():
                 channel_count = LSL.streams[stream_type].info().channel_count() if LSL.streams[stream_type] else 0
