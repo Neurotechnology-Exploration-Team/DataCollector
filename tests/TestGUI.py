@@ -1,4 +1,8 @@
 import tkinter as tk
+import os.path
+import threading
+import time
+from queue import Queue
 
 
 class TestGUI:
@@ -22,6 +26,12 @@ class TestGUI:
 
     participant_ID = ""
     session_ID = ""
+
+    timer_label = None
+    timer_thread = None
+    test_start_time = None
+    timer_queue = None
+    dynamic_test_duration = 0
 
     @staticmethod
     def init_gui():
@@ -56,6 +66,10 @@ class TestGUI:
         TestGUI.close_button = tk.Button(frame, text="EXIT TESTING", height=4, width=30,
                                          command=lambda: TestGUI.__exit())
         TestGUI.close_button.pack(side="right")
+
+        TestGUI.timer_label = tk.Label(TestGUI.control_window, text="Elapsed Time: 0.00 seconds", height=5, width=30)
+        TestGUI.timer_label.pack()  # Pack the timer label into the control window
+        TestGUI.timer_queue = Queue()  # Initialize a queue for communication between thread
 
         TestGUI.__prompt_participant_info()
 
@@ -96,6 +110,9 @@ class TestGUI:
                 TestGUI.tests[test]['button'].config(state="disabled")
                 TestGUI.tests[test]['button'].config(bg="green")
 
+        # Reset the timer
+        TestGUI.reset_timer()
+
         # Return true if test is complete
         return TestGUI.tests[TestGUI.current_thread.name]['completed']
 
@@ -117,9 +134,60 @@ class TestGUI:
         TestGUI.current_thread = test_thread
         TestGUI.tests[TestGUI.current_thread.name]['button'].config(bg="yellow")
 
+        # Initialize test start time
+        TestGUI.test_start_time = time.time()  # Record the start time
+
+        # Start the timer
+        TestGUI.timer_thread = threading.Thread(target=TestGUI.update_timer)
+        TestGUI.timer_thread.start()
+
+        TestGUI.test_start_time = time.time()  # Record the start time
+
     #
     # HELPER METHODS
     #
+
+    @staticmethod
+    def update_timer():
+        """
+        Update the timer label with the elapsed time.
+        """
+        while True:
+            # Check for messages in the queue
+            try:
+                message = TestGUI.timer_queue.get(block=False)
+                if message == "stop":
+                    # Stop the timer
+                    break
+                elif message == "reset":
+                    # Reset the timer label
+                    TestGUI.timer_label.config(text="Elapsed Time: 0.00 seconds")
+            except:
+                pass  # No messages in the queue, continue updating the timer
+
+            # Update the timer label with the elapsed time
+            elapsed_time = time.time() - TestGUI.test_start_time
+            elapsed_seconds = int(elapsed_time)
+            milliseconds = int((elapsed_time - elapsed_seconds) * 100)
+            TestGUI.timer_label.config(text=f"Elapsed Time: {elapsed_seconds}.{milliseconds:02d} seconds")
+            time.sleep(0.01)  # Update the label every 10 milliseconds
+
+    @staticmethod
+    def stop_timer():
+        """
+        Stop the timer.
+        """
+        # Send a "stop" message to the timer thread
+        TestGUI.timer_queue.put("stop")
+
+    @staticmethod
+    def reset_timer():
+        """
+        Reset the timer label.
+        """
+        # Send a "reset" message to the timer thread
+        TestGUI.timer_label.config(text="Elapsed Time: 0.00 seconds")
+        TestGUI.timer_queue.put("reset")
 
     @staticmethod
     def __show_data_and_confirm():
@@ -127,6 +195,9 @@ class TestGUI:
         Popup the data confirmation window to check if it should be accepted or rejected,
         without displaying graphs.
         """
+        # Stop the timer
+        TestGUI.stop_timer()
+
         popup = tk.Toplevel()
         popup.wm_title("Data Confirmation")
         TestGUI.disable_close_button(popup)
