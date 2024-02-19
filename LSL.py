@@ -33,7 +33,7 @@ class LSL:
 
         # Initialize all required streams
         for stream_type in LSL.streams.keys():
-            LSL.__find_and_initialize_stream(stream_type)
+            LSL._find_and_initialize_stream(stream_type)
 
     @staticmethod
     def clear_stream_buffers():
@@ -60,7 +60,7 @@ class LSL:
         LSL.collecting = True
         for stream_type in LSL.collected_data.keys():
             LSL.collected_data[stream_type] = []
-        LSL.collection_thread = threading.Thread(target=LSL.__collect_data)
+        LSL.collection_thread = threading.Thread(target=LSL._collect_data)
         LSL.collection_thread.start()
 
     @staticmethod
@@ -74,7 +74,7 @@ class LSL:
             LSL.collecting = False
             LSL.collection_thread.join()
             print("Data collection stopped. Saving collected data.")
-            LSL.__save_collected_data(path)
+            LSL._save_collected_data(path)
 
     @staticmethod
     def start_label(event: str):
@@ -99,7 +99,7 @@ class LSL:
     #
 
     @staticmethod
-    def __find_and_initialize_stream(stream_type: str):
+    def _find_and_initialize_stream(stream_type: str):
         """
         Function to find and initialize a specific LSL stream
 
@@ -118,7 +118,7 @@ class LSL:
             exit(1)
 
     @staticmethod
-    def __collect_data():
+    def _collect_data():
         """
         Helper function to collect data in the LSL stream on a separate thread to run tests with.
 
@@ -142,7 +142,7 @@ class LSL:
                         LSL.collected_data[stream_type] += [flattened_data_row]
 
     @staticmethod
-    def __save_collected_data(path: str):
+    def _save_collected_data(path: str):
         """
         Function to save data collected after collection has been stopped.
 

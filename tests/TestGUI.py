@@ -41,15 +41,15 @@ class TestGUI:
         # Control window
         TestGUI.control_window = tk.Tk()
         TestGUI.control_window.title("Control Panel")
-        TestGUI.__set_window_geometry(TestGUI.control_window, left_side=True)
-        TestGUI.__disable_close_button(TestGUI.control_window)
+        TestGUI._set_window_geometry(TestGUI.control_window, left_side=True)
+        TestGUI._disable_close_button(TestGUI.control_window)
 
         # Test display window (child of control)
         TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
         TestGUI.display_window.title("Display")
         TestGUI.display_window.configure(background='black')
-        TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
-        TestGUI.__disable_close_button(TestGUI.display_window)
+        TestGUI._set_window_geometry(TestGUI.display_window, left_side=False)
+        TestGUI._disable_close_button(TestGUI.display_window)
 
         # Display canvas filling the entire display window
         TestGUI.display_canvas = tk.Canvas(TestGUI.display_window, width=400, height=400, bg='black')
@@ -64,14 +64,14 @@ class TestGUI:
         TestGUI.abort_button.pack(side="left")
 
         TestGUI.close_button = tk.Button(frame, text="EXIT TESTING", height=4, width=30,
-                                         command=lambda: TestGUI.__exit())
+                                         command=lambda: TestGUI._exit())
         TestGUI.close_button.pack(side="right")
 
         TestGUI.timer_label = tk.Label(TestGUI.control_window, text="Elapsed Time: 0.00 seconds", height=5, width=30)
         TestGUI.timer_label.pack()  # Pack the timer label into the control window
         TestGUI.timer_queue = Queue()  # Initialize a queue for communication between thread
 
-        TestGUI.__prompt_participant_info()
+        TestGUI._prompt_participant_info()
 
     @staticmethod
     def add_test(test_name: str, test_lambda):
@@ -96,7 +96,7 @@ class TestGUI:
         Run the test and prompt the user to confirm or deny the data.
         """
         # Confirm data
-        TestGUI.__confirm_data()
+        TestGUI._confirm_data()
 
         # Reset the buttons
         TestGUI.close_button.config(state="normal")
@@ -111,7 +111,7 @@ class TestGUI:
                 TestGUI.tests[test]['button'].config(bg="green")
 
         # Reset the timer
-        TestGUI.__reset_timer()
+        TestGUI._reset_timer()
 
         # Return true if test is complete
         return TestGUI.tests[TestGUI.current_thread.name]['completed']
@@ -138,7 +138,7 @@ class TestGUI:
         TestGUI.test_start_time = time.time()  # Record the start time
 
         # Start the timer
-        TestGUI.timer_thread = threading.Thread(target=TestGUI.__update_timer)
+        TestGUI.timer_thread = threading.Thread(target=TestGUI._update_timer)
         TestGUI.timer_thread.start()
 
         TestGUI.test_start_time = time.time()  # Record the start time
@@ -183,7 +183,7 @@ class TestGUI:
             TestGUI.display_canvas.delete(TestGUI.current_display_element)
 
     @staticmethod
-    def __update_timer():
+    def _update_timer():
         """
         Update the timer label with the elapsed time.
         """
@@ -211,7 +211,7 @@ class TestGUI:
             time.sleep(0.01)  # Update the label every 10 milliseconds
 
     @staticmethod
-    def __stop_timer():
+    def _stop_timer():
         """
         Stop the timer.
         """
@@ -219,7 +219,7 @@ class TestGUI:
         TestGUI.timer_queue.put("stop")
 
     @staticmethod
-    def __reset_timer():
+    def _reset_timer():
         """
         Reset the timer label.
         """
@@ -228,29 +228,29 @@ class TestGUI:
         TestGUI.timer_queue.put("reset")
 
     @staticmethod
-    def __confirm_data():
+    def _confirm_data():
         """
         Popup the data confirmation window to check if it should be accepted or rejected,
         without displaying graphs.
         """
         # Stop the timer
-        TestGUI.__stop_timer()
+        TestGUI._stop_timer()
 
         popup = tk.Toplevel()
         popup.wm_title("Data Confirmation")
-        TestGUI.__disable_close_button(popup)
+        TestGUI._disable_close_button(popup)
         popup.geometry("400x200")
         msg = tk.Label(popup, text="Confirm Test Data", font=("Arial", 12))
         msg.pack(pady=20)
-        confirm_button = tk.Button(popup, text="Confirm", command=lambda: TestGUI.__handle_confirm(popup, True))
-        deny_button = tk.Button(popup, text="Deny", command=lambda: TestGUI.__handle_confirm(popup, False))
+        confirm_button = tk.Button(popup, text="Confirm", command=lambda: TestGUI._handle_confirm(popup, True))
+        deny_button = tk.Button(popup, text="Deny", command=lambda: TestGUI._handle_confirm(popup, False))
         confirm_button.pack(side="left", padx=20, pady=20)
         deny_button.pack(side="right", padx=20, pady=20)
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
 
     @staticmethod
-    def __handle_confirm(popup, confirmed):
+    def _handle_confirm(popup, confirmed):
         """
         Handle the confirmation or denial of data.
         """
@@ -267,7 +267,7 @@ class TestGUI:
                 test_info['button'].config(state="disabled", bg="green")
 
     @staticmethod
-    def __prompt_participant_info():
+    def _prompt_participant_info():
         """
         Creates a mandatory popup to prompt the user for the participant number and session,
         and sets TestGUI.participant_number and TestGUI.session to the result.
@@ -275,7 +275,7 @@ class TestGUI:
         """
 
         popup = tk.Toplevel(TestGUI.control_window)
-        TestGUI.__disable_close_button(popup)
+        TestGUI._disable_close_button(popup)
         popup.wm_title("Enter Participant Information")
         TestGUI.control_window.eval(f'tk::PlaceWindow {str(popup)} center')
 
@@ -299,7 +299,7 @@ class TestGUI:
         TestGUI.control_window.wait_window(popup)
 
     @staticmethod
-    def __exit():
+    def _exit():
         """
         Helper function that handles the exit behavior of the GUI.
         """
@@ -308,7 +308,7 @@ class TestGUI:
         exit(0)
 
     @staticmethod
-    def __disable_close_button(window):
+    def _disable_close_button(window):
         """
         Helper function that disables the close/X button of the specified window.
 
@@ -321,7 +321,7 @@ class TestGUI:
         window.protocol("WM_DELETE_WINDOW", disable_event)
 
     @staticmethod
-    def __set_window_geometry(window, left_side=True):
+    def _set_window_geometry(window, left_side=True):
         """
         Figure out size for a window and align it according to left_side
 
