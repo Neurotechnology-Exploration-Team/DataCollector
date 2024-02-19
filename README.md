@@ -2,7 +2,7 @@
 
 > The Data Collector is a graphical user interface to record participant EEG data. A researcher will run tests that prompt the participant to imagine motor impulses using audiovisual cues. The data from the OpenBCI LSL stream will be recorded, labeled, and saved to a folder hierarchy of all participants, sessions, and trials after a manual visual confirmation by the researcher.
 
-### Current Version: [[1.1.0-b] - 2/17/2024](docs/changelog.md)
+### Current Version: [[1.1.1-b] - 2/19/2024](docs/changelog.md)
 
 ## Download & Install
 
