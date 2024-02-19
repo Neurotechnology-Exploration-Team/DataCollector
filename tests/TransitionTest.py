@@ -37,7 +37,7 @@ class TransitionTest(TestThread):
         """
         Main loop that runs and schedules the next iteration of the test
         """
-        if self.iteration == config.ITERATIONS_PER_ACTION:
+        if self.iteration == config.ITERATIONS_PER_TEST:
             self.running = False
 
         if self.running:

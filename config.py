@@ -11,8 +11,8 @@ DATA_PADDING_DURATION = 5    # How long to wait before starting and ending a tes
 BLINK_MIN_INTERVAL = 2.5     # The minimum duration between intervals (default 2.5 seconds)
 BLINK_MAX_INTERVAL = 6       # The maximum duration between intervals (default 6 seconds)
 
-# TODO do we want this to be doubled for transition tests?
-ITERATIONS_PER_ACTION = 30   # How many iterations run per action (default 30 seconds)
+ITERATIONS_PER_TEST = 30           # How many iterations run per action (default 30)
+ITERATIONS_PER_CONSTANT_TEST = 10  # How many iterations run per constant test (default 5, generally about 5 minutes)
 
 PAUSE_AFTER_TEST = 0.5       # How long to wait after each test iteration (default 0.5 seconds)
 TRANSITION_DURATION = 10     # How long to wait before swapping transition states (default 10 seconds)

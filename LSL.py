@@ -1,7 +1,5 @@
 import os.path
 import threading
-import time
-from datetime import datetime, timedelta
 import pandas as pd
 import pylsl
 

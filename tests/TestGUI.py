@@ -1,5 +1,4 @@
 import tkinter as tk
-import os.path
 import threading
 import time
 from queue import Queue
@@ -276,6 +275,7 @@ class TestGUI:
 
         :param window: The window to disable the closing of.
         """
+
         def disable_event():
             pass
 

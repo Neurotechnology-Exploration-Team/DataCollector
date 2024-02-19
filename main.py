@@ -27,7 +27,7 @@ class DataCollectorApp:
             assets = config.TESTS[test_type][test_name]
             test = test_class(test_name, os.path.join('.', 'assets', assets[0]), os.path.join('.', 'assets', assets[1]))
         elif test_type == "Constant":
-            asset = config.TESTS[test_type][test_name]  # No picture needed as of now
+            # asset = config.TESTS[test_type][test_name]  # No picture needed as of now
             test = test_class(test_name)
         elif test_type == "Blink":
             test = test_class(test_name)
