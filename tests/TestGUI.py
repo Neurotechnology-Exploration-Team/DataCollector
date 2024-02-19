@@ -26,6 +26,7 @@ class TestGUI:
     participant_ID = ""
     session_ID = ""
 
+    # TODO possibly refactor timer into different class/module?
     timer_label = None
     timer_thread = None
     test_start_time = None
@@ -41,14 +42,14 @@ class TestGUI:
         TestGUI.control_window = tk.Tk()
         TestGUI.control_window.title("Control Panel")
         TestGUI.__set_window_geometry(TestGUI.control_window, left_side=True)
-        TestGUI.disable_close_button(TestGUI.control_window)
+        TestGUI.__disable_close_button(TestGUI.control_window)
 
         # Test display window (child of control)
         TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
         TestGUI.display_window.title("Display")
         TestGUI.display_window.configure(background='black')
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
-        TestGUI.disable_close_button(TestGUI.display_window)
+        TestGUI.__disable_close_button(TestGUI.display_window)
 
         # Display canvas filling the entire display window
         TestGUI.display_canvas = tk.Canvas(TestGUI.display_window, width=400, height=400, bg='black')
@@ -95,7 +96,7 @@ class TestGUI:
         Run the test and prompt the user to confirm or deny the data.
         """
         # Confirm data
-        TestGUI.__show_data_and_confirm()
+        TestGUI.__confirm_data()
 
         # Reset the buttons
         TestGUI.close_button.config(state="normal")
@@ -110,7 +111,7 @@ class TestGUI:
                 TestGUI.tests[test]['button'].config(bg="green")
 
         # Reset the timer
-        TestGUI.reset_timer()
+        TestGUI.__reset_timer()
 
         # Return true if test is complete
         return TestGUI.tests[TestGUI.current_thread.name]['completed']
@@ -137,20 +138,58 @@ class TestGUI:
         TestGUI.test_start_time = time.time()  # Record the start time
 
         # Start the timer
-        TestGUI.timer_thread = threading.Thread(target=TestGUI.update_timer)
+        TestGUI.timer_thread = threading.Thread(target=TestGUI.__update_timer)
         TestGUI.timer_thread.start()
 
         TestGUI.test_start_time = time.time()  # Record the start time
 
-    #
-    # HELPER METHODS
-    #
+    @staticmethod
+    def place_image(image):
+        """
+        Helper function to place an image in the middle of the display window. Returns the ID of the image object
+        for destruction.
+
+        :param image: The Tkinter image to place
+        """
+        if TestGUI.current_display_element is not None:
+            TestGUI.destroy_current_element()
+
+        x = TestGUI.display_canvas.winfo_width() // 2
+        y = TestGUI.display_canvas.winfo_height() // 2
+        TestGUI.current_display_element = TestGUI.display_canvas.create_image(x, y, anchor=tk.CENTER, image=image)
 
     @staticmethod
-    def update_timer():
+    def place_text(text):
+        """
+        Helper function to place text in the middle of the display window. Returns the ID of the text object
+        for destruction.
+
+        :param text: The text to place
+        """
+        if TestGUI.current_display_element is not None:
+            TestGUI.destroy_current_element()
+
+        x = TestGUI.display_canvas.winfo_width() // 2
+        y = TestGUI.display_canvas.winfo_height() // 2
+        TestGUI.current_display_element = TestGUI.display_canvas.create_text(x, y, anchor=tk.CENTER, text=text,
+                                                                             fill='white', font='Helvetica 25 bold')
+
+    @staticmethod
+    def destroy_current_element():
+        """
+        Helper function to remove the current element (text or image) from the display canvas.
+        """
+        if TestGUI.current_display_element is not None:
+            TestGUI.display_canvas.delete(TestGUI.current_display_element)
+
+    @staticmethod
+    def __update_timer():
         """
         Update the timer label with the elapsed time.
         """
+        # TODO Instead message could be initialized above the while loop and the condition could be
+        #  while message != "stop". It accomplishes the same thing but makes it a bit more clear as
+        #  to when the loop quits - Feedback from Matt L., needs to be tested for thread safety first
         while True:
             # Check for messages in the queue
             try:
@@ -172,7 +211,7 @@ class TestGUI:
             time.sleep(0.01)  # Update the label every 10 milliseconds
 
     @staticmethod
-    def stop_timer():
+    def __stop_timer():
         """
         Stop the timer.
         """
@@ -180,7 +219,7 @@ class TestGUI:
         TestGUI.timer_queue.put("stop")
 
     @staticmethod
-    def reset_timer():
+    def __reset_timer():
         """
         Reset the timer label.
         """
@@ -189,17 +228,17 @@ class TestGUI:
         TestGUI.timer_queue.put("reset")
 
     @staticmethod
-    def __show_data_and_confirm():
+    def __confirm_data():
         """
         Popup the data confirmation window to check if it should be accepted or rejected,
         without displaying graphs.
         """
         # Stop the timer
-        TestGUI.stop_timer()
+        TestGUI.__stop_timer()
 
         popup = tk.Toplevel()
         popup.wm_title("Data Confirmation")
-        TestGUI.disable_close_button(popup)
+        TestGUI.__disable_close_button(popup)
         popup.geometry("400x200")
         msg = tk.Label(popup, text="Confirm Test Data", font=("Arial", 12))
         msg.pack(pady=20)
@@ -236,7 +275,7 @@ class TestGUI:
         """
 
         popup = tk.Toplevel(TestGUI.control_window)
-        TestGUI.disable_close_button(popup)
+        TestGUI.__disable_close_button(popup)
         popup.wm_title("Enter Participant Information")
         TestGUI.control_window.eval(f'tk::PlaceWindow {str(popup)} center')
 
@@ -269,7 +308,7 @@ class TestGUI:
         exit(0)
 
     @staticmethod
-    def disable_close_button(window):
+    def __disable_close_button(window):
         """
         Helper function that disables the close/X button of the specified window.
 
@@ -295,42 +334,3 @@ class TestGUI:
         width = screen_width // 2
         x = 0 if left_side else width
         window.geometry(f"{width}x{screen_height}+{x}+0")
-
-    @staticmethod
-    def place_image(image):
-        """
-        Helper function to place an image in the middle of the display window. Returns the ID of the image object
-        for destruction.
-
-        :param image: The Tkinter image to place
-        """
-        if TestGUI.current_display_element is not None:
-            TestGUI.destroy_current_element()
-
-        x = TestGUI.display_canvas.winfo_width() / 2
-        y = TestGUI.display_canvas.winfo_height() / 2
-        TestGUI.current_display_element = TestGUI.display_canvas.create_image(x, y, anchor=tk.CENTER, image=image)
-
-    @staticmethod
-    def place_text(text):
-        """
-        Helper function to place text in the middle of the display window. Returns the ID of the text object
-        for destruction.
-
-        :param text: The text to place
-        """
-        if TestGUI.current_display_element is not None:
-            TestGUI.destroy_current_element()
-
-        x = TestGUI.display_canvas.winfo_width() / 2
-        y = TestGUI.display_canvas.winfo_height() / 2
-        TestGUI.current_display_element = TestGUI.display_canvas.create_text(x, y, anchor=tk.CENTER, text=text,
-                                                                             fill='white', font='Helvetica 25 bold')
-
-    @staticmethod
-    def destroy_current_element():
-        """
-        Helper function to remove the current element (text or image) from the display canvas.
-        """
-        if TestGUI.current_display_element is not None:
-            TestGUI.display_canvas.delete(TestGUI.current_display_element)

@@ -81,7 +81,7 @@ class LSL:
         """
         Function to start labelling each data frame until stop_label() is called
         """
-        if not event == LSL.collection_label:
+        if event != LSL.collection_label:
             LSL.collection_label = event
             print(f"Labeling Data: {event}")
 
@@ -129,7 +129,7 @@ class LSL:
         """
         while LSL.collecting:
             for stream_type, stream in LSL.streams.items():
-                data_row = {'Timestamp': None, 'Label': "Resting" if not LSL.collection_label else LSL.collection_label}
+                data_row = {'Timestamp': None, 'Label': config.DEFAULT_LABEL if not LSL.collection_label else LSL.collection_label}
 
                 if stream:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
@@ -157,8 +157,6 @@ class LSL:
 
                 # Convert collected data to a DataFrame, format with columns above, and write to CSV
                 df = pd.DataFrame(LSL.collected_data[stream_type], columns=columns)
-                # Formatting breaks everything for some reason:
-                # df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%Y-%m-%d %H:%M:%S.%f')
                 df = df.sort_values(by='Timestamp')
                 df.to_csv(os.path.join(path, f"{stream_type}_data.csv"), index=False)
                 print(f"Collected {stream_type} data saved.")

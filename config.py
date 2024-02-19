@@ -5,6 +5,7 @@ SUPPORTED_STREAMS = {           # Which streams to enable/data to collect
     'Accelerometer': False,
     'FFT': False
 }
+DEFAULT_LABEL = "No Event"
 
 # Test length
 DATA_PADDING_DURATION = 5    # How long to wait before starting and ending a test (default 5 seconds)
