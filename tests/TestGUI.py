@@ -1,11 +1,7 @@
-import os.path
 import tkinter as tk
-
-import matplotlib.pyplot as plt
-import pandas as pd
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from postprocessing.NoiseReduction import butter_bandpass_filter
-import config
+import threading
+import time
+from queue import Queue
 
 
 class TestGUI:
@@ -13,38 +9,69 @@ class TestGUI:
     Holds all logic relating to creating the GUI, adding buttons/windows, and the test confirmation window.
     """
 
+    # Window variables
     control_window = None
     display_window = None
+    display_canvas = None  # The canvas on the display window to display images/text
     close_button = None
+    abort_button = None
+
+    current_display_element = None  # The ID of the current element being displayed on display_canvas
 
     # Setup test states: A dictionary with test name keys corresponding to sub-dictionaries with lambda, button,
     # trial_number, and completed parameters
     tests = {}
-    current_test = None
+    current_thread = None
 
     participant_ID = ""
     session_ID = ""
+
+    # TODO possibly refactor timer into different class/module?
+    timer_label = None
+    timer_thread = None
+    test_start_time = None
+    timer_queue = None
+    dynamic_test_duration = 0
 
     @staticmethod
     def init_gui():
         """
         MUST BE CALLED BEFORE ACCESSING ANY CLASS VARIABLES. Sets up the display window.
         """
+        # Control window
         TestGUI.control_window = tk.Tk()
         TestGUI.control_window.title("Control Panel")
-        TestGUI.__set_window_geometry(TestGUI.control_window, left_side=True)
-        TestGUI.disable_close_button(TestGUI.control_window)
+        TestGUI._set_window_geometry(TestGUI.control_window, left_side=True)
+        TestGUI._disable_close_button(TestGUI.control_window)
 
+        # Test display window (child of control)
         TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
         TestGUI.display_window.title("Display")
-        TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
-        TestGUI.disable_close_button(TestGUI.display_window)
+        TestGUI.display_window.configure(background='black')
+        TestGUI._set_window_geometry(TestGUI.display_window, left_side=False)
+        TestGUI._disable_close_button(TestGUI.display_window)
 
-        TestGUI.close_button = tk.Button(TestGUI.control_window, text="EXIT TESTING", height=5, width=30)
-        TestGUI.close_button.config(command=lambda: TestGUI.__exit())
-        TestGUI.close_button.pack(side="bottom", pady=100)
+        # Display canvas filling the entire display window
+        TestGUI.display_canvas = tk.Canvas(TestGUI.display_window, width=400, height=400, bg='black')
+        TestGUI.display_canvas.pack(expand=True, fill=tk.BOTH)
 
-        TestGUI.__prompt_participant_info()
+        # Test lifecycle buttons (child of control)
+        frame = tk.Frame(TestGUI.control_window)
+        frame.pack(side="bottom", pady=100)
+
+        TestGUI.abort_button = tk.Button(frame, text="ABORT TEST", height=4, width=30, state="disabled",
+                                         command=lambda: TestGUI.current_thread.abort())
+        TestGUI.abort_button.pack(side="left")
+
+        TestGUI.close_button = tk.Button(frame, text="EXIT TESTING", height=4, width=30,
+                                         command=lambda: TestGUI._exit())
+        TestGUI.close_button.pack(side="right")
+
+        TestGUI.timer_label = tk.Label(TestGUI.control_window, text="Elapsed Time: 0.00 seconds", height=5, width=30)
+        TestGUI.timer_label.pack()  # Pack the timer label into the control window
+        TestGUI.timer_queue = Queue()  # Initialize a queue for communication between thread
+
+        TestGUI._prompt_participant_info()
 
     @staticmethod
     def add_test(test_name: str, test_lambda):
@@ -64,17 +91,17 @@ class TestGUI:
         print("Added test: " + test_name)
 
     @staticmethod
-    def confirm_current_test(test_data_path: str) -> bool:
+    def confirm_current_test() -> bool:
         """
         Run the test and prompt the user to confirm or deny the data.
-
-        :param test_data_path: The path to the current test data FOLDER.
         """
         # Confirm data
-        TestGUI.__show_data_and_confirm(test_data_path)
+        TestGUI._confirm_data()
 
-        TestGUI.close_button.config(state="normal")
         # Reset the buttons
+        TestGUI.close_button.config(state="normal")
+        TestGUI.abort_button.config(state="disabled")
+
         for test in TestGUI.tests.keys():
             if not TestGUI.tests[test]['completed']:  # If test is not complete, re-enable button
                 TestGUI.tests[test]['button'].config(state="normal")
@@ -83,124 +110,164 @@ class TestGUI:
                 TestGUI.tests[test]['button'].config(state="disabled")
                 TestGUI.tests[test]['button'].config(bg="green")
 
-        # Clear graphs from memory
-        plt.close()
+        # Reset the timer
+        TestGUI._reset_timer()
 
         # Return true if test is complete
-        return TestGUI.tests[TestGUI.current_test]['completed']
+        return TestGUI.tests[TestGUI.current_thread.name]['completed']
 
     @staticmethod
-    def start_test(test_name):
+    def start_test(test_thread):
         """
         A function to disable buttons while a test is running.
 
-        :param test_name: The name of the current test running (to enable the indicator).
+        :param test_thread: The thread object of the current test running (to enable the indicator).
         """
         # Disable all buttons
         TestGUI.close_button.config(state="disabled")
+        TestGUI.abort_button.config(state="normal")
 
         for test in TestGUI.tests.keys():
             TestGUI.tests[test]['button'].config(state="disabled")
 
         # Indicate current test
-        TestGUI.current_test = test_name
-        TestGUI.tests[TestGUI.current_test]['button'].config(bg="yellow")
+        TestGUI.current_thread = test_thread
+        TestGUI.tests[TestGUI.current_thread.name]['button'].config(bg="yellow")
 
-    #
-    # HELPER METHODS
-    #
+        # Initialize test start time
+        TestGUI.test_start_time = time.time()  # Record the start time
+
+        # Start the timer
+        TestGUI.timer_thread = threading.Thread(target=TestGUI._update_timer)
+        TestGUI.timer_thread.start()
+
+        TestGUI.test_start_time = time.time()  # Record the start time
 
     @staticmethod
-    def __show_data_and_confirm(test_data_path: str):
+    def place_image(image):
         """
-        Popup the data confirmation window and check if it should be accepted or rejected.
-        If enabled for collection, EEG and accelerometer graphs will be displayed.
+        Helper function to place an image in the middle of the display window. Returns the ID of the image object
+        for destruction.
 
-        :param test_data_path: The path to the test data CSV.
+        :param image: The Tkinter image to place
         """
-        # Setup the window and canvas
+        if TestGUI.current_display_element is not None:
+            TestGUI.destroy_current_element()
+
+        x = TestGUI.display_canvas.winfo_width() // 2
+        y = TestGUI.display_canvas.winfo_height() // 2
+        TestGUI.current_display_element = TestGUI.display_canvas.create_image(x, y, anchor=tk.CENTER, image=image)
+
+    @staticmethod
+    def place_text(text):
+        """
+        Helper function to place text in the middle of the display window. Returns the ID of the text object
+        for destruction.
+
+        :param text: The text to place
+        """
+        if TestGUI.current_display_element is not None:
+            TestGUI.destroy_current_element()
+
+        x = TestGUI.display_canvas.winfo_width() // 2
+        y = TestGUI.display_canvas.winfo_height() // 2
+        TestGUI.current_display_element = TestGUI.display_canvas.create_text(x, y, anchor=tk.CENTER, text=text,
+                                                                             fill='white', font='Helvetica 25 bold')
+
+    @staticmethod
+    def destroy_current_element():
+        """
+        Helper function to remove the current element (text or image) from the display canvas.
+        """
+        if TestGUI.current_display_element is not None:
+            TestGUI.display_canvas.delete(TestGUI.current_display_element)
+
+    @staticmethod
+    def _update_timer():
+        """
+        Update the timer label with the elapsed time.
+        """
+        # TODO Instead message could be initialized above the while loop and the condition could be
+        #  while message != "stop". It accomplishes the same thing but makes it a bit more clear as
+        #  to when the loop quits - Feedback from Matt L., needs to be tested for thread safety first
+        while True:
+            # Check for messages in the queue
+            try:
+                message = TestGUI.timer_queue.get(block=False)
+                if message == "stop":
+                    # Stop the timer
+                    break
+                elif message == "reset":
+                    # Reset the timer label
+                    TestGUI.timer_label.config(text="Elapsed Time: 0.00 seconds")
+            except:
+                pass  # No messages in the queue, continue updating the timer
+
+            # Update the timer label with the elapsed time
+            elapsed_time = time.time() - TestGUI.test_start_time
+            elapsed_seconds = int(elapsed_time)
+            milliseconds = int((elapsed_time - elapsed_seconds) * 100)
+            TestGUI.timer_label.config(text=f"Elapsed Time: {elapsed_seconds}.{milliseconds:02d} seconds")
+            time.sleep(0.01)  # Update the label every 10 milliseconds
+
+    @staticmethod
+    def _stop_timer():
+        """
+        Stop the timer.
+        """
+        # Send a "stop" message to the timer thread
+        TestGUI.timer_queue.put("stop")
+
+    @staticmethod
+    def _reset_timer():
+        """
+        Reset the timer label.
+        """
+        # Send a "reset" message to the timer thread
+        TestGUI.timer_label.config(text="Elapsed Time: 0.00 seconds")
+        TestGUI.timer_queue.put("reset")
+
+    @staticmethod
+    def _confirm_data():
+        """
+        Popup the data confirmation window to check if it should be accepted or rejected,
+        without displaying graphs.
+        """
+        # Stop the timer
+        TestGUI._stop_timer()
+
         popup = tk.Toplevel()
         popup.wm_title("Data Confirmation")
-        TestGUI.disable_close_button(popup)
-
-        if os.name == "posix":  # Needs to be different for unix
-            popup.state('-zoomed')
-        else:
-            popup.state('zoomed')
-
-        canvas = tk.Canvas(popup)
-        scrollbar = tk.Scrollbar(popup, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas)
-
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(
-                scrollregion=canvas.bbox("all")
-            )
-        )
-
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
-
-        # Make it scrollable so we don't have to click the tiny scrollbar
-        canvas.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1 * (event.delta / 120)), "units"))
-
-        # Read in and merge all data from the trial into a single dataframe
-        # This should ignore NaN values, so graphs will not go to zero unless value is actually zero
-        frames = []
-        for stream_type, enabled in config.SUPPORTED_STREAMS.items():
-            if enabled and stream_type != 'FFT':
-                frames.append(pd.read_csv(os.path.join(test_data_path, f"{stream_type}_data.csv")))
-        data_df = pd.concat(frames, axis=1)
-
-        # Figure out how many graphs we can fit on the screen
-        screen_width = popup.winfo_screenwidth()
-        graphs_per_row = screen_width // config.WIDTH_PER_GRAPH
-
-        if graphs_per_row == 0:
-            graphs_per_row = 1
-
-        # Loop through each EEG and draw the graphs
-        if config.SUPPORTED_STREAMS['EEG']:
-            idx = 0
-            for idx, col in enumerate(data_df.filter(like='EEG')):
-                fig, ax = plt.subplots(figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
-                filtered_data = butter_bandpass_filter(data_df[col], order=6)
-                ax.plot(filtered_data)
-                ax.set_title(f'{col} Data')
-                FigureCanvasTkAgg(fig, master=scrollable_frame).get_tk_widget().grid(row=idx // graphs_per_row,
-                                                                                     column=idx % graphs_per_row)
-
-        # Now draw the accelerometer graph at the end
-        if config.SUPPORTED_STREAMS['Accelerometer']:
-            accel_data = data_df.filter(like='Accelerometer').mean(axis=1)
-            fig2, ax2 = plt.subplots(
-                figsize=(config.WIDTH_PER_GRAPH / config.HEIGHT_PER_GRAPH, 3))
-            ax2.plot(accel_data)
-            ax2.set_title('Accelerometer Data')
-            FigureCanvasTkAgg(fig2, master=scrollable_frame).get_tk_widget().grid(row=(idx + 1) // graphs_per_row,
-                                                                                  column=(idx + 1) % graphs_per_row)
-
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-
-        def confirm_data():
-            popup.destroy()
-            TestGUI.tests[TestGUI.current_test]['completed'] = True
-
-        # Create buttons to accept and deny the data
-        confirm_button = tk.Button(scrollable_frame, text="Confirm Data", command=lambda: confirm_data())
-        confirm_button.grid(row=(idx + 2) // graphs_per_row, column=0, pady=10)
-
-        deny_button = tk.Button(scrollable_frame, text="Deny Data", command=lambda: popup.destroy())
-        deny_button.grid(row=(idx + 2) // graphs_per_row, column=1, pady=10)
-
-        # Force popup to be on top & halt program execution
+        TestGUI._disable_close_button(popup)
+        popup.geometry("400x200")
+        msg = tk.Label(popup, text="Confirm Test Data", font=("Arial", 12))
+        msg.pack(pady=20)
+        confirm_button = tk.Button(popup, text="Confirm", command=lambda: TestGUI._handle_confirm(popup, True))
+        deny_button = tk.Button(popup, text="Deny", command=lambda: TestGUI._handle_confirm(popup, False))
+        confirm_button.pack(side="left", padx=20, pady=20)
+        deny_button.pack(side="right", padx=20, pady=20)
         popup.grab_set()
         TestGUI.control_window.wait_window(popup)
 
     @staticmethod
-    def __prompt_participant_info():
+    def _handle_confirm(popup, confirmed):
+        """
+        Handle the confirmation or denial of data.
+        """
+        if confirmed:
+            print("Data confirmed.")
+        else:
+            print("Data denied.")
+        TestGUI.tests[TestGUI.current_thread.name]['completed'] = confirmed
+        popup.destroy()
+        for test_name, test_info in TestGUI.tests.items():
+            if not test_info['completed']:
+                test_info['button'].config(state="normal", bg="red")
+            else:
+                test_info['button'].config(state="disabled", bg="green")
+
+    @staticmethod
+    def _prompt_participant_info():
         """
         Creates a mandatory popup to prompt the user for the participant number and session,
         and sets TestGUI.participant_number and TestGUI.session to the result.
@@ -208,7 +275,7 @@ class TestGUI:
         """
 
         popup = tk.Toplevel(TestGUI.control_window)
-        TestGUI.disable_close_button(popup)
+        TestGUI._disable_close_button(popup)
         popup.wm_title("Enter Participant Information")
         TestGUI.control_window.eval(f'tk::PlaceWindow {str(popup)} center')
 
@@ -232,7 +299,7 @@ class TestGUI:
         TestGUI.control_window.wait_window(popup)
 
     @staticmethod
-    def __exit():
+    def _exit():
         """
         Helper function that handles the exit behavior of the GUI.
         """
@@ -241,19 +308,20 @@ class TestGUI:
         exit(0)
 
     @staticmethod
-    def disable_close_button(window):
+    def _disable_close_button(window):
         """
         Helper function that disables the close/X button of the specified window.
 
         :param window: The window to disable the closing of.
         """
+
         def disable_event():
             pass
 
         window.protocol("WM_DELETE_WINDOW", disable_event)
 
     @staticmethod
-    def __set_window_geometry(window, left_side=True):
+    def _set_window_geometry(window, left_side=True):
         """
         Figure out size for a window and align it according to left_side
 
