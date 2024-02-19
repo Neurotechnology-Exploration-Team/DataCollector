@@ -1,12 +1,18 @@
+import os
 import tkinter as tk
 import threading
 import time
+import json
 from queue import Queue
+
+import config
 
 
 class TestGUI:
     """
     Holds all logic relating to creating the GUI, adding buttons/windows, and the test confirmation window.
+
+    This acts as an all-in-one test controller and GUI manager.
     """
 
     # Window variables
@@ -44,7 +50,7 @@ class TestGUI:
         TestGUI.disable_close_button(TestGUI.control_window)
 
         # Test display window (child of control)
-        TestGUI.display_window = tk.Toplevel(TestGUI.control_window)
+        TestGUI.display_window = tk.Toplevel()
         TestGUI.display_window.title("Display")
         TestGUI.display_window.configure(background='black')
         TestGUI.__set_window_geometry(TestGUI.display_window, left_side=False)
@@ -72,6 +78,15 @@ class TestGUI:
 
         TestGUI.__prompt_participant_info()
 
+        state_save_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID, "test_states.json")
+        if os.path.isfile(state_save_path):
+            print("Found saved test states.")
+            try:
+                # Read data from file:
+                TestGUI.tests = json.load(open(state_save_path))
+            except:
+                print("Error reading saved test states.")
+
     @staticmethod
     def add_test(test_name: str, test_lambda):
         """
@@ -86,8 +101,17 @@ class TestGUI:
         btn.pack()
 
         # Configure test state
-        TestGUI.tests[test_name] = {'lambda': test_lambda, 'button': btn, 'trial': 0, 'completed': False}
-        print("Added test: " + test_name)
+        if not TestGUI.tests.get(test_name):
+            TestGUI.tests[test_name] = {'lambda': test_lambda, 'button': btn, 'trial': 0, 'completed': False}
+            print("Added test: " + test_name)
+        else:
+            TestGUI.tests[test_name]['button'] = btn
+            TestGUI.tests[test_name]['lambda'] = test_lambda
+
+            test = TestGUI.tests[test_name]
+            if test['completed']:
+                btn.config(state="disabled", bg="green")
+            print(f"Added test from saved state: {test_name} - Trial: {test['trial']}, Completed: {test['completed']}")
 
     @staticmethod
     def confirm_current_test() -> bool:
@@ -101,13 +125,11 @@ class TestGUI:
         TestGUI.close_button.config(state="normal")
         TestGUI.abort_button.config(state="disabled")
 
-        for test in TestGUI.tests.keys():
-            if not TestGUI.tests[test]['completed']:  # If test is not complete, re-enable button
-                TestGUI.tests[test]['button'].config(state="normal")
-                TestGUI.tests[test]['button'].config(bg="red")
-            else:  # If test is complete, set to green
-                TestGUI.tests[test]['button'].config(state="disabled")
-                TestGUI.tests[test]['button'].config(bg="green")
+        for test_name, test_info in TestGUI.tests.items():
+            if not test_info['completed']:
+                test_info['button'].config(state="normal", bg="red")
+            else:
+                test_info['button'].config(state="disabled", bg="green")
 
         # Reset the timer
         TestGUI.reset_timer()
@@ -264,6 +286,18 @@ class TestGUI:
         """
         Helper function that handles the exit behavior of the GUI.
         """
+        state_save_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID, "test_states.json")
+
+        # Remove GUI-specific data (lambda, button) from subkeys
+        keys_to_remove = ['button', 'lambda']
+        for test in TestGUI.tests.keys():
+            for key in keys_to_remove:
+                if TestGUI.tests[test].get(key):
+                    del TestGUI.tests[test][key]
+
+        # Serialize test data into file:
+        json.dump(TestGUI.tests, open(state_save_path, 'w'))
+
         TestGUI.display_window.destroy()
         TestGUI.control_window.destroy()
         exit(0)
@@ -307,8 +341,8 @@ class TestGUI:
         if TestGUI.current_display_element is not None:
             TestGUI.destroy_current_element()
 
-        x = TestGUI.display_canvas.winfo_width() / 2
-        y = TestGUI.display_canvas.winfo_height() / 2
+        x = TestGUI.display_canvas.winfo_width() // 2
+        y = TestGUI.display_canvas.winfo_height() // 2
         TestGUI.current_display_element = TestGUI.display_canvas.create_image(x, y, anchor=tk.CENTER, image=image)
 
     @staticmethod
@@ -322,8 +356,8 @@ class TestGUI:
         if TestGUI.current_display_element is not None:
             TestGUI.destroy_current_element()
 
-        x = TestGUI.display_canvas.winfo_width() / 2
-        y = TestGUI.display_canvas.winfo_height() / 2
+        x = TestGUI.display_canvas.winfo_width() // 2
+        y = TestGUI.display_canvas.winfo_height() // 2
         TestGUI.current_display_element = TestGUI.display_canvas.create_text(x, y, anchor=tk.CENTER, text=text,
                                                                              fill='white', font='Helvetica 25 bold')
 
@@ -334,3 +368,4 @@ class TestGUI:
         """
         if TestGUI.current_display_element is not None:
             TestGUI.display_canvas.delete(TestGUI.current_display_element)
+            TestGUI.current_display_element = None
