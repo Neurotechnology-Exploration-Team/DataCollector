@@ -89,7 +89,7 @@ class TestThread(threading.Thread):
         Function to abort test and save current data to new trial
         """
         # Remove all children of display window
-        for child in TestGUI.display_window.winfo_children():
+        for child in TestGUI.display_canvas.winfo_children():
             child.destroy()
 
         # Cancel currently running timer
