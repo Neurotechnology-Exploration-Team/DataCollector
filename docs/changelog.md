@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - A timer displaying the elapsed time of the test to the top of the control window.
 
-
 ## [1.0.0-b] - 2/16/2024
 > **THE TEST RELEASE** - all tests are now accurate and working to IRB specification.
 
