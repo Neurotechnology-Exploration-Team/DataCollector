@@ -23,7 +23,7 @@ $ pip install -r requirements.txt
 
 ## Usage
 
-> You will first need to setup LSL streams for the Data Collector to interface with.
+> You will first need to set up LSL streams for the Data Collector to interface with.
 
 ### LSL Streaming
 
@@ -56,7 +56,7 @@ streaming test data.
 
 > Once the LSL streams have been established, the data collection process can be initiated
 
-Run main.py to run all tests and record data
+Run main.py to run all tests and record data.
 
 ```bash
 $ python main.py
@@ -68,6 +68,9 @@ $ python main.py
   - Each LSL stream will be saved to a separate CSV file. There should be no blank values.
 - Once all tests have been completed, the window will automatically close.
 
+> By default, only EEG data is recorded. To enable other data streams, modify the `SUPPORTED_STREAMS` booleans in 
+> `config.py`.
+
 ## Contributors
 
 **Principal Investigator:** [Alex Burbano](mailto:arb8590@rit.edu)
@@ -78,3 +81,13 @@ $ python main.py
 - [Ian Dunn](mailto:itd3516@rit.edu)
 - [Mack Leonard](mailto:mml2034@rit.edu)
 - [Matt London](mailto:mrl2534@rit.edu)
+
+### How to Contribute
+
+**Bugs:** Any bugs found should be opened as an issue. If you're able to after creating the issue, feel free to assign yourself
+and start working on it! Otherwise, the current development team will look into it.
+
+**Features:** Any unassigned, open issues are free game for any team member. There is usually more detailed instructions
+in the issue. If you have an idea for a new feature, create an issue or fork of the repository.
+
+> Any contributions MUST have a **pull request** and **changelog** before being merged into dev (main for hotfixes).
