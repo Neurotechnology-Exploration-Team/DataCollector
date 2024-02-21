@@ -33,7 +33,7 @@ class LSL:
 
         # Initialize all required streams
         for stream_type in LSL.streams.keys():
-            LSL.__find_and_initialize_stream(stream_type)
+            LSL._find_and_initialize_stream(stream_type)
 
     @staticmethod
     def clear_stream_buffers():
@@ -60,7 +60,7 @@ class LSL:
         LSL.collecting = True
         for stream_type in LSL.collected_data.keys():
             LSL.collected_data[stream_type] = []
-        LSL.collection_thread = threading.Thread(target=LSL.__collect_data)
+        LSL.collection_thread = threading.Thread(target=LSL._collect_data)
         LSL.collection_thread.start()
 
     @staticmethod
@@ -74,14 +74,14 @@ class LSL:
             LSL.collecting = False
             LSL.collection_thread.join()
             print("Data collection stopped. Saving collected data.")
-            LSL.__save_collected_data(path)
+            LSL._save_collected_data(path)
 
     @staticmethod
     def start_label(event: str):
         """
         Function to start labelling each data frame until stop_label() is called
         """
-        if not event == LSL.collection_label:
+        if event != LSL.collection_label:
             LSL.collection_label = event
             print(f"Labeling Data: {event}")
 
@@ -99,7 +99,7 @@ class LSL:
     #
 
     @staticmethod
-    def __find_and_initialize_stream(stream_type: str):
+    def _find_and_initialize_stream(stream_type: str):
         """
         Function to find and initialize a specific LSL stream
 
@@ -118,7 +118,7 @@ class LSL:
             exit(1)
 
     @staticmethod
-    def __collect_data():
+    def _collect_data():
         """
         Helper function to collect data in the LSL stream on a separate thread to run tests with.
 
@@ -129,7 +129,7 @@ class LSL:
         """
         while LSL.collecting:
             for stream_type, stream in LSL.streams.items():
-                data_row = {'Timestamp': None, 'Label': "Resting" if not LSL.collection_label else LSL.collection_label}
+                data_row = {'Timestamp': None, 'Label': config.DEFAULT_LABEL if not LSL.collection_label else LSL.collection_label}
 
                 if stream:
                     sample, timestamp = stream.pull_sample(timeout=0.0)  # Non-blocking pull
@@ -142,7 +142,7 @@ class LSL:
                         LSL.collected_data[stream_type] += [flattened_data_row]
 
     @staticmethod
-    def __save_collected_data(path: str):
+    def _save_collected_data(path: str):
         """
         Function to save data collected after collection has been stopped.
 
@@ -157,8 +157,6 @@ class LSL:
 
                 # Convert collected data to a DataFrame, format with columns above, and write to CSV
                 df = pd.DataFrame(LSL.collected_data[stream_type], columns=columns)
-                # Formatting breaks everything for some reason:
-                # df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%Y-%m-%d %H:%M:%S.%f')
                 df = df.sort_values(by='Timestamp')
                 df.to_csv(os.path.join(path, f"{stream_type}_data.csv"), index=False)
                 print(f"Collected {stream_type} data saved.")
