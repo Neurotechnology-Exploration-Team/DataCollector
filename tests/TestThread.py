@@ -82,6 +82,8 @@ class TestThread(threading.Thread):
         if not complete:  # If test is not complete
             TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
 
+        TestGUI.destroy_current_element()
+
         self._stop_event.set()  # Set the stop event so Python auto-kills the thread
 
     def abort(self):

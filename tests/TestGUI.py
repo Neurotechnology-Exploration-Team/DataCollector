@@ -336,9 +336,11 @@ class TestGUI:
 
         # Serialize test data into file:
         json.dump(TestGUI.tests, open(state_save_path, 'w'))
+        print("Test data serialized to test_states.json")
 
         TestGUI.display_window.destroy()
         TestGUI.control_window.destroy()
+        print("Exiting Data Collector")
         exit(0)
 
     @staticmethod
