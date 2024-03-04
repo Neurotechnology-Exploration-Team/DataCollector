@@ -6,8 +6,8 @@ from pygame import mixer
 
 import config
 from lsl import start_collection, start_label, stop_label, stop_collection
-from test_gui import display_window, tests, participant_ID, session_ID, start_test, confirm_current_test, current_thread, \
-    destroy_current_element, display_canvas
+from test_gui import display_window, participant_ID, session_ID, start_test, confirm_current_test, \
+    destroy_current_element, display_canvas, get_trial_number, increment_trial_number
 
 
 class TestThread(threading.Thread):
@@ -23,7 +23,7 @@ class TestThread(threading.Thread):
 
         # Setup name and trial number
         self.name = name
-        self.trial_number = tests[self.name]["trial"]
+        self.trial_number = get_trial_number(self.name)
 
         # Setup save path and create directories
         test_path = os.path.join(config.SAVED_DATA_PATH, participant_ID, session_ID, self.name)
@@ -75,13 +75,11 @@ class TestThread(threading.Thread):
         stop_collection(self.current_path)  # Stop collecting
 
         complete = confirm_current_test()
-        current_test = current_thread.name
         # Log finalized test status
-        print(f"{current_test} - Trial {tests[current_test]['trial']}: "
-              f"{'Complete' if complete else 'Discarded'}")
+        print(f"{self.name} - Trial {self.trial_number}: "f"{'Complete' if complete else 'Discarded'}")
 
         if not complete:  # If test is not complete
-            tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
+            increment_trial_number(self.name)  # Increase trial number OUTSIDE OF THREAD!!!
 
         destroy_current_element()
 

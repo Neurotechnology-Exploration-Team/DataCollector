@@ -4,7 +4,7 @@ import json
 
 import config
 import timer
-from tests.TestThread import TestThread
+from threading import Thread
 
 """
 Holds all logic relating to creating the GUI, adding buttons/windows, and the test confirmation window.
@@ -25,7 +25,7 @@ current_display_element: int = None  # The ID of the current element being displ
 # Setup test states: A dictionary with test name keys corresponding to sub-dictionaries with lambda, button,
 # trial_number, and completed parameters
 tests = {}
-current_thread: TestThread = None
+current_thread: Thread = None
 
 participant_ID = ""
 session_ID = ""
@@ -264,10 +264,7 @@ def _prompt_participant_info():
     session = tk.StringVar(value="S001")
 
     def submit():
-        global participant_ID, session_ID
-
-        participant_ID = participant.get()
-        session_ID = session.get()
+        set_IDs(participant.get(), session.get())
         print(f"Participant: {participant_ID}, Session: {session_ID}")
 
         popup.destroy()
@@ -298,13 +295,26 @@ def _exit():
                 del tests[test][key]
 
     # Serialize test data into file:
-    json.dump(tests, open(state_save_path, 'w'))
-    print("Test data serialized to test_states.json")
+    try:
+        json.dump(tests, open(state_save_path, 'w'))
+        print("Test status data serialized to test_states.json")
+    except:
+        print(f"Error serializing test status data to {state_save_path}")
 
     display_window.destroy()
     control_window.destroy()
     print("Exiting Data Collector")
     exit(0)
+
+
+def set_IDs(pid, sid):
+    """
+    Weird helper method, otherwise there are issues with the global variables.
+    """
+    # TODO find a less hacky fix 💀
+    global participant_ID, session_ID
+    participant_ID = pid
+    session_ID = sid
 
 
 def _disable_close_button(window):
@@ -313,6 +323,7 @@ def _disable_close_button(window):
 
     :param window: The window to disable the closing of.
     """
+
     def disable_event():
         pass
 
@@ -332,3 +343,11 @@ def _set_window_geometry(window, left_side=True):
     width = screen_width // 2
     x = 0 if left_side else width
     window.geometry(f"{width}x{screen_height}+{x}+0")
+
+
+def get_trial_number(test_name: str) -> int:
+    return tests[test_name]["trial"]
+
+
+def increment_trial_number(test_name: str) -> None:
+    tests[test_name]["trial"] += 1
