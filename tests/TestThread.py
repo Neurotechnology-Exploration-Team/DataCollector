@@ -82,20 +82,21 @@ class TestThread(threading.Thread):
         if not complete:  # If test is not complete
             TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
 
+        TestGUI.destroy_current_element()
+
         self._stop_event.set()  # Set the stop event so Python auto-kills the thread
 
     def abort(self):
         """
         Function to abort test and save current data to new trial
         """
-        # Remove all children of display window
+        # Remove all children of display canvas
         for child in TestGUI.display_canvas.winfo_children():
             child.destroy()
 
         # Cancel currently running timer
         TestGUI.display_window.after_cancel(self.test_job_id)
         self.test_job_id = None
-
         self.stop()
 
     def stopped(self):
