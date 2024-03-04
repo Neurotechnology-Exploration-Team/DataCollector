@@ -5,8 +5,9 @@ from time import sleep
 from pygame import mixer
 
 import config
-from LSL import LSL
-from tests.TestGUI import TestGUI
+from lsl import start_collection, start_label, stop_label, stop_collection
+from test_gui import display_window, tests, participant_ID, session_ID, start_test, confirm_current_test, current_thread, \
+    destroy_current_element, display_canvas
 
 
 class TestThread(threading.Thread):
@@ -22,10 +23,10 @@ class TestThread(threading.Thread):
 
         # Setup name and trial number
         self.name = name
-        self.trial_number = TestGUI.tests[self.name]["trial"]
+        self.trial_number = tests[self.name]["trial"]
 
         # Setup save path and create directories
-        test_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID, self.name)
+        test_path = os.path.join(config.SAVED_DATA_PATH, participant_ID, session_ID, self.name)
         self.current_path = os.path.join(str(test_path), f"trial_{str(self.trial_number).zfill(2)}")
         os.makedirs(self.current_path, exist_ok=True)
 
@@ -44,15 +45,15 @@ class TestThread(threading.Thread):
         """
         All logic related to the control panel, starting collection, and calling the stop method after a certain duration.
         """
-        TestGUI.start_test(self)
+        start_test(self)
 
         print(f"Starting test {self.name}: Trial {self.trial_number}")
 
-        LSL.start_collection()  # Start LSL collection
+        start_collection()  # Start LSL collection
 
         sleep(config.DATA_PADDING_DURATION)  # This gives the data collection a five second padding of rest
 
-        LSL.start_label(self.name)
+        start_label(self.name)
 
         self.run_test()
 
@@ -68,21 +69,21 @@ class TestThread(threading.Thread):
         """
         All logic relating to shutting down the test thread and stopping data collection.
         """
-        LSL.stop_label()  # Stop labelling
+        stop_label()  # Stop labelling
         sleep(config.DATA_PADDING_DURATION)  # Wait to collect junk data
 
-        LSL.stop_collection(self.current_path)  # Stop collecting
+        stop_collection(self.current_path)  # Stop collecting
 
-        complete = TestGUI.confirm_current_test()
-        current_test = TestGUI.current_thread.name
+        complete = confirm_current_test()
+        current_test = current_thread.name
         # Log finalized test status
-        print(f"{current_test} - Trial {TestGUI.tests[current_test]['trial']}: "
+        print(f"{current_test} - Trial {tests[current_test]['trial']}: "
               f"{'Complete' if complete else 'Discarded'}")
 
         if not complete:  # If test is not complete
-            TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
+            tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
 
-        TestGUI.destroy_current_element()
+        destroy_current_element()
 
         self._stop_event.set()  # Set the stop event so Python auto-kills the thread
 
@@ -91,11 +92,11 @@ class TestThread(threading.Thread):
         Function to abort test and save current data to new trial
         """
         # Remove all children of display canvas
-        for child in TestGUI.display_canvas.winfo_children():
+        for child in display_canvas.winfo_children():
             child.destroy()
 
         # Cancel currently running timer
-        TestGUI.display_window.after_cancel(self.test_job_id)
+        display_window.after_cancel(self.test_job_id)
         self.test_job_id = None
         self.stop()
 
@@ -110,3 +111,9 @@ class TestThread(threading.Thread):
         Helper method to play the constant sinusoidal beep sound for auditory stimulus (assets/beep.mp3).
         """
         self.sound.play()
+
+    def wait(self, function, duration):
+        """
+        function to execute, duration in ms
+        """
+        self.test_job_id = display_window.after(duration, function)

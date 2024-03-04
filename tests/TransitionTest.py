@@ -1,8 +1,8 @@
 import tkinter as tk
 
 import config
-from LSL import LSL
-from tests.TestGUI import TestGUI
+from lsl import start_label, stop_label
+from test_gui import place_image, destroy_current_element
 from tests.TestThread import TestThread
 
 
@@ -43,11 +43,11 @@ class TransitionTest(TestThread):
         if self.running:
             # Display current image and start labeling based on flag
             if self.firstImage:
-                LSL.start_label(self.label_1)
-                self.current_image = TestGUI.place_image(self.image_1)
+                start_label(self.label_1)
+                self.current_image = place_image(self.image_1)
             else:
-                LSL.start_label(self.label_2)
-                self.current_image = TestGUI.place_image(self.image_2)
+                start_label(self.label_2)
+                self.current_image = place_image(self.image_2)
 
             self.playsound()  # Auditory stimulus
 
@@ -58,13 +58,13 @@ class TransitionTest(TestThread):
                 self.firstImage = not self.firstImage
                 self.run_test()
 
-            self.test_job_id = TestGUI.display_window.after(config.TRANSITION_DURATION * 1000, swap)
+            self.wait(swap, config.TRANSITION_DURATION * 1000)
 
             self.iteration += 1
         else:
             # Stop test thread
             self.running = False
-            TestGUI.destroy_current_element()
+            destroy_current_element()
 
-            LSL.stop_label()
+            stop_label()
             self.stop()

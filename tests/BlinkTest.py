@@ -2,8 +2,7 @@ import random
 from time import sleep
 
 import config
-from LSL import LSL
-from tests.TestGUI import TestGUI
+from lsl import start_label, stop_label
 from tests.TestThread import TestThread
 
 
@@ -26,18 +25,18 @@ class BlinkTest(TestThread):
 
         if self.running:
             # Blink & setup next interval
-            LSL.start_label(self.name)
+            start_label(self.name)
             self.playsound()
             self.iteration += 1
 
             interval = random.randint(config.BLINK_MIN_INTERVAL * 1000, config.BLINK_MAX_INTERVAL * 1000)
             sleep(config.PAUSE_AFTER_TEST)  # Wait extra after blinking
-            LSL.stop_label()
+            stop_label()
 
-            self.test_job_id = TestGUI.display_window.after(interval, self.run_test)
+            self.wait(self.run_test, interval)
         else:
             # Stop test thread
             self.running = False
 
-            LSL.stop_label()
+            stop_label()
             self.stop()
