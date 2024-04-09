@@ -7,7 +7,7 @@ SUPPORTED_STREAMS = {           # Which streams to enable/data to collect
 }
 DEFAULT_LABEL = "No Event"
 
-# Test length
+# Test length TODO add a simple equation or something to describe test durations
 DATA_PADDING_DURATION = 5    # How long to wait before starting and ending a test (default 5 seconds)
 BLINK_MIN_INTERVAL = 2.5     # The minimum duration between intervals (default 2.5 seconds)
 BLINK_MAX_INTERVAL = 6       # The maximum duration between intervals (default 6 seconds)

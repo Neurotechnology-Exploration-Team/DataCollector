@@ -34,6 +34,10 @@ class TestThread(threading.Thread):
         self.running = True
         self.test_job_id = None
 
+        # Hold values here as well incase durations need to be modified
+        self.transition_duration = config.TRANSITION_DURATION
+        self.constant_duration = config.CONSTANT_TEST_DURATION
+
         # Setup beep using pygame
         mixer.init()
         self.sound = mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'beep.mp3'))
@@ -44,6 +48,11 @@ class TestThread(threading.Thread):
         """
         All logic related to the control panel, starting collection, and calling the stop method after a certain duration.
         """
+        # If eyes test, cut transition duration in half
+        if "eyes" in self.name.lower():
+            config.TRANSITION_DURATION /= 2
+            config.CONSTANT_TEST_DURATION /= 2
+
         TestGUI.start_test(self)
 
         print(f"Starting test {self.name}: Trial {self.trial_number}")
@@ -78,6 +87,10 @@ class TestThread(threading.Thread):
         # Log finalized test status
         print(f"{current_test} - Trial {TestGUI.tests[current_test]['trial']}: "
               f"{'Complete' if complete else 'Discarded'}")
+
+        # Restore durations if they were modified
+        config.TRANSITION_DURATION = self.transition_duration
+        config.CURRENT_TEST = self.constant_duration
 
         if not complete:  # If test is not complete
             TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
