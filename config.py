@@ -23,6 +23,7 @@ CONSTANT_TEST_BREAK = 5      # How long to break for during constant tests (defa
 #
 # The main list of all tests corresponding to type and their images.
 #
+# TODO set up a better list of tests with auditory stimulus config, etc.
 TESTS = {
     "Transition": {
         "Stationary Float to Select": ["Stop.png", "Select.png"],
@@ -49,9 +50,6 @@ TESTS = {
         "Blink"
     ]
 }
-
-# Subject information
-NUMBER_OF_SUBJECTS = 10 #Is there a limit to amount of subjects?
 
 # Save path configuration (<DATA_PATH>/PXXX/SXXX/trial_XX/<STREAM_TYPE>_data.csv)
 SAVED_DATA_PATH = "csv_downloads"

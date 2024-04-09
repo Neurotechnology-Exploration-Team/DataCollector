@@ -37,6 +37,10 @@ class ConstantTest(TestThread):
             self.text = TestGUI.place_text(self.name)
             self.test_job_id = TestGUI.display_window.after(3000, TestGUI.destroy_current_element)
 
+            # Play auditory stimulus for eyes test TODO find a way to toggle auditory stimulus in config
+            if "eyes" in self.name.lower():
+                self.playsound()
+
             def resume():
                 """
                 Resumes the test after a labeling buffer for the specified duration.
