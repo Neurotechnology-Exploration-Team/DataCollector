@@ -50,8 +50,8 @@ class TestThread(threading.Thread):
         """
         # If eyes test, cut transition duration in half
         if "eyes" in self.name.lower():
-            config.TRANSITION_DURATION /= 2
-            config.CONSTANT_TEST_DURATION /= 2
+            config.TRANSITION_DURATION = int(config.TRANSITION_DURATION / 2)
+            config.CONSTANT_TEST_DURATION = int(config.CONSTANT_TEST_DURATION / 2)
 
         TestGUI.start_test(self)
 
@@ -90,7 +90,7 @@ class TestThread(threading.Thread):
 
         # Restore durations if they were modified
         config.TRANSITION_DURATION = self.transition_duration
-        config.CURRENT_TEST = self.constant_duration
+        config.CONSTANT_TEST_DURATION = self.constant_duration
 
         if not complete:  # If test is not complete
             TestGUI.tests[self.name]["trial"] += 1  # Increase trial number OUTSIDE OF THREAD!!!
