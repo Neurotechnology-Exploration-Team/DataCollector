@@ -325,7 +325,11 @@ class TestGUI:
         """
         Helper function that handles the exit behavior of the GUI.
         """
-        state_save_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID, "test_states.json")
+        # Create save path if it doesn't exist
+        state_save_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID)
+        if not os.path.exists(state_save_path):
+            os.makedirs(state_save_path)
+        state_save_path = os.path.join(state_save_path, "test_states.json")
 
         # Remove GUI-specific data (lambda, button) from subkeys
         keys_to_remove = ['button', 'lambda']
