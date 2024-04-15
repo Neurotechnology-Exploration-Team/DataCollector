@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0-b] - 4/14/2024
+
+### Added
+- Added audio cues to eye tests.
+
+### Changed
+- Modified all test durations resulting in session time being reduced to around 60-90 minutes.
+- Cut eye test durations in half due to participant discomfort.
+
+### Fixed
+- Floating point random number generation causing issues in older versions of Python.
+- Fixed crashing on exit if no tests have been ran.
+
 ## [1.2.1-b] - 4/9/2024
 
 ### Changed

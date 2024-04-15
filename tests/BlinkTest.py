@@ -30,7 +30,7 @@ class BlinkTest(TestThread):
             self.playsound()
             self.iteration += 1
 
-            interval = random.randint(config.BLINK_MIN_INTERVAL * 1000, config.BLINK_MAX_INTERVAL * 1000)
+            interval = random.randint(int(config.BLINK_MIN_INTERVAL * 1000), int(config.BLINK_MAX_INTERVAL * 1000))
             sleep(config.PAUSE_AFTER_TEST)  # Wait extra after blinking
             LSL.stop_label()
 
