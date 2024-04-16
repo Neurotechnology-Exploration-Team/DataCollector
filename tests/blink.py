@@ -2,9 +2,8 @@ import random
 from time import sleep
 
 import config
-from LSL import LSL
-from tests.TestGUI import TestGUI
-from tests.TestThread import TestThread
+from lsl import LSL
+from tests.thread import TestThread
 
 
 class BlinkTest(TestThread):
@@ -14,8 +13,8 @@ class BlinkTest(TestThread):
     Audio only
     """
 
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, controller, name):
+        super().__init__(controller, name)
 
     def run_test(self):
         """
@@ -34,7 +33,7 @@ class BlinkTest(TestThread):
             sleep(config.PAUSE_AFTER_TEST)  # Wait extra after blinking
             LSL.stop_label()
 
-            self.test_job_id = TestGUI.display_window.after(interval, self.run_test)
+            self.test_job_id = self.controller.gui.display_window.after(interval, self.run_test)
         else:
             # Stop test thread
             self.running = False

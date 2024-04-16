@@ -2,9 +2,8 @@ import os
 import tkinter as tk
 
 import config
-from LSL import LSL
-from tests.TestGUI import TestGUI
-from tests.TestThread import TestThread
+from lsl import LSL
+from tests.thread import TestThread
 
 
 class ConstantTest(TestThread):
@@ -15,11 +14,11 @@ class ConstantTest(TestThread):
     Visual (text and stop image) only
     """
 
-    def __init__(self, name):
+    def __init__(self, controller, name):
         """
         Initializes the image asset for the display window.
         """
-        super().__init__(name)
+        super().__init__(controller, name)
 
         self.pause_image = tk.PhotoImage(file=os.path.join('assets', 'stop red.PNG'))
         self.text = None
@@ -34,8 +33,8 @@ class ConstantTest(TestThread):
         if self.running:
             LSL.start_label(self.name)
 
-            self.text = TestGUI.place_text(self.name)
-            self.test_job_id = TestGUI.display_window.after(3000, TestGUI.destroy_current_element)
+            self.text = self.controller.gui.place_text(self.name)
+            self.test_job_id = self.controller.gui.display_window.after(3000, self.controller.gui.destroy_current_element)
 
             # Play auditory stimulus for eyes test TODO find a way to toggle auditory stimulus in config
             if "eyes" in self.name.lower():
@@ -46,8 +45,8 @@ class ConstantTest(TestThread):
                 Resumes the test after a labeling buffer for the specified duration.
                 """
                 if self.running:
-                    TestGUI.destroy_current_element()
-                    self.test_job_id = TestGUI.display_window.after(int(config.PAUSE_AFTER_TEST * 1000), self.run_test)
+                    self.controller.gui.destroy_current_element()
+                    self.test_job_id = self.controller.gui.display_window.after(int(config.PAUSE_AFTER_TEST * 1000), self.run_test)
 
             def pause():
                 """
@@ -56,10 +55,10 @@ class ConstantTest(TestThread):
                 LSL.stop_label()
 
                 if self.running:
-                    self.text = TestGUI.place_image(self.pause_image)
-                    self.test_job_id = TestGUI.display_window.after(config.CONSTANT_TEST_BREAK * 1000, resume)  # Resume
+                    self.text = self.controller.gui.place_image(self.pause_image)
+                    self.test_job_id = self.controller.gui.display_window.after(config.CONSTANT_TEST_BREAK * 1000, resume)  # Resume
 
-            self.test_job_id = TestGUI.display_window.after(config.CONSTANT_TEST_DURATION * 1000, pause)  # Pause
+            self.test_job_id = self.controller.gui.display_window.after(config.CONSTANT_TEST_DURATION * 1000, pause)  # Pause
             self.iteration += 1
         else:
             # Stop test thread

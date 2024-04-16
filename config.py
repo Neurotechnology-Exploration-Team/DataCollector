@@ -25,7 +25,7 @@ CONSTANT_TEST_BREAK = 5      # How long to break for during constant tests (defa
 #
 # TODO set up a better list of tests with auditory stimulus config, etc.
 TESTS = {
-    "Transition": {
+    "transition": {
         "Stationary Float to Select": ["Stop.png", "Select.png"],
         "Stationary Float to Float Left": ["Stop.png", "Left.png"],
         "Stationary Float to Float Right": ["Stop.png", "Right.png"],
@@ -34,7 +34,7 @@ TESTS = {
         "Eyes Open to Eyes Closed": ["EyesOpen.png", "EyesClosed.png"],
         "Brow Furrow to Brow Unfurrow": ["BrowFurrow.png", "BrowUnfurrow.png"]
     },
-    "Constant": {  # Images currently not used, only text is used
+    "constant": {  # Images currently not used, only text is used
         "Eyes Open": "EyesOpen.png",
         "Eyes Closed": "EyesClosed.png",
         "Brow Furrow": "BrowFurrow.png",
@@ -46,7 +46,7 @@ TESTS = {
         "Float Backward": "Down.png",
         "Select": "Select.png"
     },
-    "Blink": [  # No images for blinking tests
+    "blink": [  # No images for blinking tests
         "Blink"
     ]
 }

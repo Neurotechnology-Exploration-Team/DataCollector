@@ -1,9 +1,8 @@
 import tkinter as tk
 
 import config
-from LSL import LSL
-from tests.TestGUI import TestGUI
-from tests.TestThread import TestThread
+from lsl import LSL
+from tests.thread import TestThread
 
 
 class TransitionTest(TestThread):
@@ -13,7 +12,7 @@ class TransitionTest(TestThread):
     Visual (images) and auditory stimulus
     """
 
-    def __init__(self, name, image_path_1, image_path_2):
+    def __init__(self, controller, name, image_path_1, image_path_2):
         """
         Initializes and creates the transition labels in the display window.
 
@@ -21,7 +20,7 @@ class TransitionTest(TestThread):
         :param image_path_1: The path to the image of state 1
         :param image_path_2: The path to the image of state 2
         """
-        super().__init__(name)
+        super().__init__(controller, name)
 
         self.image_1 = tk.PhotoImage(file=image_path_1)
         self.image_2 = tk.PhotoImage(file=image_path_2)
@@ -44,10 +43,10 @@ class TransitionTest(TestThread):
             # Display current image and start labeling based on flag
             if self.firstImage:
                 LSL.start_label(self.label_1)
-                self.current_image = TestGUI.place_image(self.image_1)
+                self.current_image = self.controller.gui.place_image(self.image_1)
             else:
                 LSL.start_label(self.label_2)
-                self.current_image = TestGUI.place_image(self.image_2)
+                self.current_image = self.controller.gui.place_image(self.image_2)
 
             self.playsound()  # Auditory stimulus
 
@@ -58,13 +57,13 @@ class TransitionTest(TestThread):
                 self.firstImage = not self.firstImage
                 self.run_test()
 
-            self.test_job_id = TestGUI.display_window.after(config.TRANSITION_DURATION * 1000, swap)
+            self.test_job_id = self.controller.gui.display_window.after(config.TRANSITION_DURATION * 1000, swap)
 
             self.iteration += 1
         else:
             # Stop test thread
             self.running = False
-            TestGUI.destroy_current_element()
+            self.controller.gui.destroy_current_element()
 
             LSL.stop_label()
             self.stop()
