@@ -10,11 +10,16 @@ from timer import Timer
 
 class Controller:
     def __init__(self):
-        self.gui = TestGUI(self.exit, self.stop_test)
         # Setup test states: A dictionary with test name keys corresponding to sub-dictionaries with lambda, button,
         # trial_number, and completed parameters
         self.tests = {}
         self.current_thread = None
+        self.gui_delay_id = None
+
+        def abort_current_test():
+            self.current_thread.abort()
+
+        self.gui = TestGUI(self.exit, abort_current_test)
 
         self.timer = Timer(self.gui.timer_label)
 
@@ -68,6 +73,14 @@ class Controller:
         self.gui.disable_buttons(test_thread.name)
 
     def stop_test(self):
+        # Remove all children of display canvas
+        for child in self.gui.display_canvas.winfo_children():
+            child.destroy()
+
+        # Cancel currently running timer
+        self.gui.display_window.after_cancel(self.gui_delay_id)
+        self.gui_delay_id = None
+
         self.timer.stop_timer()
         self.timer.reset_timer()
 
@@ -101,6 +114,9 @@ class Controller:
 
         print("Exiting Data Collector")
         exit(0)
+
+    def start_delay(self, interval, function):
+        self.gui_delay_id = self.gui.display_window.after(int(interval), function)
 
     def _read_save_state(self):
         state_save_path = os.path.join(config.SAVED_DATA_PATH, self.participantID, self.sessionID, "test_states.json")

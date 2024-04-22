@@ -57,7 +57,7 @@ class TransitionTest(TestThread):
                 self.firstImage = not self.firstImage
                 self.run_test()
 
-            self.test_job_id = self.controller.gui.display_window.after(config.TRANSITION_DURATION * 1000, swap)
+            self.controller.start_delay(config.TRANSITION_DURATION * 1000, swap)
 
             self.iteration += 1
         else:

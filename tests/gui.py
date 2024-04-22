@@ -58,6 +58,7 @@ class TestGUI:
         frame = tk.Frame(self.control_window)
         frame.pack(side="bottom", pady=100)
 
+        # TODO kind of a hacky fix since the controller exit and abort functons are passed in on construction
         self.close_button = tk.Button(frame, text="EXIT TESTING", height=4, width=30, command=exit_fn)
         self.abort_button = tk.Button(frame, text="ABORT TEST", height=4, width=30, state="disabled", command=abort_fn)
 

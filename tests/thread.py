@@ -32,7 +32,6 @@ class TestThread(threading.Thread):
         # Setup test details: iteration, the running state, and the ID of the current timer
         self.iteration = 0
         self.running = True
-        self.test_job_id = None
 
         # Hold values here as well incase durations need to be modified
         self.transition_duration = config.TRANSITION_DURATION
@@ -94,13 +93,7 @@ class TestThread(threading.Thread):
         """
         Function to abort test and save current data to new trial
         """
-        # Remove all children of display canvas
-        for child in self.controller.gui.display_canvas.winfo_children():
-            child.destroy()
-
-        # Cancel currently running timer
-        self.controller.gui.display_window.after_cancel(self.test_job_id)
-        self.test_job_id = None
+        self.controller.stop_test()
         self.stop()
 
     def stopped(self):

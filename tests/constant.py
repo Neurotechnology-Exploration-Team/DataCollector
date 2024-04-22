@@ -34,7 +34,7 @@ class ConstantTest(TestThread):
             LSL.start_label(self.name)
 
             self.text = self.controller.gui.place_text(self.name)
-            self.test_job_id = self.controller.gui.display_window.after(3000, self.controller.gui.destroy_current_element)
+            self.controller.start_delay(3000, self.controller.gui.destroy_current_element)
 
             # Play auditory stimulus for eyes test TODO find a way to toggle auditory stimulus in config
             if "eyes" in self.name.lower():
@@ -46,7 +46,7 @@ class ConstantTest(TestThread):
                 """
                 if self.running:
                     self.controller.gui.destroy_current_element()
-                    self.test_job_id = self.controller.gui.display_window.after(int(config.PAUSE_AFTER_TEST * 1000), self.run_test)
+                    self.controller.start_delay(config.PAUSE_AFTER_TEST * 1000, self.run_test)
 
             def pause():
                 """
@@ -56,9 +56,9 @@ class ConstantTest(TestThread):
 
                 if self.running:
                     self.text = self.controller.gui.place_image(self.pause_image)
-                    self.test_job_id = self.controller.gui.display_window.after(config.CONSTANT_TEST_BREAK * 1000, resume)  # Resume
+                    self.controller.start_delay(config.CONSTANT_TEST_BREAK * 1000, resume)  # Resume
 
-            self.test_job_id = self.controller.gui.display_window.after(config.CONSTANT_TEST_DURATION * 1000, pause)  # Pause
+            self.controller.start_delay(config.CONSTANT_TEST_DURATION * 1000, pause)  # Pause
             self.iteration += 1
         else:
             # Stop test thread

@@ -33,7 +33,7 @@ class BlinkTest(TestThread):
             sleep(config.PAUSE_AFTER_TEST)  # Wait extra after blinking
             LSL.stop_label()
 
-            self.test_job_id = self.controller.gui.display_window.after(interval, self.run_test)
+            self.controller.start_delay(interval, self.run_test)
         else:
             # Stop test thread
             self.running = False
