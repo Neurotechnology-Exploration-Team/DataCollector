@@ -12,7 +12,7 @@ class TransitionTest(TestThread):
     Visual (images) and auditory stimulus
     """
 
-    def __init__(self, controller, name, image_path_1, image_path_2):
+    def __init__(self, controller, name, save_path, image_path_1, image_path_2):
         """
         Initializes and creates the transition labels in the display window.
 
@@ -20,7 +20,7 @@ class TransitionTest(TestThread):
         :param image_path_1: The path to the image of state 1
         :param image_path_2: The path to the image of state 2
         """
-        super().__init__(controller, name)
+        super().__init__(controller, name, save_path)
 
         self.image_1 = tk.PhotoImage(file=image_path_1)
         self.image_2 = tk.PhotoImage(file=image_path_2)

@@ -14,11 +14,11 @@ class ConstantTest(TestThread):
     Visual (text and stop image) only
     """
 
-    def __init__(self, controller, name):
+    def __init__(self, controller, name, save_path):
         """
         Initializes the image asset for the display window.
         """
-        super().__init__(controller, name)
+        super().__init__(controller, name, save_path)
 
         self.pause_image = tk.PhotoImage(file=os.path.join('assets', 'stop red.PNG'))
         self.text = None
@@ -33,7 +33,7 @@ class ConstantTest(TestThread):
         if self.running:
             LSL.start_label(self.name)
 
-            self.text = self.controller.place_text(self.name)
+            self.controller.place_text(self.name)
             self.controller.start_delay(3000, self.controller.clear_display)
 
             # Play auditory stimulus for eyes test TODO find a way to toggle auditory stimulus in config
@@ -55,7 +55,7 @@ class ConstantTest(TestThread):
                 LSL.stop_label()
 
                 if self.running:
-                    self.text = self.controller.place_image(self.pause_image)
+                    self.controller.place_image(self.pause_image)
                     self.controller.start_delay(config.CONSTANT_TEST_BREAK * 1000, resume)  # Resume
 
             self.controller.start_delay(config.CONSTANT_TEST_DURATION * 1000, pause)  # Pause

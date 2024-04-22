@@ -13,7 +13,7 @@ class TestThread(threading.Thread):
     A class that all tests should extend that holds all threading logic, initialization, and data logging.
     """
 
-    def __init__(self, controller, name):
+    def __init__(self, controller, name, save_path):
         """
         The constructor that sets up the test name and stop condition.
         """
@@ -22,12 +22,7 @@ class TestThread(threading.Thread):
 
         # Setup name and trial number
         self.name = name
-        self.trial_number = self.controller.tests[self.name]["trial"]
-
-        # Setup save path and create directories TODO move to controller
-        test_path = os.path.join(config.SAVED_DATA_PATH, self.controller.participantID, self.controller.sessionID, self.name)
-        self.current_path = os.path.join(str(test_path), f"trial_{str(self.trial_number).zfill(2)}")
-        os.makedirs(self.current_path, exist_ok=True)
+        self.save_path = save_path
 
         # Setup test details: iteration, the running state, and the ID of the current timer
         self.iteration = 0
@@ -52,10 +47,6 @@ class TestThread(threading.Thread):
             config.TRANSITION_DURATION = int(config.TRANSITION_DURATION / 2)
             config.CONSTANT_TEST_DURATION = int(config.CONSTANT_TEST_DURATION / 2)
 
-        self.controller.start_test(self)
-
-        print(f"Starting test {self.name}: Trial {self.trial_number}")
-
         LSL.start_collection()  # Start LSL collection
 
         sleep(config.DATA_PADDING_DURATION)  # This gives the data collection a five second padding of rest
@@ -79,7 +70,7 @@ class TestThread(threading.Thread):
         LSL.stop_label()  # Stop labelling
         sleep(config.DATA_PADDING_DURATION)  # Wait to collect junk data
 
-        LSL.stop_collection(self.current_path)  # Stop collecting
+        LSL.stop_collection(self.save_path)  # Stop collecting
 
         self.controller.stop_test()
 
@@ -88,13 +79,6 @@ class TestThread(threading.Thread):
         config.CONSTANT_TEST_DURATION = self.constant_duration
 
         self._stop_event.set()  # Set the stop event so Python auto-kills the thread
-
-    def abort(self):
-        """
-        Function to abort test and save current data to new trial
-        """
-        self.controller.stop_test()
-        self.stop()
 
     def stopped(self):
         """

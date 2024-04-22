@@ -13,8 +13,8 @@ class BlinkTest(TestThread):
     Audio only
     """
 
-    def __init__(self, controller, name):
-        super().__init__(controller, name)
+    def __init__(self, controller, name, save_path):
+        super().__init__(controller, name, save_path)
 
     def run_test(self):
         """
