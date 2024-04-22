@@ -72,8 +72,6 @@ class TestGUI:
         self.timer_label = tk.Label(self.control_window, text="Elapsed Time: 0.00 seconds", height=5, width=30)
         self.timer_label.pack()  # Pack the timer label into the control window
 
-        self.prompt_participant_info()
-
     def add_test(self, test_name: str, test_lambda):
         """
         Adds a button to the test window with its name and function to run.

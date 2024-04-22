@@ -33,8 +33,8 @@ class ConstantTest(TestThread):
         if self.running:
             LSL.start_label(self.name)
 
-            self.text = self.controller.gui.place_text(self.name)
-            self.controller.start_delay(3000, self.controller.gui.destroy_current_element)
+            self.text = self.controller.place_text(self.name)
+            self.controller.start_delay(3000, self.controller.clear_display)
 
             # Play auditory stimulus for eyes test TODO find a way to toggle auditory stimulus in config
             if "eyes" in self.name.lower():
@@ -45,7 +45,7 @@ class ConstantTest(TestThread):
                 Resumes the test after a labeling buffer for the specified duration.
                 """
                 if self.running:
-                    self.controller.gui.destroy_current_element()
+                    self.controller.clear_display()
                     self.controller.start_delay(config.PAUSE_AFTER_TEST * 1000, self.run_test)
 
             def pause():
@@ -55,7 +55,7 @@ class ConstantTest(TestThread):
                 LSL.stop_label()
 
                 if self.running:
-                    self.text = self.controller.gui.place_image(self.pause_image)
+                    self.text = self.controller.place_image(self.pause_image)
                     self.controller.start_delay(config.CONSTANT_TEST_BREAK * 1000, resume)  # Resume
 
             self.controller.start_delay(config.CONSTANT_TEST_DURATION * 1000, pause)  # Pause

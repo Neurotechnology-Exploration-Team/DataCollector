@@ -100,16 +100,7 @@ class Controller:
         self.gui.destroy_current_element()
 
     def exit(self):
-        # Create save path if it doesn't exist
-        state_save_path = os.path.join(config.SAVED_DATA_PATH, self.participantID, self.sessionID)
-        if not os.path.exists(state_save_path):
-            os.makedirs(state_save_path)
-        state_save_path = os.path.join(str(state_save_path), "test_states.json")
-
-        # Serialize test data into file:
-        json.dump(self.tests, open(state_save_path, 'w'))
-        print("Test data serialized to test_states.json")
-
+        self._write_save_state()
         self.gui.exit_gui()
 
         print("Exiting Data Collector")
@@ -117,6 +108,15 @@ class Controller:
 
     def start_delay(self, interval, function):
         self.gui_delay_id = self.gui.display_window.after(int(interval), function)
+
+    def place_image(self, image):
+        self.gui.place_image(image)
+
+    def place_text(self, text):
+        self.gui.place_text(text)
+
+    def clear_display(self):
+        self.gui.destroy_current_element()
 
     def _read_save_state(self):
         state_save_path = os.path.join(config.SAVED_DATA_PATH, self.participantID, self.sessionID, "test_states.json")
@@ -127,6 +127,17 @@ class Controller:
                 self.tests = json.load(open(state_save_path))
             except:
                 print("Error reading saved test states.")
+
+    def _write_save_state(self):
+        # Create save path if it doesn't exist
+        state_save_path = os.path.join(config.SAVED_DATA_PATH, self.participantID, self.sessionID)
+        if not os.path.exists(state_save_path):
+            os.makedirs(state_save_path)
+        state_save_path = os.path.join(str(state_save_path), "test_states.json")
+
+        # Serialize test data into file:
+        json.dump(self.tests, open(state_save_path, 'w'))
+        print("Test data serialized to test_states.json")
 
     def _get_completed_tests(self):
         completed_tests = []

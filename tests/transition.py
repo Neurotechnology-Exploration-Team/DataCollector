@@ -43,10 +43,10 @@ class TransitionTest(TestThread):
             # Display current image and start labeling based on flag
             if self.firstImage:
                 LSL.start_label(self.label_1)
-                self.current_image = self.controller.gui.place_image(self.image_1)
+                self.current_image = self.controller.place_image(self.image_1)
             else:
                 LSL.start_label(self.label_2)
-                self.current_image = self.controller.gui.place_image(self.image_2)
+                self.current_image = self.controller.place_image(self.image_2)
 
             self.playsound()  # Auditory stimulus
 
@@ -63,7 +63,7 @@ class TransitionTest(TestThread):
         else:
             # Stop test thread
             self.running = False
-            self.controller.gui.destroy_current_element()
+            self.controller.clear_display()
 
             LSL.stop_label()
             self.stop()
