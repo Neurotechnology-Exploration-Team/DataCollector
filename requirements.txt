@@ -1,6 +1,6 @@
-matplotlib~=3.8.2
-pandas~=2.1.4
-pylsl~=1.16.2
-scipy~=1.10.1
-numpy~=1.24.3
-pygame~=2.5.2
+matplotlib
+pandas
+pylsl
+scipy
+numpy
+pygame
