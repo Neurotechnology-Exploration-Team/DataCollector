@@ -28,6 +28,8 @@ class DataCollectorApp:
             test = test_class(test_name, os.path.join('.', 'assets', assets[0]), os.path.join('.', 'assets', assets[1]))
         elif test_type == "Constant":
             test = test_class(test_name)
+        elif test_type == "Continuous":
+            test = test_class(test_name)
         elif test_type == "Blink":
             test = test_class(test_name)
         else:

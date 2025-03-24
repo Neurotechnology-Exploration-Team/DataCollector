@@ -26,25 +26,29 @@ CONSTANT_TEST_BREAK = 5      # How long to break for during constant tests (defa
 # TODO set up a better list of tests with auditory stimulus config, etc.
 TESTS = {
     "Transition": {
-        "Stationary Float to Select": ["Stop.png", "Select.png"],
-        "Stationary Float to Float Left": ["Stop.png", "Left.png"],
-        "Stationary Float to Float Right": ["Stop.png", "Right.png"],
-        "Stationary Float to Float Forward": ["Stop.png", "Up.png"],
-        "Stationary Float to Float Backward": ["Stop.png", "Down.png"],
-        "Eyes Open to Eyes Closed": ["EyesOpen.png", "EyesClosed.png"],
-        "Brow Furrow to Brow Unfurrow": ["BrowFurrow.png", "BrowUnfurrow.png"]
+        # "Stationary Float to Select": ["Stop.png", "Select.png"],
+        # "Stationary Float to Float Left": ["Stop.png", "Left.png"],
+        # "Stationary Float to Float Right": ["Stop.png", "Right.png"],
+        # "Stationary Float to Float Forward": ["Stop.png", "Up.png"],
+        # "Stationary Float to Float Backward": ["Stop.png", "Down.png"],
+        # "Eyes Open to Eyes Closed": ["EyesOpen.png", "EyesClosed.png"],
+        # "Brow Furrow to Brow Unfurrow": ["BrowFurrow.png", "BrowUnfurrow.png"]
     },
+    "Continuous": [
+        "Stationary float to float movement",
+        "Float movement"
+    ],
     "Constant": {  # Images currently not used, only text is used
-        "Eyes Open": "EyesOpen.png",
-        "Eyes Closed": "EyesClosed.png",
+        # "Eyes Open": "EyesOpen.png",
+        # "Eyes Closed": "EyesClosed.png",
         "Brow Furrow": "BrowFurrow.png",
         "Brow Unfurrow": "BrowUnfurrow.png",
-        "Stationary Floating": "Stop.png",
-        "Float Left": "Left.png",
-        "Float Right": "Right.png",
-        "Float Forward": "Up.png",
-        "Float Backward": "Down.png",
-        "Select": "Select.png"
+        # "Stationary Floating": "Stop.png",
+        # "Float Left": "Left.png",
+        # "Float Right": "Right.png",
+        # "Float Forward": "Up.png",
+        # "Float Backward": "Down.png",
+        # "Select": "Select.png"
     },
     "Blink": [  # No images for blinking tests
         "Blink"
