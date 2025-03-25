@@ -4,6 +4,7 @@ import threading
 import time
 import json
 from queue import Queue
+from pygame import mixer
 
 import config
 
@@ -21,6 +22,7 @@ class TestGUI:
     display_canvas = None  # The canvas on the display window to display images/text
     close_button = None
     abort_button = None
+    sound_button = None
 
     current_display_element = None  # The ID of the current element being displayed on display_canvas
 
@@ -72,6 +74,11 @@ class TestGUI:
         TestGUI.close_button = tk.Button(frame, text="EXIT TESTING", height=4, width=30,
                                          command=lambda: TestGUI._exit())
         TestGUI.close_button.pack(side="right")
+
+        sound = mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'beep.mp3'))
+        TestGUI.sound_button = tk.Button(frame, text="EXIT TESTING", height=4, width=30,
+                                         command=lambda: sound.play())
+        TestGUI.sound_button.pack(side="top")
 
         TestGUI.timer_label = tk.Label(TestGUI.control_window, text="Elapsed Time: 0.00 seconds", height=5, width=30)
         TestGUI.timer_label.pack()  # Pack the timer label into the control window
