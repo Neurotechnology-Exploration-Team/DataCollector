@@ -309,7 +309,12 @@ class TestGUI:
             TestGUI.session_ID = session.get()
             print(f"Participant: {TestGUI.participant_ID}, Session: {TestGUI.session_ID}")
 
-            popup.destroy()
+            state_save_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID)
+            if os.path.exists(state_save_path):
+                error_text = tk.Label(popup, text="Already exists", height=5, width=30, fg="red")
+                error_text.pack()
+            else:
+                popup.destroy()
 
         tk.Entry(popup, textvariable=participant).pack()
         tk.Entry(popup, textvariable=session).pack()
