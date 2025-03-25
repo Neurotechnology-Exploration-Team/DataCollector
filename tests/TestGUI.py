@@ -310,9 +310,13 @@ class TestGUI:
             print(f"Participant: {TestGUI.participant_ID}, Session: {TestGUI.session_ID}")
 
             state_save_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID)
-            if os.path.exists(state_save_path):
+            exists = 0
+            if os.path.exists(state_save_path) and exists == 0:
+                exists = 1
                 error_text = tk.Label(popup, text="Already exists", height=5, width=30, fg="red")
                 error_text.pack()
+            elif exists == 1:
+                pass
             else:
                 popup.destroy()
 
