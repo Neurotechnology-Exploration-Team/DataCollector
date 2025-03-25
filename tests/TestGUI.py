@@ -302,7 +302,7 @@ class TestGUI:
         TestGUI.control_window.eval(f'tk::PlaceWindow {str(popup)} center')
 
         #variables for ensuring you can't do the same tests twice
-        error_text = tk.Label(popup, text="", height=5, width=30, fg="red")
+        error_text = tk.Label(popup, text="", height=1, width=30, fg="red")
         error_text.pack()
 
         participant = tk.StringVar(value="P001")
