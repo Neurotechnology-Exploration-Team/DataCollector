@@ -302,8 +302,8 @@ class TestGUI:
         TestGUI.control_window.eval(f'tk::PlaceWindow {str(popup)} center')
 
         #variables for ensuring you can't do the same tests twice
-        error_text = tk.Label(popup, text="Already exists", height=5, width=30, fg="red")
-        exists = False
+        error_text = tk.Label(popup, text="", height=5, width=30, fg="red")
+        error_text.pack()
 
         participant = tk.StringVar(value="P001")
         session = tk.StringVar(value="S001")
@@ -315,11 +315,8 @@ class TestGUI:
 
             #ensuring that the session has not already been run
             state_save_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID)
-            if os.path.exists(state_save_path) and exists == False:
-                exists = True
-                error_text.pack()
-            elif exists == True:
-                pass
+            if os.path.exists(state_save_path):
+                error_text.config(text="Already exists")
             else:
                 popup.destroy()
 
