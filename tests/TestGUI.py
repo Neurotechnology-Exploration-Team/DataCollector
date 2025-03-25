@@ -311,14 +311,14 @@ class TestGUI:
 
             state_save_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID)
             exists = 0
-            if os.path.exists(state_save_path) and exists == 0:
-                exists = 1
-                error_text = tk.Label(popup, text="Already exists", height=5, width=30, fg="red")
-                error_text.pack()
-            elif exists == 1:
-                pass
-            else:
-                popup.destroy()
+            # if os.path.exists(state_save_path) and exists == 0:
+            #     exists = 1
+            #     error_text = tk.Label(popup, text="Already exists", height=5, width=30, fg="red")
+            #     error_text.pack()
+            # elif exists == 1:
+            #     pass
+            # else:
+            #     popup.destroy()
 
         tk.Entry(popup, textvariable=participant).pack()
         tk.Entry(popup, textvariable=session).pack()
