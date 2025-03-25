@@ -24,9 +24,6 @@ class TestGUI:
     abort_button = None
     sound_button = None
 
-    #initlizing mixer for beeping
-    mixer.init()
-    sound = mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'beep.mp3'))
 
     current_display_element = None  # The ID of the current element being displayed on display_canvas
 
@@ -50,6 +47,11 @@ class TestGUI:
         """
         MUST BE CALLED BEFORE ACCESSING ANY CLASS VARIABLES. Sets up the display window.
         """
+
+        #initlizing mixer for beeping
+        mixer.init()
+        sound = mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'beep.mp3'))
+
         # Control window
         TestGUI.control_window = tk.Tk()
         TestGUI.control_window.title("Control Panel")
@@ -79,7 +81,7 @@ class TestGUI:
                                          command=lambda: TestGUI._exit())
         TestGUI.close_button.pack(side="right")
 
-        TestGUI.sound_button = tk.Button(frame, text="EXIT TESTING", height=4, width=30,
+        TestGUI.sound_button = tk.Button(frame, text="TEST SOUND", height=4, width=30,
                                          command=lambda: sound.play())
         TestGUI.sound_button.pack(side="top")
 
