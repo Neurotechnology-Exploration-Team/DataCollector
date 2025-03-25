@@ -311,13 +311,9 @@ class TestGUI:
 
             #ensuring that the session has not already been run
             state_save_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID)
-            exists = 0
-            if os.path.exists(state_save_path) and exists == 0:
-                exists = 1
-                error_text = tk.Label(popup, text="Already exists", height=5, width=30, fg="red")
+            error_text = tk.Label(popup, text="Already exists", height=5, width=30, fg="red")
+            if os.path.exists(state_save_path) and error_text is not None:
                 error_text.pack()
-            elif exists == 1: #this is probably bad code practice so I apologize - Logan
-                pass
             else:
                 popup.destroy()
 
