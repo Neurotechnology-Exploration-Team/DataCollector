@@ -180,6 +180,10 @@ class TestGUI:
         y = TestGUI.display_canvas.winfo_height() // 2
         TestGUI.current_display_element = TestGUI.display_canvas.create_image(x, y, anchor=tk.CENTER, image=image)
 
+        TestGUI.display_canvas.update_idletasks()
+
+        return TestGUI.current_display_element
+
     @staticmethod
     def place_text(text):
         """
