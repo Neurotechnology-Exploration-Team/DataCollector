@@ -316,9 +316,9 @@ class TestGUI:
             #ensuring that the session has not already been run
             state_save_path = os.path.join(config.SAVED_DATA_PATH, TestGUI.participant_ID, TestGUI.session_ID)
             if os.path.exists(state_save_path) and exists == 0:
-                exists = 1
+                exists = True
                 error_text.pack()
-            elif exists == 1:
+            elif exists == True:
                 pass
             else:
                 popup.destroy()
