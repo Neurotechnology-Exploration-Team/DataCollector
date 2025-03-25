@@ -24,6 +24,10 @@ class TestGUI:
     abort_button = None
     sound_button = None
 
+    #initlizing mixer for beeping
+    mixer.init()
+    sound = mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'beep.mp3'))
+
     current_display_element = None  # The ID of the current element being displayed on display_canvas
 
     # Setup test states: A dictionary with test name keys corresponding to sub-dictionaries with lambda, button,
@@ -75,7 +79,6 @@ class TestGUI:
                                          command=lambda: TestGUI._exit())
         TestGUI.close_button.pack(side="right")
 
-        sound = mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'beep.mp3'))
         TestGUI.sound_button = tk.Button(frame, text="EXIT TESTING", height=4, width=30,
                                          command=lambda: sound.play())
         TestGUI.sound_button.pack(side="top")
