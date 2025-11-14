@@ -1,0 +1,7 @@
+[project]
+name = "datacollector"
+version = "0.1.0"
+description = "DataCollector for NXT"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
