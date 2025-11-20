@@ -4,4 +4,11 @@ version = "0.1.0"
 description = "DataCollector for NXT"
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = []
+dependencies = [
+    "matplotlib>=3.9.4",
+    "numpy>=2.0.2",
+    "pandas>=2.3.3",
+    "pygame>=2.6.1",
+    "pylsl>=1.17.6",
+    "scipy>=1.13.1",
+]
