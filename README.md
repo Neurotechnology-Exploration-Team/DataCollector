@@ -6,20 +6,21 @@
 
 ## Download & Install
 
-### Git
-
-```bash
-$ git clone https://github.com/Neurotechnology-Exploration-Team/DataCollector.git
-$ cd DataCollector/
-$ pip install -r requirements.txt
-```
-
 ### Software Requirements
 
 - Python v3.12.x
+- [uv](https://docs.astral.sh/uv/) package manager. To install it in Windows, run `winget install uv`.
 - [Standalone OpenBCI GUI](https://openbci.com/downloads) v5.2.2 (Required to interact with LSL stream data)
     - MacOS & Linux users will need to install [liblsl](https://github.com/sccn/liblsl); OpenBCI only ships with the
       library on Windows.
+
+### Git Installation
+
+```cmd
+git clone https://github.com/Neurotechnology-Exploration-Team/DataCollector.git
+cd DataCollector/
+uv add -r requirements.txt
+```
 
 ## Usage
 
@@ -34,9 +35,9 @@ Select data source type from **`System Control Panel > DATA SOURCE`**.
 - Real-Time LSL Data: Select **`CYTON (Live)`**
   - To configure OpenBCI/set up the Cyton board communication, follow steps III and IV from the [OpenBCI Cyton setup instructions](https://docs.openbci.com/GettingStarted/Boards/CytonGS/#iii-prepare-your-openbci-hardware).
   - To set up EEG hardware, use the [OpenBCI EEG setup guide](https://docs.openbci.com/GettingStarted/Biosensing-Setups/EEGSetup/).
-- Algorithmic LSL Data **(USE FOR TESTING ONLY)**: Select **`SYNTHETIC (Algorithmic)`**
+- Algorithmic LSL Data **(USE FOR TESTING ONLY)**: Select **`SYNTHETIC (Algorithmic)`** -> **`Network`**
 
-Leave all settings as default, and press **`START SESSION`**
+Leave all other settings as default, and press **`START SESSION`**
 
 Setup LSL Stream
 
@@ -58,8 +59,8 @@ streaming test data.
 
 Run main.py to run all tests and record data.
 
-```bash
-$ python main.py
+```cmd
+uv run main.py
 ```
 
 - Clicking on the button to start each test will display the test in the display window.
@@ -81,6 +82,7 @@ $ python main.py
 - [Ian Dunn](mailto:itd3516@rit.edu)
 - [Mack Leonard](mailto:mml2034@rit.edu)
 - [Matt London](mailto:mrl2534@rit.edu)
+- [Aqil Contractor](mailto:amc1522@rit.edu)
 
 ### How to Contribute
 
