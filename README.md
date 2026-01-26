@@ -19,7 +19,7 @@
 ```cmd
 git clone https://github.com/Neurotechnology-Exploration-Team/DataCollector.git
 cd DataCollector/
-uv add -r requirements.txt
+uv sync
 ```
 
 ## Usage
