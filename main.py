@@ -1,7 +1,8 @@
 import datetime
 import random
 import re
-from sys import argv, sleep
+from time import sleep
+from sys import argv
 from LSL import LSL
 import tkinter as tk
 from tkinter import font
@@ -16,10 +17,10 @@ class Test:
   LF = "left"
 
 test_desc = {
-  [Test.FW]: "Think about Floating forwards.",
-  [Test.BW]: "Think about Floating backwards.",
-  [Test.RT]: "Think about Floating to the right.",
-  [Test.LF]: "Think about Floating to the left.",
+  Test.FW: "Think about Floating forwards.",
+  Test.BW: "Think about Floating backwards.",
+  Test.RT: "Think about Floating to the right.",
+  Test.LF: "Think about Floating to the left.",
 }
 
 
@@ -61,11 +62,14 @@ def main():
 
   last_test_name = None
   while datetime.now() < end:
-    shuffled = dict(random.shuffle(list(test_desc.items())))
+    shuffled_items = list(test_desc.items())
+    random.shuffle(shuffled_items)
+    shuffled = dict(shuffled_items)
 
     if last_test_name == shuffled[0][0]:
       while last_test_name == shuffled[0][0]:
-        shuffled = dict(random.shuffle(list(test_desc.items())))
+        random.shuffle(shuffled_items)
+        shuffled = dict(shuffled_items)
 
     for name, text in shuffled.items():
       print("Collecting data for: " + name + " Displaying Text:", text)
