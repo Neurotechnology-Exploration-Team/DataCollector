@@ -26,9 +26,6 @@ test_desc = {
 
 
 def main():
-  # Initialize streams & GUI
-
-
   try: 
     if argv[1] == "-h" or argv[1] == "--help":
       print("\tusage: uv run main.py <participant name> <trial #> <# of mins>")
@@ -36,7 +33,7 @@ def main():
 
   try: participant_name = argv[1]
   except:
-    participant_name = input("Enter the participant name (e.g. John Doe): ")
+    participant_name = input("Enter the participant name (e.g. John Doe): ") or "Participant"
     participant_name = ' '.join(word[0].upper() + word[1:].lower() if len(word) > 0 else word for word in participant_name.split())
     participant_name = re.sub(re.compile(r" "), "_", participant_name)
     participant_name = re.sub(re.compile(r"[^a-zA-Z0-9_]"), "", participant_name)
@@ -69,8 +66,8 @@ def main():
     random.shuffle(shuffled_items)
     shuffled = dict(shuffled_items)
 
-    if last_test_name == shuffled[0][0]:
-      while last_test_name == shuffled[0][0]:
+    if last_test_name == shuffled_items[0][0]:
+      while last_test_name == shuffled_items[0][0]:
         random.shuffle(shuffled_items)
         shuffled = dict(shuffled_items)
 
