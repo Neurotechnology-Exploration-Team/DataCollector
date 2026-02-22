@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 import random
 import re
 from time import sleep
@@ -27,10 +27,12 @@ test_desc = {
 
 def main():
   # Initialize streams & GUI
-  LSL.init_lsl_stream()
 
-  if argv[1] == "-h" or argv[1] == "--help":
-    print("\tusage: uv run main.py <participant name> <trial #> <# of mins>")
+
+  try: 
+    if argv[1] == "-h" or argv[1] == "--help":
+      print("\tusage: uv run main.py <participant name> <trial #> <# of mins>")
+  except: pass
 
   try: participant_name = argv[1]
   except:
@@ -40,10 +42,10 @@ def main():
     participant_name = re.sub(re.compile(r"[^a-zA-Z0-9_]"), "", participant_name)
 
   try: trial_num = int(argv[2])
-  except: trial_num = input("Enter the trial number (e.g. 1): ")
+  except: trial_num = int(input("Enter the trial number (e.g. 1): "))
 
   try: mins = int(argv[3])
-  except: mins = input("Enter the number of minutes you are planning on collecting data: ")
+  except: mins = int(input("Enter the number of minutes you are planning on collecting data: "))
 
   test_data_path = path.join(config.SAVED_DATA_PATH, participant_name, f"trial{str(trial_num).zfill(2)}.csv")
   makedirs(path.dirname(test_data_path), exist_ok=True)
@@ -52,8 +54,9 @@ def main():
   print(f"Data will be saved to: {test_data_path}\n")
 
   start = datetime.now()
-  end = start + datetime.timedelta(minutes=mins)
+  end = start + timedelta(minutes=mins)
 
+  LSL.init_lsl_stream()
   window = create_fullscreen_window("NXT Data Collector")
   LSL.start_collection()
 
