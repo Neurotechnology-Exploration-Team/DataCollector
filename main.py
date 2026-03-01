@@ -5,7 +5,6 @@ from time import sleep
 from sys import argv
 from LSL import LSL
 import tkinter as tk
-from tkinter import font
 from os import path, makedirs
 from PIL import Image, ImageTk
 import config
@@ -24,12 +23,42 @@ test_desc = {
   Test.LF: "assets/Left.png",
 }
 
+test_data_path = ""
+
+def stop_collection(window: tk.Tk):
+  print("Data collection complete. Stopping collection and saving data.")
+  LSL.stop_label()
+  LSL.stop_collection(test_data_path)
+  window.destroy()
+  exit()
+
+def run_task(canvas: tk.Canvas, fixation: int, time: int, rest: int, img_path: str, label: str):
+  print("Collecting data for: " + label)
+
+  LSL.start_label(label + "_fixation")
+  add_image_to_window(canvas, "assets/Fixation.png")
+  canvas.update()
+  sleep(fixation)
+
+  LSL.start_label(label)
+  add_image_to_window(canvas, img_path)
+  canvas.update()
+  sleep(time)
+
+  canvas.delete("all")
+  LSL.start_label(label + "_rest")
+  canvas.update()
+  sleep(rest)
 
 def main():
-  try: 
+  try:
     if argv[1] == "-h" or argv[1] == "--help":
       print("\tusage: uv run main.py <participant name> <trial #> <# of mins>")
   except: pass
+
+  print("Welcome to the NXT Data Collector!")
+  print("This program will collect data for the NXT dataset. You can specify the participant name, trial number, and duration of data collection as command line arguments or input them when prompted.\n")
+  print("Starting configuration. Press Enter to use default values.")
 
   try: participant_name = argv[1]
   except:
@@ -39,13 +68,13 @@ def main():
     participant_name = re.sub(re.compile(r"[^a-zA-Z0-9_]"), "", participant_name)
 
   try: trial_num = int(argv[2])
-  except: trial_num = int(input("Enter the trial number (e.g. 1): "))
+  except: trial_num = int(input("Enter the trial number (default = 1): ") or 1)
 
   try: mins = int(argv[3])
-  except: mins = int(input("Enter the number of minutes you are planning on collecting data: "))
+  except: mins = int(input("Enter the number of minutes you are planning on collecting data (default = 10): ") or 10)
 
-  test_data_path = path.join(config.SAVED_DATA_PATH, participant_name, f"trial{str(trial_num).zfill(2)}.csv")
-  makedirs(path.dirname(test_data_path), exist_ok=True)
+  test_data_path = path.join(config.SAVED_DATA_PATH, participant_name, f"trial{str(trial_num).zfill(2)}/")
+  makedirs(test_data_path, exist_ok=True)
 
   print(f"Participant: {participant_name}, Trial: {trial_num}, Duration: {mins} minutes")
   print(f"Data will be saved to: {test_data_path}\n")
@@ -73,16 +102,9 @@ def main():
         shuffled = dict(shuffled_items)
 
     for name, img_path in shuffled.items():
-      print("Collecting data for: " + name)
-      LSL.start_label(name)
-      add_image_to_window(window[1], img_path)
-      window[0].update()
-      sleep(10)
+      run_task(window[1], fixation=3, time=4, rest=2, img_path=img_path, label=name)
 
-  print("Data collection complete. Stopping collection and saving data.")
-  LSL.stop_label()
-  LSL.stop_collection(test_data_path)
-  window[0].destroy()
+  stop_collection(window[0])
 
 
 def create_fullscreen_window(title: str):
@@ -96,7 +118,7 @@ def create_fullscreen_window(title: str):
   screen_height = root.winfo_screenheight()
 
   root.geometry(f"{screen_width}x{screen_height}+{screen_width}+0")
-  root.bind('<Escape>', lambda: root.destroy())
+  root.bind('<Escape>', lambda: (root.destroy(), stop_collection(root)))
 
   canvas = tk.Canvas(root, width=screen_width, height=screen_height, bg='black')
   canvas.pack(expand=True, fill=tk.BOTH)  # Add a black canvas to cover the entire window
