@@ -76,6 +76,7 @@ def main():
       LSL.start_label(name)
       add_text_to_window(window[1], text)
       window[0].update()
+      sleep(10)
 
   print("Data collection complete. Stopping collection and saving data.")
   LSL.stop_label()
