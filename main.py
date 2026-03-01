@@ -7,6 +7,7 @@ from LSL import LSL
 import tkinter as tk
 from tkinter import font
 from os import path, makedirs
+from PIL import Image, ImageTk
 import config
 
 
@@ -17,10 +18,10 @@ class Test:
   LF = "left"
 
 test_desc = {
-  Test.FW: "Think about Floating forwards.",
-  Test.BW: "Think about Floating backwards.",
-  Test.RT: "Think about Floating to the right.",
-  Test.LF: "Think about Floating to the left.",
+  Test.FW: "assets/Up.png",
+  Test.BW: "assets/Down.png",
+  Test.RT: "assets/Right.png",
+  Test.LF: "assets/Left.png",
 }
 
 
@@ -71,10 +72,10 @@ def main():
         random.shuffle(shuffled_items)
         shuffled = dict(shuffled_items)
 
-    for name, text in shuffled.items():
-      print("Collecting data for: " + name + "\nDisplaying Text:", text)
+    for name, img_path in shuffled.items():
+      print("Collecting data for: " + name)
       LSL.start_label(name)
-      add_text_to_window(window[1], text)
+      add_image_to_window(window[1], img_path)
       window[0].update()
       sleep(10)
 
@@ -103,13 +104,16 @@ def create_fullscreen_window(title: str):
   return (root, canvas)
 
 
-def add_text_to_window(canvas: tk.Canvas, text: str, font_size: int = 40):
+def add_image_to_window(canvas: tk.Canvas, img_path: str):
   """
-  Places text in the middle of the window canvas with the specified font size. replaces text that is there already if it exists.
+  Displays an image centered on the canvas. Replaces existing image if present.
   """
-  canvas.delete("all")  # Clear existing text
-  custom_font = font.Font(family="Helvetica", size=font_size, weight="bold")
-  canvas.create_text(canvas.winfo_width() // 2, canvas.winfo_height() // 2, text=text, fill="white", font=custom_font)
+  canvas.delete("all")
+  img = Image.open(img_path)
+  img.thumbnail((canvas.winfo_width(), canvas.winfo_height()), Image.Resampling.LANCZOS)
+  photo = ImageTk.PhotoImage(img)
+  canvas.image = photo
+  canvas.create_image(canvas.winfo_width() // 2, canvas.winfo_height() // 2, image=photo)
   return canvas
 
 
