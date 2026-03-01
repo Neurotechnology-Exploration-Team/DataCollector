@@ -24,7 +24,6 @@ test_desc = {
 }
 
 
-
 def main():
   try: 
     if argv[1] == "-h" or argv[1] == "--help":
@@ -58,6 +57,7 @@ def main():
   LSL.start_collection()
 
   # Sleep for five seconds to gather some rest data
+  window[0].update()
   sleep(5)
 
   last_test_name = None
@@ -72,12 +72,10 @@ def main():
         shuffled = dict(shuffled_items)
 
     for name, text in shuffled.items():
-      print("Collecting data for: " + name + " Displaying Text:", text)
+      print("Collecting data for: " + name + "\nDisplaying Text:", text)
       LSL.start_label(name)
       add_text_to_window(window[1], text)
-      sleep(15)
-
-    last_test_name = name
+      window[0].update()
 
   print("Data collection complete. Stopping collection and saving data.")
   LSL.stop_label()
@@ -100,7 +98,7 @@ def create_fullscreen_window(title: str):
 
   canvas = tk.Canvas(root, width=screen_width, height=screen_height, bg='black')
   canvas.pack(expand=True, fill=tk.BOTH)  # Add a black canvas to cover the entire window
-
+  root.update()
   return (root, canvas)
 
 
